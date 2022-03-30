@@ -1,23 +1,13 @@
 import maplibregl from "maplibre-gl";
 import axios from "axios";
-import { buildPoint, buildRoutelines, buildSnaplines } from "./utils";
-import layers from "./layers";
+import { buildOptions, buildPoint, buildRoutelines, buildSnaplines, roundToN } from "./utils";
 import { Feature, FeatureCollection, LineString, Point } from "geojson";
-import { Directions, MaplibreGlDirectionsOptions } from "./types";
-
-const defaultOptions: MaplibreGlDirectionsOptions = {
-  layers,
-  sensitiveWaypointLayers: ["directions-waypoint", "directions-waypoint-casing"],
-  sensitiveSnappointLayers: ["directions-snappoint", "directions-snappoint-casing"],
-  sensitiveRoutelineLayers: ["directions-routeline", "directions-routeline-casing"],
-  sensitiveAltRoutelineLayers: ["directions-alt-routeline", "directions-alt-routeline-casing"],
-  dragThreshold: 10,
-};
+import { DefaultMaplibreGlDirectionsOptions, Directions, MaplibreGlDirectionsOptions } from "./types";
 
 export default class MaplibreGlDirections {
-  constructor(map: maplibregl.Map, options: Partial<MaplibreGlDirectionsOptions> = {}) {
+  constructor(map: maplibregl.Map, options: Partial<MaplibreGlDirectionsOptions>) {
     this.map = map;
-    this.options = Object.assign({}, defaultOptions, options);
+    this.options = buildOptions(options);
 
     /**
      * Bind the event listeners to `this` since e.g. `map.off("type", onMove)` won't work if it was registered
@@ -49,23 +39,36 @@ export default class MaplibreGlDirections {
   private hoverpoint: Feature<Point> | undefined = undefined;
 
   private get waypointsCoordinates(): [number, number][] {
-    return this.waypoints.map((waypoint) => {
-      return [waypoint.geometry.coordinates[0], waypoint.geometry.coordinates[1]];
-    });
+    if (!this.options.request.geometries || this.options.request.geometries === "polyline") {
+      return this.waypoints.map((waypoint) => {
+        return [roundToN(waypoint.geometry.coordinates[0], 5), roundToN(waypoint.geometry.coordinates[1], 5)];
+      });
+    } else {
+      return this.waypoints.map((waypoint) => {
+        return [waypoint.geometry.coordinates[0], waypoint.geometry.coordinates[1]];
+      });
+    }
   }
 
   private get snappointsCoordinates(): [number, number][] {
-    return this.snappoints.map((snappoint) => {
-      return [snappoint.geometry.coordinates[0], snappoint.geometry.coordinates[1]];
-    });
+    if (!this.options.request.geometries || this.options.request.geometries === "polyline") {
+      return this.snappoints.map((snappoint) => {
+        return [roundToN(snappoint.geometry.coordinates[0], 5), roundToN(snappoint.geometry.coordinates[1], 5)];
+      });
+    } else {
+      return this.snappoints.map((snappoint) => {
+        return [snappoint.geometry.coordinates[0], snappoint.geometry.coordinates[1]];
+      });
+    }
   }
 
   private get snaplines(): Feature<LineString>[] {
     return buildSnaplines(
       this.waypointsCoordinates,
       this.snappointsCoordinates,
-      this.hoverpoint?.geometry.coordinates as [number, number] | undefined,
       this.departSnappointIndex,
+      this.hoverpoint?.geometry.coordinates as [number, number] | undefined,
+      this.hoverpoint?.properties?.showSnaplines,
     );
   }
 
@@ -74,6 +77,7 @@ export default class MaplibreGlDirections {
       type: "geojson",
       data: {
         type: "FeatureCollection",
+        lineMetrics: true,
         features: [],
       } as FeatureCollection,
     };
@@ -96,18 +100,18 @@ export default class MaplibreGlDirections {
   private async fetchDirections() {
     this.interactive = false;
 
-    const options = [
-      "access_token=pk.eyJ1IjoiZXhhbXBsZXMiLCJhIjoiY2p0MG01MXRqMW45cjQzb2R6b2ptc3J4MSJ9.zA2W0IkI0c6KaAhJfk9bWg",
-      "overview=full",
-      "geometries=polyline6",
-      "steps=true",
-      "alternatives=true",
-    ];
-
     if (this.waypoints.length >= 2) {
+      const options = Object.entries(this.options.request).reduce((acc, [key, value]) => {
+        if (!(key in DefaultMaplibreGlDirectionsOptions.request)) {
+          acc = acc.concat(`${key}=${value}`);
+        }
+
+        return acc;
+      }, [] as string[]);
+
       const { routes, waypoints: snappoints } = (
         await axios.get<Directions>(
-          `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${this.waypointsCoordinates
+          `${this.options.request.api}${this.options.request.profile}/${this.waypointsCoordinates
             .map((waypoint) => waypoint.join(","))
             .join(";")}?${options.join("&")}`,
         )
@@ -117,7 +121,13 @@ export default class MaplibreGlDirections {
         return buildPoint(snappoint.location, "SNAPPOINT");
       });
 
-      this.routelines = buildRoutelines(routes, this.selectedRouteIndex);
+      this.routelines = buildRoutelines(
+        routes,
+        this.selectedRouteIndex,
+        this.snappointsCoordinates,
+        this.options.request,
+      );
+
       if (routes.length <= this.selectedRouteIndex) this.selectedRouteIndex = 0;
     } else {
       this.snappoints = [];
@@ -171,8 +181,30 @@ export default class MaplibreGlDirections {
     }
   }
 
-  private highlightedWaypoint: Feature<Point> | undefined;
-  private highlightedSnappoint: Feature<Point> | undefined;
+  private highlightedWaypoints: Feature<Point>[] = [];
+  private highlightedSnappoints: Feature<Point>[] = [];
+
+  private deHighlight() {
+    this.highlightedWaypoints.forEach((waypoint) => {
+      if (waypoint?.properties) {
+        waypoint.properties.highlight = false;
+      }
+    });
+
+    this.highlightedSnappoints.forEach((snappoint) => {
+      if (snappoint?.properties) {
+        snappoint.properties.highlight = false;
+      }
+    });
+
+    this.routelines.forEach((routeline) => {
+      routeline.forEach((leg) => {
+        if (leg.properties) {
+          leg.properties.highlight = false;
+        }
+      });
+    });
+  }
 
   private onMove(e: maplibregl.MapMouseEvent) {
     const feature: (Feature & { layer: { id: string } }) | undefined = this.map.queryRenderedFeatures(e.point, {
@@ -187,24 +219,7 @@ export default class MaplibreGlDirections {
     /**
      * De-highlight everything first in order to be able to highlight only the necessary stuff.
      */
-
-    if (this.highlightedWaypoint?.properties) {
-      this.highlightedWaypoint.properties.highlight = false;
-      this.highlightedWaypoint = undefined;
-    }
-
-    if (this.highlightedSnappoint?.properties) {
-      this.highlightedSnappoint.properties.highlight = false;
-      this.highlightedSnappoint = undefined;
-    }
-
-    this.routelines.forEach((routeline) => {
-      routeline.forEach((leg) => {
-        if (leg.properties) {
-          leg.properties.highlight = false;
-        }
-      });
-    });
+    this.deHighlight();
 
     if (this.options.sensitiveWaypointLayers.includes(feature?.layer.id ?? "")) {
       /**
@@ -222,15 +237,15 @@ export default class MaplibreGlDirections {
         return waypoint.properties?.id === feature?.properties?.id;
       });
 
-      this.highlightedWaypoint = this.waypoints[highlightedWaypointIndex];
-      this.highlightedSnappoint = this.snappoints[highlightedWaypointIndex];
+      this.highlightedWaypoints = [this.waypoints[highlightedWaypointIndex]];
+      this.highlightedSnappoints = [this.snappoints[highlightedWaypointIndex]];
 
-      if (this.highlightedWaypoint?.properties) {
-        this.highlightedWaypoint.properties.highlight = true;
+      if (this.highlightedWaypoints[0]?.properties) {
+        this.highlightedWaypoints[0].properties.highlight = true;
       }
 
-      if (this.highlightedSnappoint?.properties) {
-        this.highlightedSnappoint.properties.highlight = true;
+      if (this.highlightedSnappoints[0]?.properties) {
+        this.highlightedSnappoints[0].properties.highlight = true;
       }
 
       if (this.hoverpoint) this.hoverpoint = undefined;
@@ -248,15 +263,15 @@ export default class MaplibreGlDirections {
         return snappoint.properties?.id === feature?.properties?.id;
       });
 
-      this.highlightedSnappoint = this.snappoints[highlightedSnappointIndex];
-      this.highlightedWaypoint = this.waypoints[highlightedSnappointIndex];
+      this.highlightedSnappoints = [this.snappoints[highlightedSnappointIndex]];
+      this.highlightedWaypoints = [this.waypoints[highlightedSnappointIndex]];
 
-      if (this.highlightedSnappoint?.properties) {
-        this.highlightedSnappoint.properties.highlight = true;
+      if (this.highlightedSnappoints[0].properties) {
+        this.highlightedSnappoints[0].properties.highlight = true;
       }
 
-      if (this.highlightedWaypoint?.properties) {
-        this.highlightedWaypoint.properties.highlight = true;
+      if (this.highlightedWaypoints[0].properties) {
+        this.highlightedWaypoints[0].properties.highlight = true;
       }
 
       if (this.hoverpoint) this.hoverpoint = undefined;
@@ -292,9 +307,9 @@ export default class MaplibreGlDirections {
       this.map.getCanvas().style.cursor = "pointer";
 
       this.routelines.forEach((routeline) => {
-        routeline.forEach((segment) => {
-          if (segment.properties && segment.properties?.id === feature?.properties?.id) {
-            segment.properties.highlight = true;
+        routeline.forEach((leg) => {
+          if (leg.properties && leg.properties?.id === feature?.properties?.id) {
+            leg.properties.highlight = true;
           }
         });
       });
@@ -316,11 +331,12 @@ export default class MaplibreGlDirections {
   private dragDownPosition: { x: number; y: number } = { x: 0, y: 0 };
   private waypointBeingDragged?: Feature<Point>;
   private waypointBeingDraggedInitialCoordinates?: [number, number];
-  private departSnappointIndex?: number;
-  private departSnappoint?: Feature<Point>;
-  private arriveSnappoint?: Feature<Point>;
+  private departSnappointIndex = -1;
 
-  private onDragDown(e: maplibregl.MapMouseEvent) {
+  private onDragDown(e: maplibregl.MapMouseEvent | maplibregl.MapTouchEvent) {
+    if (e.type === "touchstart" && e.originalEvent.touches.length !== 1) return;
+    if (e.type === "mousedown" && e.originalEvent.which !== 1) return;
+
     const feature: (Feature & { layer: { id: string } }) | undefined = this.map.queryRenderedFeatures(e.point, {
       layers: [...this.options.sensitiveWaypointLayers, ...this.options.sensitiveRoutelineLayers],
     })[0];
@@ -344,29 +360,38 @@ export default class MaplibreGlDirections {
         | undefined;
     } else if (this.options.sensitiveRoutelineLayers.includes(feature?.layer.id ?? "")) {
       /**
-       * When a routeline (a leg in particular) is being dragged, find its respective depart and arrive snappoints and
-       * the depart-point's index and save them outside.
+       * the "touchstart" event ("mousemove" equivalent) is not always fired before this `onDragDown` (which is also the
+       * "touchstart"), therefore the hoverpoint might not exist yet. If it indeed does not, then create it and then
+       * enable showing its snaplines.
        */
-      this.departSnappointIndex = this.snappointsCoordinates.findIndex((snappoint) => {
-        const { lng: departLng, lat: departLat } = JSON.parse(feature?.properties?.depart);
-        return snappoint[0] === departLng && snappoint[1] === departLat;
-      });
+      if (this.hoverpoint) {
+        this.hoverpoint.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
+      } else {
+        this.hoverpoint = buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT");
+      }
 
-      this.departSnappoint = this.snappoints[this.departSnappointIndex];
+      if (this.hoverpoint.properties) {
+        this.hoverpoint.properties.showSnaplines = true;
+      }
 
-      const arriveSnappointIndex = this.snappointsCoordinates.findIndex((snappoint) => {
-        const { lng: arriveLng, lat: arriveLat } = JSON.parse(feature?.properties?.arrive);
-        return snappoint[0] === arriveLng && snappoint[1] === arriveLat;
-      });
-
-      this.arriveSnappoint = this.snappoints[arriveSnappointIndex];
+      /**
+       * When a routeline (a leg in particular) is being dragged, find its respective depart snappoint's index and save
+       * it outside.
+       */
+      this.departSnappointIndex = JSON.parse(feature?.properties?.legIndex);
 
       /**
        * Highlight the respective leg's depart and arrive snappoints.
        */
-      if (this.departSnappoint.properties && this.arriveSnappoint.properties) {
-        this.departSnappoint.properties.highlight = true;
-        this.arriveSnappoint.properties.highlight = true;
+      if (~this.departSnappointIndex && this.snappoints[this.departSnappointIndex]?.properties) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        this.snappoints[this.departSnappointIndex].properties.highlight = true;
+        this.highlightedSnappoints.push(this.snappoints[this.departSnappointIndex]);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        this.snappoints[this.departSnappointIndex + 1].properties.highlight = true;
+        this.highlightedSnappoints.push(this.snappoints[this.departSnappointIndex + 1]);
       }
     }
 
@@ -379,15 +404,27 @@ export default class MaplibreGlDirections {
     /**
      * Add specific drag-only listeners.
      */
-    this.map.on("mousemove", this.onDragMoveHandler);
-    this.map.on("mouseup", this.onDragUpHandler);
-    this.map.on("touchmove", this.onDragMoveHandler);
-    this.map.on("touchend", this.onDragUpHandler);
+    if (e.type === "touchstart") {
+      this.map.on("touchmove", this.onDragMoveHandler);
+      this.map.on("touchend", this.onDragUpHandler);
+    } else if (e.type === "mousedown") {
+      this.map.on("mousemove", this.onDragMoveHandler);
+      this.map.on("mouseup", this.onDragUpHandler);
+    }
 
     this.draw();
   }
 
-  private onDragMove(e: maplibregl.MapMouseEvent) {
+  private onDragMove(e: maplibregl.MapMouseEvent | maplibregl.MapTouchEvent) {
+    // TODO: remove ts-ignores when https://github.com/maplibre/maplibre-gl-js/pull/1131 is merged
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    if (e.type === "touchmove") e.originalEvent.preventDefault();
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    if (e.type === "touchmove" && e.originalEvent.touches.length !== 1) return;
+    if (e.type === "mousemove" && e.originalEvent.which !== 1) return;
+
     if (this.waypointBeingDragged) {
       /**
        * If it's a waypoint that's being dragged then update accordingly its coordinates.
@@ -400,17 +437,19 @@ export default class MaplibreGlDirections {
        */
 
       this.hoverpoint.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
-    } else {
-      this.hoverpoint = buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT");
     }
 
     this.draw();
   }
 
-  private onDragUp(e: maplibregl.MapMouseEvent) {
+  private onDragUp(e: maplibregl.MapMouseEvent | maplibregl.MapTouchEvent) {
+    if (e.type === "mouseup" && e.originalEvent.which !== 1) return;
+
+    if (this.hoverpoint?.properties) this.hoverpoint.properties.showSnaplines = false;
+
     /**
-     * Only add a new waypoint if the mouse has been dragged for more than the specified threshold. If the specified
-     * threshold's value is less than zero then treat is at if it was zero.
+     * Only add a new waypoint of change the dragged one's position if the mouse has been dragged for more than the
+     * specified threshold. If the specified threshold's value is less than zero then treat is at if it was zero.
      */
     if (
       Math.abs(e.point.x - this.dragDownPosition?.x) >
@@ -439,25 +478,13 @@ export default class MaplibreGlDirections {
         );
 
         /**
-         * De-highlight the previously-highlighted related snappoints.
-         */
-        if (this.departSnappoint?.properties && this.arriveSnappoint?.properties) {
-          this.departSnappoint.properties.highlight = false;
-          this.departSnappoint = undefined;
-
-          this.arriveSnappoint.properties.highlight = false;
-          this.arriveSnappoint = undefined;
-        }
-
-        /**
          * Remove the hoverpoint and nullify the departSnappoint's index
          */
         this.hoverpoint = undefined;
-        this.departSnappointIndex = undefined;
       }
     } else {
       /**
-       * If the waypoint has been dragged not far enough, restore its initial location.
+       * If the waypoint or the selected routeline has been dragged not far enough, restore its initial location.
        */
 
       if (this.waypointBeingDragged && this.waypointBeingDraggedInitialCoordinates) {
@@ -465,16 +492,26 @@ export default class MaplibreGlDirections {
 
         this.waypointBeingDragged = undefined;
         this.waypointBeingDraggedInitialCoordinates = undefined;
+      } else if (this.hoverpoint) {
+        this.hoverpoint = undefined;
       }
     }
 
     /**
+     * De-highlight everything.
+     */
+    this.deHighlight();
+
+    /**
      * Remove the specifically assigned for the drag-related events listeners.
      */
-    this.map.off("mousemove", this.onDragMoveHandler);
-    this.map.off("mouseup", this.onDragUpHandler);
-    this.map.off("touchmove", this.onDragMoveHandler);
-    this.map.off("touchend", this.onDragUpHandler);
+    if (e.type === "touchend") {
+      this.map.off("touchmove", this.onDragMoveHandler);
+      this.map.off("touchend", this.onDragUpHandler);
+    } else if (e.type === "mouseup") {
+      this.map.off("mousemove", this.onDragMoveHandler);
+      this.map.off("mouseup", this.onDragUpHandler);
+    }
 
     /**
      * Restore the removed global `onMove` listeners.
@@ -541,6 +578,8 @@ export default class MaplibreGlDirections {
     this.draw(false);
   }
 
+  // public interface begins here
+
   get interactive() {
     return this._interactive;
   }
@@ -549,17 +588,17 @@ export default class MaplibreGlDirections {
     this._interactive = interactive;
 
     if (interactive) {
+      this.map.on("touchstart", this.onMoveHandler);
+      this.map.on("touchstart", this.onDragDownHandler);
       this.map.on("mousemove", this.onMoveHandler);
       this.map.on("mousedown", this.onDragDownHandler);
       this.map.on("click", this.onClickHandler);
-      this.map.on("touchstart", this.onMoveHandler);
-      this.map.on("touchstart", this.onDragDownHandler);
     } else {
+      this.map.off("touchstart", this.onMoveHandler);
+      this.map.off("touchstart", this.onDragDownHandler);
       this.map.off("mousemove", this.onMoveHandler);
       this.map.off("mousedown", this.onDragDownHandler);
       this.map.off("click", this.onClickHandler);
-      this.map.off("touchstart", this.onMoveHandler);
-      this.map.off("touchstart", this.onDragDownHandler);
     }
   }
 
@@ -586,5 +625,10 @@ export default class MaplibreGlDirections {
 
     this.draw();
     await this.fetchDirections();
+  }
+
+  clearRoutes() {
+    this.setWaypoints([]);
+    this.routelines = [];
   }
 }

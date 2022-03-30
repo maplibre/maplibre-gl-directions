@@ -1,5 +1,15 @@
 <template>
-  <div ref="mapRef" class="h-full" />
+  <div class="flex flex-col h-full">
+    <div class="p-4 flex gap-2">
+      <label class="flex gap-2 items-center">
+        <input v-model="interactive" type="checkbox" />
+        <span>Interactive</span>
+      </label>
+
+      <button :disabled="!directions" @click="clearRoutes">Clear Routes</button>
+    </div>
+    <div ref="mapRef" class="h-full" />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -8,7 +18,6 @@
   import type { Map } from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
   import style from "./assets/map/style.json";
-  // import as module but configure vite config to resolve module from dist
   import MaplibreGlDirections from "../src/main";
 
   const mapRef = ref();
@@ -27,16 +36,36 @@
     });
   });
 
-  eventuallyMap.then((map) => {
-    // map.on("click", (e) => {
-    //   console.log(e.lngLat);
-    // });
-    const directions = new MaplibreGlDirections(map);
-    directions.interactive = true;
+  const interactive = ref(true);
 
-    // setTimeout(() => {
-    //   directions.interactive = false;
-    // }, 6000);
-    // map.addControl(new MaplibreGlDirectionsControl());
+  watch(interactive, () => {
+    directions.value.interactive = interactive.value;
   });
+
+  const directions = ref();
+
+  eventuallyMap.then((map) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+
+    directions.value = new MaplibreGlDirections(map, {
+      request: {
+        access_token:
+          "pk.eyJ1Ijoic21lbGx5c2hvdmVsIiwiYSI6ImNsMWI3ZjByczFuYmUzanBmeWMxemQ1MzQifQ.stv4tSZc_8ProkPWVNb31A",
+        annotations: "congestion_numeric",
+        geometries: "polyline6",
+      },
+    });
+
+    directions.value.interactive = interactive.value;
+
+    // directions.value.on("interactive", ({ interactive }) => {
+    //   interactive.value = interactive;
+    // });
+  });
+
+  function clearRoutes() {
+    directions.value.clearRoutes();
+  }
 </script>
