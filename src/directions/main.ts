@@ -123,7 +123,7 @@ export default class MaplibreGlDirections {
 
         const response = (
           await axios.post<Directions>(
-            `${this.options.request.api}${this.options.request.profile}${
+            `${this.options.request.api}/${this.options.request.profile}${
               this.options.request.access_token ? `?access_token=${this.options.request.access_token}` : ""
             }`,
             // the URLSearchParams constructor perfectly works with the FormData, so ignore the TypeScript's complaint
@@ -144,7 +144,7 @@ export default class MaplibreGlDirections {
         // eslint-disable-next-line no-var
         const response = (
           await axios.get<Directions>(
-            `${this.options.request.api}${this.options.request.profile}/${this.waypointsCoordinates
+            `${this.options.request.api}/${this.options.request.profile}/${this.waypointsCoordinates
               .map((waypoint) => waypoint.join(","))
               .join(";")}?${options.join("&")}`,
           )

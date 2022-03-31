@@ -58,7 +58,7 @@
         // geometries: "polyline6",
         // overview: "full",
       },
-      // makePostRequest: true,
+      makePostRequest: true,
     });
 
     directions.value.interactive = interactive.value;

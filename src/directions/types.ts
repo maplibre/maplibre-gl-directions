@@ -19,7 +19,7 @@ export interface MaplibreGlDirectionsOptions {
 
 export const DefaultMaplibreGlDirectionsOptions: Omit<MaplibreGlDirectionsOptions, "layers"> = {
   request: {
-    api: "https://api.mapbox.com/directions/v5/",
+    api: "https://api.mapbox.com/directions/v5",
     profile: "mapbox/driving-traffic",
   },
   makePostRequest: false,
