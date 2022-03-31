@@ -1,6 +1,6 @@
 import type { Feature, FeatureCollection, LineString, Point } from "geojson";
 import type maplibregl from "maplibre-gl";
-import type { Directions, MaplibreGlDirectionsOptions } from "./types";
+import type { Directions, MaplibreGlDirectionsOptions, Route, Waypoint } from "./types";
 import axios from "axios";
 import { buildOptions, buildPointFactory, buildRoutelinesFactory, buildSnaplinesFactory } from "./utils";
 import { DefaultMaplibreGlDirectionsOptions } from "./types";
@@ -105,13 +105,54 @@ export default class MaplibreGlDirections {
         return acc;
       }, [] as string[]);
 
-      const { routes, waypoints: snappoints } = (
-        await axios.get<Directions>(
-          `${this.options.request.api}${this.options.request.profile}/${this.waypointsCoordinates
-            .map((waypoint) => waypoint.join(","))
-            .join(";")}?${options.join("&")}`,
-        )
-      ).data;
+      let snappoints: Waypoint[];
+      let routes: Route[];
+
+      if (this.options.makePostRequest) {
+        options.push(`coordinates=${this.waypointsCoordinates.map((waypoint) => waypoint.join(",")).join(";")}`);
+
+        const formData = new FormData();
+
+        options.forEach((option) => {
+          const [key, value] = option.split("=");
+
+          if (key !== "access_token") {
+            formData.set(key, value);
+          }
+        });
+
+        const response = (
+          await axios.post<Directions>(
+            `${this.options.request.api}${this.options.request.profile}${
+              this.options.request.access_token ? `?access_token=${this.options.request.access_token}` : ""
+            }`,
+            // the URLSearchParams constructor perfectly works with the FormData, so ignore the TypeScript's complaint
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            new URLSearchParams(formData),
+            {
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+            },
+          )
+        ).data;
+
+        snappoints = response.waypoints;
+        routes = response.routes;
+      } else {
+        // eslint-disable-next-line no-var
+        const response = (
+          await axios.get<Directions>(
+            `${this.options.request.api}${this.options.request.profile}/${this.waypointsCoordinates
+              .map((waypoint) => waypoint.join(","))
+              .join(";")}?${options.join("&")}`,
+          )
+        ).data;
+
+        snappoints = response.waypoints;
+        routes = response.routes;
+      }
 
       this.snappoints = snappoints.map((snappoint) => this.buildPoint(snappoint.location, "SNAPPOINT"));
       this.routelines = this.buildRoutelines(routes, this.selectedRouteIndex, this.snappointsCoordinates);
