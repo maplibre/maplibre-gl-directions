@@ -6,6 +6,7 @@ export interface MaplibreGlDirectionsOptions {
   request: {
     [requestOption: string]: unknown;
   };
+  makePostRequest: boolean;
   layers: LayerSpecification[];
   pointsScalingFactor: number;
   linesScalingFactor: number;
@@ -21,6 +22,7 @@ export const DefaultMaplibreGlDirectionsOptions: Omit<MaplibreGlDirectionsOption
     api: "https://api.mapbox.com/directions/v5/",
     profile: "mapbox/driving-traffic",
   },
+  makePostRequest: false,
   pointsScalingFactor: 1,
   linesScalingFactor: 1,
   sensitiveWaypointLayers: ["directions-waypoint", "directions-waypoint-casing"],
@@ -64,3 +66,5 @@ export interface Step {
 export interface Waypoint {
   location: [number, number];
 }
+
+export type PointType = "WAYPOINT" | "SNAPPOINT" | "HOVERPOINT";

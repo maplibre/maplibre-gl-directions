@@ -1,15 +1,20 @@
-import maplibregl from "maplibre-gl";
+import type { Feature, FeatureCollection, LineString, Point } from "geojson";
+import type maplibregl from "maplibre-gl";
+import type { Directions, MaplibreGlDirectionsOptions } from "./types";
 import axios from "axios";
-import { buildOptions, buildPoint, buildRoutelines, buildSnaplines, roundToN } from "./utils";
-import { Feature, FeatureCollection, LineString, Point } from "geojson";
-import { DefaultMaplibreGlDirectionsOptions, Directions, MaplibreGlDirectionsOptions } from "./types";
+import { buildOptions, buildPointFactory, buildRoutelinesFactory, buildSnaplinesFactory } from "./utils";
+import { DefaultMaplibreGlDirectionsOptions } from "./types";
 
 export default class MaplibreGlDirections {
-  constructor(map: maplibregl.Map, options: Partial<MaplibreGlDirectionsOptions>) {
+  constructor(map: maplibregl.Map, options?: Partial<MaplibreGlDirectionsOptions>) {
     this.map = map;
     this.options = buildOptions(options);
 
-    /**
+    this.buildPoint = buildPointFactory(this.options.request);
+    this.buildSnaplines = buildSnaplinesFactory(this.options.request);
+    this.buildRoutelines = buildRoutelinesFactory(this.options.request);
+
+    /*
      * Bind the event listeners to `this` since e.g. `map.off("type", onMove)` won't work if it was registered
      * as `map.on("type", onMove.bind(this))`. `onMove !== onMove.bind(this)`, but
      * `onMoveHandler === onMoveHandler`!
@@ -26,6 +31,9 @@ export default class MaplibreGlDirections {
   private readonly map: maplibregl.Map;
   private readonly options: MaplibreGlDirectionsOptions;
   private _interactive = false;
+  private readonly buildPoint: ReturnType<typeof buildPointFactory>;
+  private readonly buildSnaplines: ReturnType<typeof buildSnaplinesFactory>;
+  private readonly buildRoutelines: ReturnType<typeof buildRoutelinesFactory>;
   private readonly onMoveHandler: (e: maplibregl.MapMouseEvent) => void;
   private readonly onDragDownHandler: (e: maplibregl.MapMouseEvent) => void;
   private readonly onDragMoveHandler: (e: maplibregl.MapMouseEvent) => void;
@@ -39,35 +47,23 @@ export default class MaplibreGlDirections {
   private hoverpoint: Feature<Point> | undefined = undefined;
 
   private get waypointsCoordinates(): [number, number][] {
-    if (!this.options.request.geometries || this.options.request.geometries === "polyline") {
-      return this.waypoints.map((waypoint) => {
-        return [roundToN(waypoint.geometry.coordinates[0], 5), roundToN(waypoint.geometry.coordinates[1], 5)];
-      });
-    } else {
-      return this.waypoints.map((waypoint) => {
-        return [waypoint.geometry.coordinates[0], waypoint.geometry.coordinates[1]];
-      });
-    }
+    return this.waypoints.map((waypoint) => {
+      return [waypoint.geometry.coordinates[0], waypoint.geometry.coordinates[1]];
+    });
   }
 
   private get snappointsCoordinates(): [number, number][] {
-    if (!this.options.request.geometries || this.options.request.geometries === "polyline") {
-      return this.snappoints.map((snappoint) => {
-        return [roundToN(snappoint.geometry.coordinates[0], 5), roundToN(snappoint.geometry.coordinates[1], 5)];
-      });
-    } else {
-      return this.snappoints.map((snappoint) => {
-        return [snappoint.geometry.coordinates[0], snappoint.geometry.coordinates[1]];
-      });
-    }
+    return this.snappoints.map((snappoint) => {
+      return [snappoint.geometry.coordinates[0], snappoint.geometry.coordinates[1]];
+    });
   }
 
   private get snaplines(): Feature<LineString>[] {
-    return buildSnaplines(
+    return this.buildSnaplines(
       this.waypointsCoordinates,
       this.snappointsCoordinates,
-      this.departSnappointIndex,
       this.hoverpoint?.geometry.coordinates as [number, number] | undefined,
+      this.departSnappointIndex,
       this.hoverpoint?.properties?.showSnaplines,
     );
   }
@@ -117,17 +113,8 @@ export default class MaplibreGlDirections {
         )
       ).data;
 
-      this.snappoints = snappoints.map((snappoint) => {
-        return buildPoint(snappoint.location, "SNAPPOINT");
-      });
-
-      this.routelines = buildRoutelines(
-        routes,
-        this.selectedRouteIndex,
-        this.snappointsCoordinates,
-        this.options.request,
-      );
-
+      this.snappoints = snappoints.map((snappoint) => this.buildPoint(snappoint.location, "SNAPPOINT"));
+      this.routelines = this.buildRoutelines(routes, this.selectedRouteIndex, this.snappointsCoordinates);
       if (routes.length <= this.selectedRouteIndex) this.selectedRouteIndex = 0;
     } else {
       this.snappoints = [];
@@ -288,7 +275,7 @@ export default class MaplibreGlDirections {
       if (this.hoverpoint) {
         this.hoverpoint.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
       } else {
-        this.hoverpoint = buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT");
+        this.hoverpoint = this.buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT");
       }
 
       this.routelines.forEach((routeline) => {
@@ -367,7 +354,7 @@ export default class MaplibreGlDirections {
       if (this.hoverpoint) {
         this.hoverpoint.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
       } else {
-        this.hoverpoint = buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT");
+        this.hoverpoint = this.buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT");
       }
 
       if (this.hoverpoint.properties) {
@@ -604,7 +591,7 @@ export default class MaplibreGlDirections {
 
   async setWaypoints(waypoints: [number, number][]) {
     this.waypoints = waypoints.map((waypoint) => {
-      return buildPoint(waypoint, "WAYPOINT");
+      return this.buildPoint(waypoint, "WAYPOINT");
     });
 
     this.draw();
@@ -613,7 +600,7 @@ export default class MaplibreGlDirections {
 
   async addWaypoint(waypoint: [number, number], index?: number) {
     index = index ?? this.waypoints.length;
-    this.waypoints.splice(index, 0, buildPoint(waypoint, "WAYPOINT"));
+    this.waypoints.splice(index, 0, this.buildPoint(waypoint, "WAYPOINT"));
 
     this.draw();
     await this.fetchDirections();

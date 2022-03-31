@@ -53,8 +53,10 @@
       request: {
         access_token:
           "pk.eyJ1Ijoic21lbGx5c2hvdmVsIiwiYSI6ImNsMWI3ZjByczFuYmUzanBmeWMxemQ1MzQifQ.stv4tSZc_8ProkPWVNb31A",
-        annotations: "congestion_numeric",
-        geometries: "polyline6",
+        // alternatives: true,
+        // annotations: "congestion",
+        // geometries: "polyline6",
+        // overview: "full",
       },
     });
 
