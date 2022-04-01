@@ -1,9 +1,10 @@
 import type { MaplibreGlDirectionsOptions, PointType, Route } from "./types";
 import type { Feature, LineString, Point } from "geojson";
-import { DefaultMaplibreGlDirectionsOptions } from "./types";
+import { DefaultMaplibreGlDirectionsOptions, Geometry } from "./types";
 import layersFactory from "./layers";
 import { nanoid } from "nanoid";
 import { congestionLevelDecoderFactory, coordinateRounderFactory, geometryDecoderFactory } from "./helpers";
+import MaplibreGlDirections from "./main";
 
 /**
  * Takes a missing or an incomplete options object from the user and augments it with the default values.
@@ -23,6 +24,65 @@ export function buildOptions(
 }
 
 /**
+ * Creates a context-aware function that takes the waypoints' coordinates and produces a FormData instance...
+ *
+ * @param {MaplibreGlDirectionsOptions["request"]} requestOptions
+ * @returns {(waypointsCoordinates: [number, number][]) => URLSearchParams}
+ */
+export function buildPostRequestPayloadFactory(requestOptions: MaplibreGlDirectionsOptions["request"]) {
+  console.log("FACTORY CALL");
+  const newRequestPayload = Object.entries(requestOptions).reduce((acc, [key, value]) => {
+    if (!(key in DefaultMaplibreGlDirectionsOptions.request)) {
+      acc = acc.concat(`${key}=${value}`);
+    }
+
+    return acc;
+  }, [] as string[]);
+
+  function buildPostRequestPayload(waypointsCoordinates: [number, number][]): FormData {
+    newRequestPayload.push(`coordinates=${waypointsCoordinates.map((waypoint) => waypoint.join(",")).join(";")}`);
+
+    const formData = new FormData();
+
+    newRequestPayload.forEach((keyValuePair) => {
+      const [key, value] = keyValuePair.split("=");
+
+      if (key !== "access_token") {
+        formData.set(key, value);
+      }
+    });
+
+    return formData;
+  }
+
+  return buildPostRequestPayload;
+}
+
+/**
+ * Creates a context-aware function that takes the waypoints' coordinates and produces an array of "="-concatenated
+ * key-value string pairs of these request options.
+ *
+ * @param {MaplibreGlDirectionsOptions["request"]} requestOptions
+ * @returns {(waypointsCoordinates: [number, number][]) => string[]}
+ */
+export function buildGetRequestPayloadFactory(requestOptions: MaplibreGlDirectionsOptions["request"]) {
+  const newRequestPayload = Object.entries(requestOptions).reduce((acc, [key, value]) => {
+    if (!(key in DefaultMaplibreGlDirectionsOptions.request)) {
+      acc = acc.concat(`${key}=${value}`);
+    }
+
+    return acc;
+  }, [] as string[]);
+
+  function buildGetRequestPayload(waypointsCoordinates: [number, number][]): string[] {
+    newRequestPayload.push(`coordinates=${waypointsCoordinates.map((waypoint) => waypoint.join(",")).join(";")}`);
+    return newRequestPayload;
+  }
+
+  return buildGetRequestPayload;
+}
+
+/**
  * Creates a context-aware function that creates a GeoJSON Point Feature of one of the known types.
  *
  * @param {MaplibreGlDirectionsOptions["request"]} requestOptions
@@ -31,7 +91,11 @@ export function buildOptions(
 export function buildPointFactory(requestOptions: MaplibreGlDirectionsOptions["request"]) {
   const coordinateRounder = coordinateRounderFactory(requestOptions);
 
-  function buildPoint(coordinate: [number, number], type: PointType): Feature<Point, { type: PointType; id: string }> {
+  function buildPoint<T extends Record<string, unknown>>(
+    coordinate: [number, number],
+    type: PointType,
+    properties?: T,
+  ): Feature<Point, { type: PointType; id: string } & T> {
     return {
       type: "Feature",
       geometry: {
@@ -41,7 +105,8 @@ export function buildPointFactory(requestOptions: MaplibreGlDirectionsOptions["r
       properties: {
         type,
         id: nanoid(),
-      },
+        ...(properties ?? {}),
+      } as { type: PointType; id: string } & T,
     };
   }
 

@@ -2,14 +2,24 @@ import type { Feature, FeatureCollection, LineString, Point } from "geojson";
 import type maplibregl from "maplibre-gl";
 import type { Directions, MaplibreGlDirectionsOptions, Route, Waypoint } from "./types";
 import axios from "axios";
-import { buildOptions, buildPointFactory, buildRoutelinesFactory, buildSnaplinesFactory } from "./utils";
-import { DefaultMaplibreGlDirectionsOptions } from "./types";
+import {
+  buildGetRequestPayloadFactory,
+  buildOptions,
+  buildPointFactory,
+  buildPostRequestPayloadFactory,
+  buildRoutelinesFactory,
+  buildSnaplinesFactory,
+} from "./utils";
 
 export default class MaplibreGlDirections {
   constructor(map: maplibregl.Map, options?: Partial<MaplibreGlDirectionsOptions>) {
     this.map = map;
-    this.options = buildOptions(options);
 
+    this.buildOptions = buildOptions;
+    this.options = this.buildOptions(options);
+
+    this.buildPostRequestPayload = buildPostRequestPayloadFactory(this.options.request);
+    this.buildGetRequestPayload = buildGetRequestPayloadFactory(this.options.request);
     this.buildPoint = buildPointFactory(this.options.request);
     this.buildSnaplines = buildSnaplinesFactory(this.options.request);
     this.buildRoutelines = buildRoutelinesFactory(this.options.request);
@@ -28,37 +38,40 @@ export default class MaplibreGlDirections {
     this.init();
   }
 
-  private readonly map: maplibregl.Map;
-  private readonly options: MaplibreGlDirectionsOptions;
-  private _interactive = false;
-  private readonly buildPoint: ReturnType<typeof buildPointFactory>;
-  private readonly buildSnaplines: ReturnType<typeof buildSnaplinesFactory>;
-  private readonly buildRoutelines: ReturnType<typeof buildRoutelinesFactory>;
-  private readonly onMoveHandler: (e: maplibregl.MapMouseEvent) => void;
-  private readonly onDragDownHandler: (e: maplibregl.MapMouseEvent) => void;
-  private readonly onDragMoveHandler: (e: maplibregl.MapMouseEvent) => void;
-  private readonly onDragUpHandler: (e: maplibregl.MapMouseEvent) => void;
-  private readonly onClickHandler: (e: maplibregl.MapMouseEvent) => void;
+  protected readonly map: maplibregl.Map;
+  protected _interactive = false;
+  protected buildOptions: typeof buildOptions;
+  protected options: MaplibreGlDirectionsOptions;
+  protected buildPostRequestPayload: ReturnType<typeof buildPostRequestPayloadFactory>;
+  protected buildGetRequestPayload: ReturnType<typeof buildGetRequestPayloadFactory>;
+  protected buildPoint: ReturnType<typeof buildPointFactory>;
+  protected buildSnaplines: ReturnType<typeof buildSnaplinesFactory>;
+  protected buildRoutelines: ReturnType<typeof buildRoutelinesFactory>;
+  protected readonly onMoveHandler: (e: maplibregl.MapMouseEvent) => void;
+  protected readonly onDragDownHandler: (e: maplibregl.MapMouseEvent) => void;
+  protected readonly onDragMoveHandler: (e: maplibregl.MapMouseEvent) => void;
+  protected readonly onDragUpHandler: (e: maplibregl.MapMouseEvent) => void;
+  protected readonly onClickHandler: (e: maplibregl.MapMouseEvent) => void;
 
-  private waypoints: Feature<Point>[] = [];
-  private snappoints: Feature<Point>[] = [];
-  private routelines: Feature<LineString>[][] = [];
-  private selectedRouteIndex = 0;
-  private hoverpoint: Feature<Point> | undefined = undefined;
+  protected waypoints: Feature<Point>[] = [];
+  protected snappoints: Feature<Point>[] = [];
+  protected routelines: Feature<LineString>[][] = [];
+  protected selectedRouteIndex = 0;
+  protected hoverpoint: Feature<Point> | undefined = undefined;
 
-  private get waypointsCoordinates(): [number, number][] {
+  protected get waypointsCoordinates(): [number, number][] {
     return this.waypoints.map((waypoint) => {
       return [waypoint.geometry.coordinates[0], waypoint.geometry.coordinates[1]];
     });
   }
 
-  private get snappointsCoordinates(): [number, number][] {
+  protected get snappointsCoordinates(): [number, number][] {
     return this.snappoints.map((snappoint) => {
       return [snappoint.geometry.coordinates[0], snappoint.geometry.coordinates[1]];
     });
   }
 
-  private get snaplines(): Feature<LineString>[] {
+  protected get snaplines(): Feature<LineString>[] {
     return this.buildSnaplines(
       this.waypointsCoordinates,
       this.snappointsCoordinates,
@@ -68,58 +81,33 @@ export default class MaplibreGlDirections {
     );
   }
 
-  private init() {
-    const directionsSource: maplibregl.GeoJSONSourceSpecification = {
-      type: "geojson",
-      data: {
-        type: "FeatureCollection",
-        lineMetrics: true,
-        features: [],
-      } as FeatureCollection,
-    };
-
+  protected init() {
     if (!this.map.getSource("directions")) {
-      this.map.addSource("directions", directionsSource);
-    } else {
-      throw new Error(`The source "directions" already exists`);
-    }
+      this.map.addSource("directions", {
+        type: "geojson",
+        data: {
+          type: "FeatureCollection",
+          features: [],
+        },
+      });
 
-    this.options.layers.forEach((layer) => {
-      if (!this.map.getLayer(layer.id)) {
-        this.map.addLayer(layer);
-      } else {
-        throw new Error(`The layer "${layer.id}" already exists`);
-      }
-    });
+      this.options.layers.forEach((layer) => {
+        if (!this.map.getLayer(layer.id)) {
+          this.map.addLayer(layer);
+        }
+      });
+    }
   }
 
-  private async fetchDirections() {
+  protected async fetchDirections() {
     this.interactive = false;
 
     if (this.waypoints.length >= 2) {
-      const options = Object.entries(this.options.request).reduce((acc, [key, value]) => {
-        if (!(key in DefaultMaplibreGlDirectionsOptions.request)) {
-          acc = acc.concat(`${key}=${value}`);
-        }
-
-        return acc;
-      }, [] as string[]);
-
       let snappoints: Waypoint[];
       let routes: Route[];
 
       if (this.options.makePostRequest) {
-        options.push(`coordinates=${this.waypointsCoordinates.map((waypoint) => waypoint.join(",")).join(";")}`);
-
-        const formData = new FormData();
-
-        options.forEach((option) => {
-          const [key, value] = option.split("=");
-
-          if (key !== "access_token") {
-            formData.set(key, value);
-          }
-        });
+        const requestPayload = this.buildPostRequestPayload(this.waypointsCoordinates);
 
         const response = (
           await axios.post<Directions>(
@@ -129,7 +117,7 @@ export default class MaplibreGlDirections {
             // the URLSearchParams constructor perfectly works with the FormData, so ignore the TypeScript's complaint
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            new URLSearchParams(formData),
+            new URLSearchParams(requestPayload),
             {
               headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
@@ -141,13 +129,10 @@ export default class MaplibreGlDirections {
         snappoints = response.waypoints;
         routes = response.routes;
       } else {
-        // eslint-disable-next-line no-var
+        const requestPayload = this.buildGetRequestPayload(this.waypointsCoordinates);
+
         const response = (
-          await axios.get<Directions>(
-            `${this.options.request.api}/${this.options.request.profile}/${this.waypointsCoordinates
-              .map((waypoint) => waypoint.join(","))
-              .join(";")}?${options.join("&")}`,
-          )
+          await axios.get<Directions>(`${this.options.request.api}/${this.options.request.profile}/?${requestPayload}`)
         ).data;
 
         snappoints = response.waypoints;
@@ -168,7 +153,7 @@ export default class MaplibreGlDirections {
     this.interactive = true;
   }
 
-  private draw(skipSelectedRouteRedraw = true) {
+  protected draw(skipSelectedRouteRedraw = true) {
     const features = [
       ...this.waypoints,
       ...this.snappoints,
@@ -209,10 +194,10 @@ export default class MaplibreGlDirections {
     }
   }
 
-  private highlightedWaypoints: Feature<Point>[] = [];
-  private highlightedSnappoints: Feature<Point>[] = [];
+  protected highlightedWaypoints: Feature<Point>[] = [];
+  protected highlightedSnappoints: Feature<Point>[] = [];
 
-  private deHighlight() {
+  protected deHighlight() {
     this.highlightedWaypoints.forEach((waypoint) => {
       if (waypoint?.properties) {
         waypoint.properties.highlight = false;
@@ -234,7 +219,7 @@ export default class MaplibreGlDirections {
     });
   }
 
-  private onMove(e: maplibregl.MapMouseEvent) {
+  protected onMove(e: maplibregl.MapMouseEvent) {
     const feature: (Feature & { layer: { id: string } }) | undefined = this.map.queryRenderedFeatures(e.point, {
       layers: [
         ...this.options.sensitiveWaypointLayers,
@@ -356,12 +341,12 @@ export default class MaplibreGlDirections {
     this.draw();
   }
 
-  private dragDownPosition: { x: number; y: number } = { x: 0, y: 0 };
-  private waypointBeingDragged?: Feature<Point>;
-  private waypointBeingDraggedInitialCoordinates?: [number, number];
-  private departSnappointIndex = -1;
+  protected dragDownPosition: { x: number; y: number } = { x: 0, y: 0 };
+  protected waypointBeingDragged?: Feature<Point>;
+  protected waypointBeingDraggedInitialCoordinates?: [number, number];
+  protected departSnappointIndex = -1;
 
-  private onDragDown(e: maplibregl.MapMouseEvent | maplibregl.MapTouchEvent) {
+  protected onDragDown(e: maplibregl.MapMouseEvent | maplibregl.MapTouchEvent) {
     if (e.type === "touchstart" && e.originalEvent.touches.length !== 1) return;
     if (e.type === "mousedown" && e.originalEvent.which !== 1) return;
 
@@ -443,7 +428,7 @@ export default class MaplibreGlDirections {
     this.draw();
   }
 
-  private onDragMove(e: maplibregl.MapMouseEvent | maplibregl.MapTouchEvent) {
+  protected onDragMove(e: maplibregl.MapMouseEvent | maplibregl.MapTouchEvent) {
     // TODO: remove ts-ignores when https://github.com/maplibre/maplibre-gl-js/pull/1131 is merged
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -470,7 +455,7 @@ export default class MaplibreGlDirections {
     this.draw();
   }
 
-  private onDragUp(e: maplibregl.MapMouseEvent | maplibregl.MapTouchEvent) {
+  protected onDragUp(e: maplibregl.MapMouseEvent | maplibregl.MapTouchEvent) {
     if (e.type === "mouseup" && e.originalEvent.which !== 1) return;
 
     if (this.hoverpoint?.properties) this.hoverpoint.properties.showSnaplines = false;
@@ -550,7 +535,7 @@ export default class MaplibreGlDirections {
     this.draw();
   }
 
-  private onClick(e: maplibregl.MapMouseEvent) {
+  protected onClick(e: maplibregl.MapMouseEvent) {
     const feature: (Feature<Point> & { layer: { id: string } }) | undefined = this.map.queryRenderedFeatures(e.point, {
       layers: [
         ...this.options.sensitiveWaypointLayers,
