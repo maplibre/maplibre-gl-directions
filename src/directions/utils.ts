@@ -1,10 +1,9 @@
 import type { MaplibreGlDirectionsOptions, PointType, Route } from "./types";
 import type { Feature, LineString, Point } from "geojson";
-import { DefaultMaplibreGlDirectionsOptions, Geometry } from "./types";
+import { DefaultMaplibreGlDirectionsOptions } from "./types";
 import layersFactory from "./layers";
 import { nanoid } from "nanoid";
 import { congestionLevelDecoderFactory, coordinateRounderFactory, geometryDecoderFactory } from "./helpers";
-import MaplibreGlDirections from "./main";
 
 /**
  * Takes a missing or an incomplete options object from the user and augments it with the default values.
@@ -30,7 +29,6 @@ export function buildOptions(
  * @returns {(waypointsCoordinates: [number, number][]) => URLSearchParams}
  */
 export function buildPostRequestPayloadFactory(requestOptions: MaplibreGlDirectionsOptions["request"]) {
-  console.log("FACTORY CALL");
   const newRequestPayload = Object.entries(requestOptions).reduce((acc, [key, value]) => {
     if (!(key in DefaultMaplibreGlDirectionsOptions.request)) {
       acc = acc.concat(`${key}=${value}`);
@@ -85,17 +83,17 @@ export function buildGetRequestPayloadFactory(requestOptions: MaplibreGlDirectio
 /**
  * Creates a context-aware function that creates a GeoJSON Point Feature of one of the known types.
  *
- * @param {MaplibreGlDirectionsOptions["request"]} requestOptions
- * @returns {(coordinate: [number, number], type: PointType) => Feature<Point, {type: PointType, id: string}>}
+ * @param requestOptions
+ * @returns {(coordinate: [number, number], type: PointType, properties?: Record<string, unknown>) => Feature<Point>}
  */
 export function buildPointFactory(requestOptions: MaplibreGlDirectionsOptions["request"]) {
   const coordinateRounder = coordinateRounderFactory(requestOptions);
 
-  function buildPoint<T extends Record<string, unknown>>(
+  function buildPoint(
     coordinate: [number, number],
     type: PointType,
-    properties?: T,
-  ): Feature<Point, { type: PointType; id: string } & T> {
+    properties?: Record<string, unknown>,
+  ): Feature<Point> {
     return {
       type: "Feature",
       geometry: {
@@ -103,10 +101,10 @@ export function buildPointFactory(requestOptions: MaplibreGlDirectionsOptions["r
         coordinates: coordinateRounder(coordinate),
       },
       properties: {
+        ...(properties ?? {}),
         type,
         id: nanoid(),
-        ...(properties ?? {}),
-      } as { type: PointType; id: string } & T,
+      },
     };
   }
 
@@ -201,12 +199,15 @@ export function buildRoutelinesFactory(requestOptions: MaplibreGlDirectionsOptio
   function buildRoutelines(
     routes: Route[],
     selectedRouteIndex: number,
-    snappointsCoordinates: [number, number][],
+    snappoints: Feature<Point>[],
   ): Feature<LineString>[][] {
     // do the following stuff for each route (there are multiple when `alternatives=true` request option is set
     return routes.map((route, routeIndex) => {
       // a list of coordinates pairs (longitude-latitude) the route goes by
       const coordinates = geometryDecoder(route.geometry);
+
+      // get coordinates from the snappoint-features
+      const snappointsCoordinates = snappoints.map((snappoint) => snappoint.geometry.coordinates);
 
       // indices of coordinate pairs that match existing snappoints (except for the first one)
       const snappointsCoordinatesIndices = snappointsCoordinates
@@ -251,6 +252,9 @@ export function buildRoutelinesFactory(requestOptions: MaplibreGlDirectionsOptio
           ) {
             previousSegment.geometry.coordinates.push(lngLat);
           } else {
+            const departSnappointProperties = snappoints[legIndex].properties ?? {};
+            const arriveSnappointProperties = snappoints[legIndex + 1].properties ?? {};
+
             const segment = {
               type: "Feature",
               geometry: {
@@ -263,6 +267,8 @@ export function buildRoutelinesFactory(requestOptions: MaplibreGlDirectionsOptio
                 route: routeIndex === selectedRouteIndex ? "SELECTED" : "ALT",
                 legIndex, // used across forEach iterations to check whether it's safe to continue a segment
                 congestion: segmentCongestion, // the current segment's congestion level
+                departSnappointProperties, // include depart and arrive snappoints' properties to allow customization
+                arriveSnappointProperties,
               },
             } as Feature<LineString>;
 

@@ -139,8 +139,12 @@ export default class MaplibreGlDirections {
         routes = response.routes;
       }
 
-      this.snappoints = snappoints.map((snappoint) => this.buildPoint(snappoint.location, "SNAPPOINT"));
-      this.routelines = this.buildRoutelines(routes, this.selectedRouteIndex, this.snappointsCoordinates);
+      this.snappoints = snappoints.map((snappoint, i) =>
+        this.buildPoint(snappoint.location, "SNAPPOINT", {
+          waypointProperties: this.waypoints[i].properties ?? {},
+        }),
+      );
+      this.routelines = this.buildRoutelines(routes, this.selectedRouteIndex, this.snappoints);
       if (routes.length <= this.selectedRouteIndex) this.selectedRouteIndex = 0;
     } else {
       this.snappoints = [];
@@ -301,7 +305,14 @@ export default class MaplibreGlDirections {
       if (this.hoverpoint) {
         this.hoverpoint.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
       } else {
-        this.hoverpoint = this.buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT");
+        this.hoverpoint = this.buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT", {
+          departSnappointProperties: {
+            ...JSON.parse(feature?.properties?.departSnappointProperties ?? "{}"),
+          },
+          arriveSnappointProperties: {
+            ...JSON.parse(feature?.properties?.arriveSnappointProperties ?? "{}"),
+          },
+        });
       }
 
       this.routelines.forEach((routeline) => {
@@ -380,7 +391,14 @@ export default class MaplibreGlDirections {
       if (this.hoverpoint) {
         this.hoverpoint.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
       } else {
-        this.hoverpoint = this.buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT");
+        this.hoverpoint = this.buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT", {
+          departSnappointProperties: {
+            ...JSON.parse(feature?.properties?.departSnappointProperties ?? "{}"),
+          },
+          arriveSnappointProperties: {
+            ...JSON.parse(feature?.properties?.arriveSnappointProperties ?? "{}"),
+          },
+        });
       }
 
       if (this.hoverpoint.properties) {
