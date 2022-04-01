@@ -51,28 +51,28 @@
     directions.value.straightLinesMode = straightLinesMode.value;
   });
 
-  let altDownHandler: (event: KeyboardEvent) => void;
-  let altUpHandler: (event: KeyboardEvent) => void;
+  let altKeyDownHandler: (event: KeyboardEvent) => void;
+  let altKeyUpHandler: (event: KeyboardEvent) => void;
 
   onMounted(() => {
     document.addEventListener(
       "keydown",
-      (altDownHandler = (event) => {
+      (altKeyDownHandler = (event) => {
         if (event.key === "Alt") straightLinesMode.value = true;
       }),
     );
 
     document.addEventListener(
       "keyup",
-      (altDownHandler = (event) => {
+      (altKeyUpHandler = (event) => {
         if (event.key === "Alt") straightLinesMode.value = false;
       }),
     );
   });
 
   onUnmounted(() => {
-    document.removeEventListener("keydown", altDownHandler);
-    document.removeEventListener("keyup", altUpHandler);
+    document.removeEventListener("keydown", altKeyDownHandler);
+    document.removeEventListener("keyup", altKeyUpHandler);
   });
 
   const directions = ref();
