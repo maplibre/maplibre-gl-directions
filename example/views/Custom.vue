@@ -26,7 +26,7 @@
   import "maplibre-gl/dist/maplibre-gl.css";
   import style from "../assets/map/style.json";
   import CustomMaplibreGlDirections from "../custom-maplibre-gl-directions/main";
-  import { layersFactory } from "../../src/main";
+  import { routingLayers } from "../custom-maplibre-gl-directions/main";
 
   const mapRef = ref();
   const eventuallyMap = new Promise<Map>((res) => {
@@ -51,38 +51,29 @@
     directions.value.straightLinesMode = straightLinesMode.value;
   });
 
-  let controlDownHandler: (event: KeyboardEvent) => void;
-  let controlUpHandler: (event: KeyboardEvent) => void;
+  let altDownHandler: (event: KeyboardEvent) => void;
+  let altUpHandler: (event: KeyboardEvent) => void;
 
   onMounted(() => {
     document.addEventListener(
       "keydown",
-      (controlDownHandler = (event) => {
-        if (event.key === "Control") straightLinesMode.value = true;
+      (altDownHandler = (event) => {
+        if (event.key === "Alt") straightLinesMode.value = true;
       }),
     );
 
     document.addEventListener(
       "keyup",
-      (controlDownHandler = (event) => {
-        if (event.key === "Control") straightLinesMode.value = false;
+      (altDownHandler = (event) => {
+        if (event.key === "Alt") straightLinesMode.value = false;
       }),
     );
   });
 
   onUnmounted(() => {
-    document.removeEventListener("keydown", controlDownHandler);
-    document.removeEventListener("keyup", controlUpHandler);
+    document.removeEventListener("keydown", altDownHandler);
+    document.removeEventListener("keyup", altUpHandler);
   });
-
-  const layers = layersFactory();
-
-  layers[9].paint["circle-color"] = layers[10].paint["circle-color"] = [
-    "case",
-    ["boolean", ["get", "straightLinesMode"], false],
-    ["case", ["boolean", ["get", "highlight"], false], "#e8b331", "#f1cc5a"],
-    ["case", ["boolean", ["get", "highlight"], false], "#6d26d7", "#7b33e7"],
-  ];
 
   const directions = ref();
 
@@ -93,7 +84,7 @@
           "pk.eyJ1Ijoic21lbGx5c2hvdmVsIiwiYSI6ImNsMWI3ZjByczFuYmUzanBmeWMxemQ1MzQifQ.stv4tSZc_8ProkPWVNb31A",
       },
       makePostRequest: true,
-      layers,
+      layers: routingLayers,
     });
 
     directions.value.interactive = true;
