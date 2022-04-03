@@ -2,7 +2,7 @@ import type { GeoJSONGeometry, Geometry, Leg, MaplibreGlDirectionsOptions, Polyl
 import { decode } from "@mapbox/polyline";
 
 /**
- * Creates a helper function that decodes the geometry of a route to the form of a precision-aware-coordinates array.
+ * Creates a helper function that decodes the geometry of a route to the form of a coordinates array.
  *
  * @param {MaplibreGlDirectionsOptions["request"]} requestOptions
  * @returns {(geometry: Geometry) => [number, number][]}
@@ -11,8 +11,6 @@ export function geometryDecoderFactory(requestOptions: MaplibreGlDirectionsOptio
   let geometryDecoder: (geometry: Geometry) => [number, number][];
 
   if (requestOptions.geometries === "geojson") {
-    // const coordinateRounder = coordinateRounderFactory(requestOptions);
-
     geometryDecoder = function geometryDecoder(geometry) {
       return (geometry as GeoJSONGeometry).coordinates;
     };

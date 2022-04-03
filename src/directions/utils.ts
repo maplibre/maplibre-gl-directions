@@ -23,7 +23,8 @@ export function buildOptions(
 }
 
 /**
- * Creates a context-aware function that takes the waypoints' coordinates and produces a FormData instance...
+ * Creates a context-aware function that takes the waypoints' coordinates and produces a FormData instance of all the
+ * options that should go in the request body.
  *
  * @param {MaplibreGlDirectionsOptions["request"]} requestOptions
  * @returns {(waypointsCoordinates: [number, number][]) => URLSearchParams}
@@ -81,7 +82,7 @@ export function buildGetRequestPayloadFactory(requestOptions: MaplibreGlDirectio
 }
 
 /**
- * Creates a GeoJSON Point Feature of one of the known types.
+ * Creates a GeoJSON Point Feature of one of the known types at a given coordinate.
  *
  * @param {[number, number]} coordinate
  * @param {PointType} type
@@ -100,16 +101,16 @@ export function buildPoint(
       coordinates: coordinate,
     },
     properties: {
-      ...(properties ?? {}),
       type,
       id: nanoid(),
+      ...(properties ?? {}),
     },
   };
 }
 
 /**
- * Creates a context-aware function that create a GeoJSON LineString Features array where each feature represents a line
- * connecting a waypoint with its respective snappoint and a hoverpoint with its respective snappoints.
+ * Creates a context-aware function that creates a GeoJSON LineString Features array where each feature represents a
+ * line connecting a waypoint with its respective snappoint and a hoverpoint with its respective snappoints.
  *
  * @param {[number, number][]} waypointsCoordinates
  * @param {[number, number][]} snappointsCoordinates
@@ -196,7 +197,7 @@ export function buildRoutelinesFactory(requestOptions: MaplibreGlDirectionsOptio
     selectedRouteIndex: number,
     snappoints: Feature<Point>[],
   ): Feature<LineString>[][] {
-    // do the following stuff for each route (there are multiple when `alternatives=true` request option is set
+    // do the following stuff for each route (there are multiple when `alternatives=true` request option is set)
     return routes.map((route, routeIndex) => {
       // a list of coordinates pairs (longitude-latitude) the route goes by
       const coordinates = geometryDecoder(route.geometry);
@@ -209,7 +210,7 @@ export function buildRoutelinesFactory(requestOptions: MaplibreGlDirectionsOptio
         .map((snappointLngLat) => {
           return coordinates.findIndex((lngLat) => {
             // there might be an error in 0.00001 degree between snappoint and decoded coordinate when using the
-            // "polyline" geometries. The comparator neglects it
+            // "polyline" geometries. The comparator neglects that
             return coordinatesComparator(lngLat, snappointLngLat as [number, number]);
           });
         })
@@ -257,12 +258,12 @@ export function buildRoutelinesFactory(requestOptions: MaplibreGlDirectionsOptio
                 route: routeIndex === selectedRouteIndex ? "SELECTED" : "ALT",
                 legIndex, // used across forEach iterations to check whether it's safe to continue a segment
                 congestion: segmentCongestion, // the current segment's congestion level
-                departSnappointProperties, // include depart and arrive snappoints' properties to allow customization
-                arriveSnappointProperties,
+                departSnappointProperties, // include depart and arrive snappoints' properties to allow customization...
+                arriveSnappointProperties, // ...of behavior via a subclass
               },
             } as Feature<LineString>;
 
-            // New segment starts with previous segment's last coordinate.
+            // a new segment starts with previous segment's last coordinate
             if (previousSegment) {
               segment.geometry.coordinates.push(
                 previousSegment.geometry.coordinates[previousSegment.geometry.coordinates.length - 1],

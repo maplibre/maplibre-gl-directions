@@ -30,6 +30,9 @@ export const DefaultMaplibreGlDirectionsOptions: Omit<MaplibreGlDirectionsOption
   dragThreshold: 10,
 };
 
+export type PointType = "WAYPOINT" | "SNAPPOINT" | "HOVERPOINT";
+
+// server response
 export interface Directions {
   code: "Ok" | "NoRoute" | "NoSegment" | "Forbidden" | "ProfileNotFound" | "InvalidInput";
   routes: Route[];
@@ -64,5 +67,3 @@ export interface Step {
 export interface Waypoint {
   location: [number, number];
 }
-
-export type PointType = "WAYPOINT" | "SNAPPOINT" | "HOVERPOINT";
