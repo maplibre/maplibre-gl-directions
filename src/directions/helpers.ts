@@ -98,3 +98,26 @@ export function congestionLevelDecoderFactory(requestOptions: MaplibreGlDirectio
 
   return congestionLevelDecoder;
 }
+
+/**
+ * Creates a helper function that compares two coordinates and returns `true` if they are equal taking into account that
+ * when using "polyline" geometries (5 digits after the comma precision) there's an allowable error in 0.00001 degree.
+ *
+ * @param {MaplibreGlDirectionsOptions["request"]} requestOptions
+ * @return {(a: [number, number], b: [number, number]) => boolean}
+ */
+export function coordinatesComparatorFactory(requestOptions: MaplibreGlDirectionsOptions["request"]) {
+  let coordinatesComparator: (a: [number, number], b: [number, number]) => boolean;
+
+  if (!requestOptions.geometries || requestOptions.geometries === "polyline") {
+    coordinatesComparator = function coordinatesComparator(a: [number, number], b: [number, number]): boolean {
+      return Math.abs(a[0] - b[0]) <= 0.00001 && Math.abs(a[1] - b[1]) <= 0.00001;
+    };
+  } else {
+    coordinatesComparator = function coordinatesComparator(a: [number, number], b: [number, number]): boolean {
+      return a[0] === b[0] && a[1] === b[1];
+    };
+  }
+
+  return coordinatesComparator;
+}

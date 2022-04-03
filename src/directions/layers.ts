@@ -1,7 +1,7 @@
 import type { LayerSpecification } from "maplibre-gl";
 
 /**
- * Build the standard MaplibreGlDirections layers with optionally scaled features.
+ * Builds the standard `MaplibreGlDirections` layers with optionally scaled features.
  *
  * @param {number=} pointsScalingFactor A number to multiply the initial points' dimensions by
  * @param {number=} linesScalingFactor A number to multiply the initial lines' dimensions by
@@ -10,9 +10,9 @@ import type { LayerSpecification } from "maplibre-gl";
 export default function layersFactory(pointsScalingFactor = 1, linesScalingFactor = 1): LayerSpecification[] {
   return [
     {
-      id: "directions-snapline",
+      id: "maplibre-gl-directions-snapline",
       type: "line",
-      source: "directions",
+      source: "maplibre-gl-directions",
       layout: {
         "line-cap": "round",
         "line-join": "round",
@@ -27,9 +27,9 @@ export default function layersFactory(pointsScalingFactor = 1, linesScalingFacto
     },
 
     {
-      id: "directions-alt-routeline-casing",
+      id: "maplibre-gl-directions-alt-routeline-casing",
       type: "line",
-      source: "directions",
+      source: "maplibre-gl-directions",
       layout: {
         "line-cap": "butt",
         "line-join": "round",
@@ -56,9 +56,9 @@ export default function layersFactory(pointsScalingFactor = 1, linesScalingFacto
       filter: ["all", ["in", "$type", "LineString"], ["in", "route", "ALT"]],
     },
     {
-      id: "directions-alt-routeline",
+      id: "maplibre-gl-directions-alt-routeline",
       type: "line",
-      source: "directions",
+      source: "maplibre-gl-directions",
       layout: {
         "line-cap": "butt",
         "line-join": "round",
@@ -87,9 +87,9 @@ export default function layersFactory(pointsScalingFactor = 1, linesScalingFacto
     },
 
     {
-      id: "directions-routeline-casing",
+      id: "maplibre-gl-directions-routeline-casing",
       type: "line",
-      source: "directions",
+      source: "maplibre-gl-directions",
       layout: {
         "line-cap": "butt",
         "line-join": "round",
@@ -123,9 +123,9 @@ export default function layersFactory(pointsScalingFactor = 1, linesScalingFacto
       filter: ["all", ["in", "$type", "LineString"], ["in", "route", "SELECTED"]],
     },
     {
-      id: "directions-routeline",
+      id: "maplibre-gl-directions-routeline",
       type: "line",
-      source: "directions",
+      source: "maplibre-gl-directions",
       layout: {
         "line-cap": "butt",
         "line-join": "round",
@@ -160,9 +160,9 @@ export default function layersFactory(pointsScalingFactor = 1, linesScalingFacto
     },
 
     {
-      id: "directions-hoverpoint-casing",
+      id: "maplibre-gl-directions-hoverpoint-casing",
       type: "circle",
-      source: "directions",
+      source: "maplibre-gl-directions",
       paint: {
         "circle-radius": [
           // same as snappoint-casing, but without highlighting (since it's always highlighted while present on the map)
@@ -182,9 +182,9 @@ export default function layersFactory(pointsScalingFactor = 1, linesScalingFacto
       filter: ["all", ["in", "$type", "Point"], ["in", "type", "HOVERPOINT"]],
     },
     {
-      id: "directions-hoverpoint",
+      id: "maplibre-gl-directions-hoverpoint",
       type: "circle",
-      source: "directions",
+      source: "maplibre-gl-directions",
       paint: {
         "circle-radius": [
           // same as snappoint, but without highlighting (since it's always highlighted while present on the map)
@@ -204,9 +204,9 @@ export default function layersFactory(pointsScalingFactor = 1, linesScalingFacto
     },
 
     {
-      id: "directions-snappoint-casing",
+      id: "maplibre-gl-directions-snappoint-casing",
       type: "circle",
-      source: "directions",
+      source: "maplibre-gl-directions",
       paint: {
         "circle-radius": [
           "interpolate",
@@ -232,9 +232,9 @@ export default function layersFactory(pointsScalingFactor = 1, linesScalingFacto
       filter: ["all", ["in", "$type", "Point"], ["in", "type", "SNAPPOINT"]],
     },
     {
-      id: "directions-snappoint",
+      id: "maplibre-gl-directions-snappoint",
       type: "circle",
-      source: "directions",
+      source: "maplibre-gl-directions",
       paint: {
         "circle-radius": [
           "interpolate",
@@ -259,9 +259,9 @@ export default function layersFactory(pointsScalingFactor = 1, linesScalingFacto
     },
 
     {
-      id: "directions-waypoint-casing",
+      id: "maplibre-gl-directions-waypoint-casing",
       type: "circle",
-      source: "directions",
+      source: "maplibre-gl-directions",
       paint: {
         "circle-radius": [
           // same as snappoint-casing
@@ -282,9 +282,9 @@ export default function layersFactory(pointsScalingFactor = 1, linesScalingFacto
     },
 
     {
-      id: "directions-waypoint",
+      id: "maplibre-gl-directions-waypoint",
       type: "circle",
-      source: "directions",
+      source: "maplibre-gl-directions",
       paint: {
         // same as snappoint
         "circle-radius": [

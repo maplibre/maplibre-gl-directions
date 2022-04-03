@@ -1,6 +1,4 @@
 import type { LayerSpecification } from "maplibre-gl";
-import { Event, MapLibreEvent } from "maplibre-gl";
-import MaplibreGlDirections from "./main";
 
 export interface MaplibreGlDirectionsOptions {
   request: {
@@ -25,10 +23,10 @@ export const DefaultMaplibreGlDirectionsOptions: Omit<MaplibreGlDirectionsOption
   makePostRequest: false,
   pointsScalingFactor: 1,
   linesScalingFactor: 1,
-  sensitiveWaypointLayers: ["directions-waypoint", "directions-waypoint-casing"],
-  sensitiveSnappointLayers: ["directions-snappoint", "directions-snappoint-casing"],
-  sensitiveRoutelineLayers: ["directions-routeline", "directions-routeline-casing"],
-  sensitiveAltRoutelineLayers: ["directions-alt-routeline", "directions-alt-routeline-casing"],
+  sensitiveWaypointLayers: ["maplibre-gl-directions-waypoint", "maplibre-gl-directions-waypoint-casing"],
+  sensitiveSnappointLayers: ["maplibre-gl-directions-snappoint", "maplibre-gl-directions-snappoint-casing"],
+  sensitiveRoutelineLayers: ["maplibre-gl-directions-routeline", "maplibre-gl-directions-routeline-casing"],
+  sensitiveAltRoutelineLayers: ["maplibre-gl-directions-alt-routeline", "maplibre-gl-directions-alt-routeline-casing"],
   dragThreshold: 10,
 };
 

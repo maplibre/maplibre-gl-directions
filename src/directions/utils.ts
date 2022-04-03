@@ -3,7 +3,12 @@ import type { Feature, LineString, Point } from "geojson";
 import { DefaultMaplibreGlDirectionsOptions } from "./types";
 import layersFactory from "./layers";
 import { nanoid } from "nanoid";
-import { congestionLevelDecoderFactory, coordinateRounderFactory, geometryDecoderFactory } from "./helpers";
+import {
+  congestionLevelDecoderFactory,
+  coordinateRounderFactory,
+  coordinatesComparatorFactory,
+  geometryDecoderFactory,
+} from "./helpers";
 
 /**
  * Takes a missing or an incomplete options object from the user and augments it with the default values.
@@ -194,6 +199,7 @@ export function buildSnaplinesFactory(_requestOptions: MaplibreGlDirectionsOptio
  */
 export function buildRoutelinesFactory(requestOptions: MaplibreGlDirectionsOptions["request"]) {
   const geometryDecoder = geometryDecoderFactory(requestOptions);
+  const coordinatesComparator = coordinatesComparatorFactory(requestOptions);
   const congestionLevelDecoder = congestionLevelDecoderFactory(requestOptions);
 
   function buildRoutelines(
@@ -213,17 +219,12 @@ export function buildRoutelinesFactory(requestOptions: MaplibreGlDirectionsOptio
       const snappointsCoordinatesIndices = snappointsCoordinates
         .map((snappointLngLat) => {
           return coordinates.findIndex((lngLat) => {
-            // when using the `geometries=polyline` request option (default value) each route's coordinate has 5
-            // fractional digits, while the snappoints always have 6. Even though that's respected by the
-            // `snappointsCoordinates` getter, sometimes they still mismatch, so the `findIndex` might return -1
-            return lngLat[0] === snappointLngLat[0] && lngLat[1] === snappointLngLat[1];
+            // there might be an error in 0.00001 degree between snappoint and decoded coordinate when using the
+            // "polyline" geometries. The comparator neglects it
+            return coordinatesComparator(lngLat, snappointLngLat as [number, number]);
           });
         })
         .slice(1); // because the first one is always 0
-
-      // if some snappoint wasn't found because of the issue described above then just through an exception, there's
-      // nothing we can do about it
-      if (snappointsCoordinatesIndices.includes(-1)) throw "MISSING_SNAPPOINT";
 
       // split the coordinates array by legs. Each leg consists of coordinates between snappoints
       let initialIndex = 0;
