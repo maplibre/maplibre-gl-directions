@@ -62,7 +62,7 @@
           "pk.eyJ1Ijoic21lbGx5c2hvdmVsIiwiYSI6ImNsMWI3ZjByczFuYmUzanBmeWMxemQ1MzQifQ.stv4tSZc_8ProkPWVNb31A",
         // alternatives: true,
         // annotations: "congestion",
-        // geometries: "polyline6",
+        geometries: "geojson",
         // overview: "full",
       },
       makePostRequest: true,

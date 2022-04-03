@@ -5,10 +5,10 @@ import axios from "axios";
 import {
   buildGetRequestPayloadFactory,
   buildOptions,
-  buildPointFactory,
+  buildPoint,
   buildPostRequestPayloadFactory,
   buildRoutelinesFactory,
-  buildSnaplinesFactory,
+  buildSnaplines,
 } from "./utils";
 
 /**
@@ -32,8 +32,8 @@ export default class MaplibreGlDirections {
      */
     this.buildPostRequestPayload = buildPostRequestPayloadFactory(this.options.request);
     this.buildGetRequestPayload = buildGetRequestPayloadFactory(this.options.request);
-    this.buildPoint = buildPointFactory(this.options.request);
-    this.buildSnaplines = buildSnaplinesFactory(this.options.request);
+    this.buildPoint = buildPoint;
+    this.buildSnaplines = buildSnaplines;
     this.buildRoutelines = buildRoutelinesFactory(this.options.request);
 
     /*
@@ -58,8 +58,8 @@ export default class MaplibreGlDirections {
   protected _interactive = false;
   protected buildPostRequestPayload: ReturnType<typeof buildPostRequestPayloadFactory>;
   protected buildGetRequestPayload: ReturnType<typeof buildGetRequestPayloadFactory>;
-  protected buildPoint: ReturnType<typeof buildPointFactory>;
-  protected buildSnaplines: ReturnType<typeof buildSnaplinesFactory>;
+  protected buildPoint: typeof buildPoint;
+  protected buildSnaplines: typeof buildSnaplines;
   protected buildRoutelines: ReturnType<typeof buildRoutelinesFactory>;
   protected onMoveHandler: (e: maplibregl.MapMouseEvent) => void;
   protected onDragDownHandler: (e: maplibregl.MapMouseEvent) => void;

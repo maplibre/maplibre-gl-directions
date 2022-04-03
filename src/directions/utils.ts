@@ -3,12 +3,7 @@ import type { Feature, LineString, Point } from "geojson";
 import { DefaultMaplibreGlDirectionsOptions } from "./types";
 import layersFactory from "./layers";
 import { nanoid } from "nanoid";
-import {
-  congestionLevelDecoderFactory,
-  coordinateRounderFactory,
-  coordinatesComparatorFactory,
-  geometryDecoderFactory,
-} from "./helpers";
+import { congestionLevelDecoderFactory, coordinatesComparatorFactory, geometryDecoderFactory } from "./helpers";
 
 /**
  * Takes a missing or an incomplete options object from the user and augments it with the default values.
@@ -86,105 +81,99 @@ export function buildGetRequestPayloadFactory(requestOptions: MaplibreGlDirectio
 }
 
 /**
- * Creates a context-aware function that creates a GeoJSON Point Feature of one of the known types.
+ * Creates a GeoJSON Point Feature of one of the known types.
  *
- * @param requestOptions
- * @returns {(coordinate: [number, number], type: PointType, properties?: Record<string, unknown>) => Feature<Point>}
+ * @param {[number, number]} coordinate
+ * @param {PointType} type
+ * @param {Record<string, unknown>} properties
+ * @return {Feature<Point>}
  */
-export function buildPointFactory(requestOptions: MaplibreGlDirectionsOptions["request"]) {
-  const coordinateRounder = coordinateRounderFactory(requestOptions);
-
-  function buildPoint(
-    coordinate: [number, number],
-    type: PointType,
-    properties?: Record<string, unknown>,
-  ): Feature<Point> {
-    return {
-      type: "Feature",
-      geometry: {
-        type: "Point",
-        coordinates: coordinateRounder(coordinate),
-      },
-      properties: {
-        ...(properties ?? {}),
-        type,
-        id: nanoid(),
-      },
-    };
-  }
-
-  return buildPoint;
+export function buildPoint(
+  coordinate: [number, number],
+  type: PointType,
+  properties?: Record<string, unknown>,
+): Feature<Point> {
+  return {
+    type: "Feature",
+    geometry: {
+      type: "Point",
+      coordinates: coordinate,
+    },
+    properties: {
+      ...(properties ?? {}),
+      type,
+      id: nanoid(),
+    },
+  };
 }
 
 /**
  * Creates a context-aware function that create a GeoJSON LineString Features array where each feature represents a line
  * connecting a waypoint with its respective snappoint and a hoverpoint with its respective snappoints.
  *
- * @param {MaplibreGlDirectionsOptions["request"]} _requestOptions
- * @returns {(waypointsCoordinates: [number, number][], snappointsCoordinates: [number, number][], hoverpointCoordinates: ([number, number] | undefined), departSnappointIndex: number, showHoverpointSnaplines?: boolean) => Feature<LineString>[]}
+ * @param {[number, number][]} waypointsCoordinates
+ * @param {[number, number][]} snappointsCoordinates
+ * @param {[number, number] | undefined} hoverpointCoordinates
+ * @param {number} departSnappointIndex
+ * @param {boolean} showHoverpointSnaplines
+ * @return {Feature<LineString>[]}
  */
-export function buildSnaplinesFactory(_requestOptions: MaplibreGlDirectionsOptions["request"]) {
-  // the function is wrapped in a factory for the sakes of consistency
+export function buildSnaplines(
+  waypointsCoordinates: [number, number][],
+  snappointsCoordinates: [number, number][],
+  hoverpointCoordinates: [number, number] | undefined,
+  departSnappointIndex: number, // might be -1
+  showHoverpointSnaplines = false,
+): Feature<LineString>[] {
+  if (waypointsCoordinates.length !== snappointsCoordinates.length) return [];
 
-  function buildSnaplines(
-    waypointsCoordinates: [number, number][],
-    snappointsCoordinates: [number, number][],
-    hoverpointCoordinates: [number, number] | undefined,
-    departSnappointIndex: number, // might be -1
-    showHoverpointSnaplines = false,
-  ): Feature<LineString>[] {
-    if (waypointsCoordinates.length !== snappointsCoordinates.length) return [];
+  const snaplines = waypointsCoordinates.map((waypointCoordinates, index) => {
+    return {
+      type: "Feature",
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [waypointCoordinates[0], waypointCoordinates[1]],
+          [snappointsCoordinates[index][0], snappointsCoordinates[index][1]],
+        ],
+      },
+      properties: {
+        type: "SNAPLINE",
+      },
+    } as Feature<LineString>;
+  });
 
-    const snaplines = waypointsCoordinates.map((waypointCoordinates, index) => {
-      return {
-        type: "Feature",
-        geometry: {
-          type: "LineString",
-          coordinates: [
-            [waypointCoordinates[0], waypointCoordinates[1]],
-            [snappointsCoordinates[index][0], snappointsCoordinates[index][1]],
-          ],
-        },
-        properties: {
-          type: "SNAPLINE",
-        },
-      } as Feature<LineString>;
+  if (~departSnappointIndex && hoverpointCoordinates !== undefined && showHoverpointSnaplines) {
+    snaplines.push({
+      type: "Feature",
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [hoverpointCoordinates[0], hoverpointCoordinates[1]],
+          [snappointsCoordinates[departSnappointIndex][0], snappointsCoordinates[departSnappointIndex][1]],
+        ],
+      },
+      properties: {
+        type: "SNAPLINE",
+      },
     });
 
-    if (~departSnappointIndex && hoverpointCoordinates !== undefined && showHoverpointSnaplines) {
-      snaplines.push({
-        type: "Feature",
-        geometry: {
-          type: "LineString",
-          coordinates: [
-            [hoverpointCoordinates[0], hoverpointCoordinates[1]],
-            [snappointsCoordinates[departSnappointIndex][0], snappointsCoordinates[departSnappointIndex][1]],
-          ],
-        },
-        properties: {
-          type: "SNAPLINE",
-        },
-      });
-
-      snaplines.push({
-        type: "Feature",
-        geometry: {
-          type: "LineString",
-          coordinates: [
-            [hoverpointCoordinates[0], hoverpointCoordinates[1]],
-            [snappointsCoordinates[departSnappointIndex + 1][0], snappointsCoordinates[departSnappointIndex + 1][1]],
-          ],
-        },
-        properties: {
-          type: "SNAPLINE",
-        },
-      });
-    }
-
-    return snaplines;
+    snaplines.push({
+      type: "Feature",
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [hoverpointCoordinates[0], hoverpointCoordinates[1]],
+          [snappointsCoordinates[departSnappointIndex + 1][0], snappointsCoordinates[departSnappointIndex + 1][1]],
+        ],
+      },
+      properties: {
+        type: "SNAPLINE",
+      },
+    });
   }
 
-  return buildSnaplines;
+  return snaplines;
 }
 
 /**
