@@ -1,9 +1,9 @@
 import type { LayerSpecification } from "maplibre-gl";
 
 /**
- * The options supported by the {@link MaplibreGlDirections}.
+ * The {@link default|MaplibreGlDirections} configuration object's interface.
  */
-export interface MaplibreGlDirectionsOptions {
+export interface MaplibreGlDirectionsConfiguration {
   /**
    * An API-provider URL to make the routing requests to.
    *
@@ -26,7 +26,7 @@ export interface MaplibreGlDirectionsOptions {
   api: string;
 
   /**
-   * A routing profile to use. The value depends on the API-provider used.
+   * A routing profile to use. The value depends on the API-provider of choice.
    *
    * @see {@link http://project-osrm.org/docs/v5.24.0/api/#requests|OSRM #Requests}
    * @see {@link https://docs.mapbox.com/api/navigation/directions/#routing-profiles|Mapbox Direction API #Routing profiles}
@@ -36,19 +36,19 @@ export interface MaplibreGlDirectionsOptions {
    * @example
    * ```
    * api: "https://router.project-osrm.org/route/v1",
-   * profile: "driving" // *
+   * profile: "driving"
    * ```
    *
    * @example
    * ```
    * api: "https://api.mapbox.com/directions/v5",
-   * profile: "mapbox/driving-traffic" // *
+   * profile: "mapbox/driving-traffic"
    * ```
    */
   profile: string;
 
   /**
-   * A list of the request-payload parameters that are passed along with the request.
+   * A list of the request-payload parameters that are passed along with routing requests.
    *
    * __Note__ that the `access-token` request-parameter has a special treatment when used along with
    * {@link makePostRequest|`makePostRequest: true`}. It's automatically removed from the `FormData` and passed as a URL
@@ -68,16 +68,14 @@ export interface MaplibreGlDirectionsOptions {
    * ```
    * api: "https://api.mapbox.com/directions/v5",
    * profile: "mapbox/driving-traffic",
-   * request: { // *
+   * request: {
    *   access_token: "<mapbox-access-token>",
    *   annotations: "congestion",
    *   geometries: "polyline6"
    * }
    * ```
    */
-  request: {
-    [requestOption: string]: string;
-  };
+  requestOptions: Partial<Record<string, string>>;
 
   /**
    * Whether to make a {@link https://docs.mapbox.com/api/navigation/http-post/|POST request} instead of a GET one.
@@ -91,7 +89,7 @@ export interface MaplibreGlDirectionsOptions {
    * ```
    * api: "https://api.mapbox.com/directions/v5",
    * profile: "mapbox/driving-traffic",
-   * makePostRequest: true // *
+   * makePostRequest: true
    * ```
    */
   makePostRequest: boolean;
@@ -240,10 +238,10 @@ export interface MaplibreGlDirectionsOptions {
   dragThreshold: number;
 }
 
-export const DefaultMaplibreGlDirectionsOptions: Omit<MaplibreGlDirectionsOptions, "layers"> = {
+export const MaplibreGlDirectionsDefaultConfiguration: Omit<MaplibreGlDirectionsConfiguration, "layers"> = {
   api: "https://router.project-osrm.org/route/v1",
   profile: "driving",
-  request: {},
+  requestOptions: {},
   makePostRequest: false,
   pointsScalingFactor: 1,
   linesScalingFactor: 1,
@@ -256,17 +254,16 @@ export const DefaultMaplibreGlDirectionsOptions: Omit<MaplibreGlDirectionsOption
 
 export type PointType = "WAYPOINT" | "SNAPPOINT" | "HOVERPOINT";
 
-// server response
+// server response. Only the necessary for the plugin fields
+
 export interface Directions {
-  code: "Ok" | "NoRoute" | "NoSegment" | "Forbidden" | "ProfileNotFound" | "InvalidInput";
   routes: Route[];
-  uuid: string;
-  waypoints: Waypoint[];
+  waypoints: Snappoint[];
 }
 
+export type Geometry = PolylineGeometry | GeoJSONGeometry;
 export type GeoJSONGeometry = { coordinates: [number, number][] };
 export type PolylineGeometry = string;
-export type Geometry = PolylineGeometry | GeoJSONGeometry;
 
 export interface Route {
   geometry: Geometry;
@@ -278,16 +275,8 @@ export interface Leg {
     congestion?: ("unknown" | "low" | "moderate" | "heavy" | "severe")[];
     congestion_numeric?: (number | null)[];
   };
-  steps: Step[];
 }
 
-export interface Step {
-  maneuver: {
-    location: [number, number];
-  };
-  geometry: Geometry;
-}
-
-export interface Waypoint {
+export interface Snappoint {
   location: [number, number];
 }
