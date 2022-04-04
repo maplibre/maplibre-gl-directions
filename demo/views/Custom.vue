@@ -24,7 +24,7 @@
   import maplibregl from "maplibre-gl";
   import type { Map } from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
-  import style from "../assets/map/style.json";
+  import style from "../assets/map/style/style.json";
   import CustomMaplibreGlDirections from "../custom-maplibre-gl-directions/main";
   import { routingLayers } from "../custom-maplibre-gl-directions/main";
 

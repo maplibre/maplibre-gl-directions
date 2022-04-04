@@ -2,26 +2,36 @@ import type { Feature, FeatureCollection, LineString, Point } from "geojson";
 import type maplibregl from "maplibre-gl";
 import type { Directions, MaplibreGlDirectionsOptions, Route, Waypoint } from "./types";
 import axios from "axios";
-import {
-  buildGetRequestPayloadFactory,
-  buildOptions,
-  buildPoint,
-  buildPostRequestPayloadFactory,
-  buildRoutelinesFactory,
-  buildSnaplines,
-} from "./utils";
+import { buildRequest, buildPoint, buildRoutelinesFactory, buildSnaplines, buildOptions } from "./utils";
+import { DefaultMaplibreGlDirectionsOptions } from "./types";
 
 /**
  * The main class responsible for the routing itself.
+ *
+ * @example
+ *
+ * ```
+ * <div id='map' style='width: 400px; height: 300px;'></div>
+ * <script>
+ * var map = new maplibregl.Map({
+ * container: 'map',
+ * style: 'https://demotiles.maplibre.org/style.json', // stylesheet location
+ * center: [-74.5, 40], // starting position [lng, lat]
+ * zoom: 9 // starting zoom
+ * });
+ * </script>
+ * ```
+ *
+ * @example
+ * ```
+ * test.test();
+ * ```
  */
 export default class MaplibreGlDirections {
   /**
    * Creates an instance of the `MaplibreGlDirections` class.
-   *
-   * @param {maplibregl.Map} map
-   * @param {Partial<MaplibreGlDirectionsOptions>} options
    */
-  constructor(map: maplibregl.Map, options?: Partial<MaplibreGlDirectionsOptions>) {
+  constructor(map: maplibregl.Map, options?: Partial<typeof DefaultMaplibreGlDirectionsOptions>) {
     this.map = map;
     this.options = buildOptions(options);
 
@@ -30,8 +40,7 @@ export default class MaplibreGlDirections {
      * the current `MaplibreGlDirections` instance. The function returned by the factory function depends on the request
      * options passed to the constructor and does one specific thing which allows to reduce the runtime-payload.
      */
-    this.buildPostRequestPayload = buildPostRequestPayloadFactory(this.options.request);
-    this.buildGetRequestPayload = buildGetRequestPayloadFactory(this.options.request);
+    this.buildRequest = buildRequest;
     this.buildPoint = buildPoint;
     this.buildSnaplines = buildSnaplines;
     this.buildRoutelines = buildRoutelinesFactory(this.options.request);
@@ -56,8 +65,7 @@ export default class MaplibreGlDirections {
   protected readonly map: maplibregl.Map;
   protected readonly options: MaplibreGlDirectionsOptions;
   protected _interactive = false;
-  protected buildPostRequestPayload: ReturnType<typeof buildPostRequestPayloadFactory>;
-  protected buildGetRequestPayload: ReturnType<typeof buildGetRequestPayloadFactory>;
+  protected buildRequest: typeof buildRequest;
   protected buildPoint: typeof buildPoint;
   protected buildSnaplines: typeof buildSnaplines;
   protected buildRoutelines: ReturnType<typeof buildRoutelinesFactory>;
@@ -113,36 +121,23 @@ export default class MaplibreGlDirections {
     this.interactive = false;
 
     if (this.waypoints.length >= 2) {
+      const { method, url, payload } = this.buildRequest(this.options, this.waypointsCoordinates);
+
       let snappoints: Waypoint[];
       let routes: Route[];
 
-      if (this.options.makePostRequest) {
-        const requestPayload = this.buildPostRequestPayload(this.waypointsCoordinates);
-
-        const response = (
-          await axios.post<Directions>(
-            `${this.options.request.api}/${this.options.request.profile}${
-              this.options.request.access_token ? `?access_token=${this.options.request.access_token}` : ""
-            }`,
-            // the URLSearchParams constructor perfectly works with the FormData, so ignore the TypeScript's complaint
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            new URLSearchParams(requestPayload),
-            {
-              headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-              },
-            },
-          )
-        ).data;
+      if (method === "get") {
+        const response = (await axios.get<Directions>(`${url}?${payload}`)).data;
 
         snappoints = response.waypoints;
         routes = response.routes;
       } else {
-        const requestPayload = this.buildGetRequestPayload(this.waypointsCoordinates);
-
         const response = (
-          await axios.get<Directions>(`${this.options.request.api}/${this.options.request.profile}/?${requestPayload}`)
+          await axios.post<Directions>(`${url}`, payload, {
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+          })
         ).data;
 
         snappoints = response.waypoints;

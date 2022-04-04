@@ -21,11 +21,14 @@
 
 <script setup lang="ts">
   import { ref, watch } from "vue";
+
   import maplibregl from "maplibre-gl";
-  import type { Map } from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
-  import style from "../assets/map/style.json";
-  import MaplibreGlDirections from "../../src/main";
+  import type { Map } from "maplibre-gl";
+  import style from "../assets/map/style/style.json";
+
+  // make sure you ran `npm link` and `npm link maplibre-gl-direction` if you've got an error here
+  import MaplibreGlDirections from "maplibre-gl-directions";
 
   const mapRef = ref();
   const eventuallyMap = new Promise<Map>((res) => {
@@ -34,6 +37,8 @@
         const _map = new maplibregl.Map({
           container: mapRef.value,
           style,
+          center: [-73.8271025, 40.8032906],
+          zoom: 10,
         });
 
         _map.on("load", () => {
@@ -49,7 +54,7 @@
     directions.value.interactive = interactive.value;
   });
 
-  const directions = ref();
+  const directions = ref<MaplibreGlDirections>();
 
   eventuallyMap.then((map) => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -57,15 +62,14 @@
     // const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 
     directions.value = new MaplibreGlDirections(map, {
+      makePostRequest: true,
+      api: "https://api.mapbox.com/directions/v5",
+      profile: "mapbox/driving-traffic",
       request: {
         access_token:
-          "pk.eyJ1Ijoic21lbGx5c2hvdmVsIiwiYSI6ImNsMWI3ZjByczFuYmUzanBmeWMxemQ1MzQifQ.stv4tSZc_8ProkPWVNb31A",
-        // alternatives: true,
-        // annotations: "congestion",
-        geometries: "geojson",
-        // overview: "full",
+          "pk.eyJ1Ijoic21lbGx5c2hvdmVsIiwiYSI6ImNsMWtoMm9najAwcjczb21vdm9hdjQyOXMifQ.oThCjV-a5XLNI0Ly-FEZXQ",
+        alternatives: "true",
       },
-      makePostRequest: true,
     });
 
     directions.value.interactive = interactive.value;
@@ -76,6 +80,6 @@
   });
 
   function clearRoutes() {
-    directions.value.clearRoutes();
+    directions.value.clear();
   }
 </script>

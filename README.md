@@ -1,11 +1,79 @@
-# Vue 3 + Typescript + Vite
+# Maplibre Gl Directions plugin
 
-This template should help get you started developing with Vue 3 and Typescript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+__❗ Please, note that the plugin is still work in progress. Don't use it in production util it reaches its stable state! ❗__
 
-## Recommended IDE Setup
+A routing-plugin for the [maplibre-gl-js](https://github.com/maplibre/maplibre-gl-js) powered maps. Supports any [OSRM](http://project-osrm.org/) or [Mapbox Directions API](https://docs.mapbox.com/api/navigation/directions/) compatible Routing-provider.
 
-- [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar)
+![1st Demo Screenshot](demo/assets/screenshots/1.png)
+![2nd Demo Screenshot](demo/assets/screenshots/2.png)
+![3rd Demo Screenshot](demo/assets/screenshots/3.png)
 
-## Type Support For `.vue` Imports in TS
 
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can enable Volar's `.vue` type support plugin by running `Volar: Switch TS Plugin on/off` from VSCode command palette.
+## Features
+
+### Different Routing-providers
+
+The plugin Supports any OSRM- or Mapbox Directions API-compatible Routing-provider out of the box!
+
+### User interaction
+
+Add and remove waypoints by clicking them, add waypoints in-between existing ones by simply dragging the selected route line, change the selected route by clicking an alternative route line. Everything is touch-friendly!
+
+You can also completely disable the user interaction anytime you want.
+
+### Congestions
+
+Support for Mapbox Directions API congestions (both plain and numeric!)
+
+### Customization
+
+The powerful customization interface allows to customize everything starting from visual aspects all the way up to request logic.
+
+
+### TypeScript support
+
+The plugin is written 100% in TypeScript and therefore ships with built-in types support.
+
+
+## Installation
+
+__❗ The plugin is awaiting to become included under the @maplibre scope. Until that there's no option to install it as an NPM package ❗__
+
+```shell
+$ npm i @maplibre/maplibre-gl-directions
+```
+
+## Usage
+
+```typescript
+// Import the plugin
+import MaplibreGlDirections from "@maplibre/maplibre-gl-directions";
+
+// Create an instance
+const directions = new MaplibreGlDirections(map, {
+  // optional settings
+});
+
+// Enable interactivity (if needed)
+directions.interactive = true;
+
+// Set the waypoints programmatically
+directions.setWaypoints([[-73.8271025, 40.8032906], [-73.8671258, 40.82234996]])
+
+// Remove waypoints
+directions.removeWaypoint(0);
+
+// Add waypoints
+directions.addWaypoint([-73.8671258, 40.82234996], 0);
+
+// Remove everything plugin-related from the map
+directions.clear();
+```
+
+Refer to the API docs (_here goes a link to deployed API docs_) for more!
+
+## Future plans
+
+* Emit events
+* Implement default control
+* Write tests

@@ -1,7 +1,9 @@
 import type { LayerSpecification } from "maplibre-gl";
 
 /**
- * Builds the standard `MaplibreGlDirections` layers with optionally scaled features.
+ * Builds the
+ * {@link https://github.com/smellyshovel/maplibre-gl-directions/blob/main/src/directions/layers.ts#L3|standard
+ * `MaplibreGlDirections` layers} with optionally scaled features.
  *
  * @param {number=} pointsScalingFactor A number to multiply the initial points' dimensions by
  * @param {number=} linesScalingFactor A number to multiply the initial lines' dimensions by

@@ -1,84 +1,53 @@
 import type { MaplibreGlDirectionsOptions, PointType, Route } from "./types";
 import type { Feature, LineString, Point } from "geojson";
-import { DefaultMaplibreGlDirectionsOptions } from "./types";
-import layersFactory from "./layers";
 import { nanoid } from "nanoid";
 import { congestionLevelDecoderFactory, coordinatesComparatorFactory, geometryDecoderFactory } from "./helpers";
+import { DefaultMaplibreGlDirectionsOptions } from "./types";
+import layersFactory from "./layers";
 
-/**
- * Takes a missing or an incomplete options object from the user and augments it with the default values.
- *
- * @param {Partial<MaplibreGlDirectionsOptions>=} customOptions
- * @returns {MaplibreGlDirectionsOptions}
- */
-export function buildOptions(
-  customOptions: Partial<MaplibreGlDirectionsOptions> = { request: {} },
-): MaplibreGlDirectionsOptions {
-  customOptions.request = Object.assign({}, DefaultMaplibreGlDirectionsOptions.request, customOptions.request);
-  const layers = layersFactory(
-    customOptions.pointsScalingFactor ?? DefaultMaplibreGlDirectionsOptions.pointsScalingFactor,
-    customOptions.linesScalingFactor ?? DefaultMaplibreGlDirectionsOptions.linesScalingFactor,
-  );
+export function buildOptions(customOptions?: Partial<MaplibreGlDirectionsOptions>): MaplibreGlDirectionsOptions {
+  const layers = layersFactory(customOptions?.pointsScalingFactor, customOptions?.linesScalingFactor);
   return Object.assign({}, DefaultMaplibreGlDirectionsOptions, { layers }, customOptions);
 }
 
 /**
- * Creates a context-aware function that takes the waypoints' coordinates and produces a FormData instance of all the
- * options that should go in the request body.
- *
- * @param {MaplibreGlDirectionsOptions["request"]} requestOptions
- * @returns {(waypointsCoordinates: [number, number][]) => URLSearchParams}
+ * Takes the {@link DefaultMaplibreGlDirectionsOptions} object and the waypoints' coordinates and returns the request method,
+ * URL and parameters.
  */
-export function buildPostRequestPayloadFactory(requestOptions: MaplibreGlDirectionsOptions["request"]) {
-  const newRequestPayload = Object.entries(requestOptions).reduce((acc, [key, value]) => {
-    if (!(key in DefaultMaplibreGlDirectionsOptions.request)) {
-      acc = acc.concat(`${key}=${value}`);
-    }
+export function buildRequest(
+  options: typeof DefaultMaplibreGlDirectionsOptions,
+  waypointsCoordinates: [number, number][],
+): { method: "get" | "post"; url: string; payload: URLSearchParams | FormData } {
+  const method = options.makePostRequest ? "post" : "get";
 
-    return acc;
-  }, [] as string[]);
+  let url: string;
+  let payload: URLSearchParams;
 
-  function buildPostRequestPayload(waypointsCoordinates: [number, number][]): FormData {
-    newRequestPayload.push(`coordinates=${waypointsCoordinates.map((waypoint) => waypoint.join(",")).join(";")}`);
+  if (method === "get") {
+    url = `${options.api}/${options.profile}/${waypointsCoordinates.join(";")}`;
+    payload = new URLSearchParams(options.request);
+  } else {
+    url = `${options.api}/${options.profile}${
+      options.request.access_token ? `?access_token=${options.request.access_token}` : ""
+    }`;
 
     const formData = new FormData();
 
-    newRequestPayload.forEach((keyValuePair) => {
-      const [key, value] = keyValuePair.split("=");
-
+    Object.entries(options.request).forEach(([key, value]) => {
       if (key !== "access_token") {
         formData.set(key, value);
       }
     });
 
-    return formData;
+    formData.set("coordinates", waypointsCoordinates.join(";"));
+
+    // the URLSearchParams constructor works perfectly fine with FormData, so ignore the TypeScript's complaint
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    payload = new URLSearchParams(formData);
   }
 
-  return buildPostRequestPayload;
-}
-
-/**
- * Creates a context-aware function that takes the waypoints' coordinates and produces an array of "="-concatenated
- * key-value string pairs of these request options.
- *
- * @param {MaplibreGlDirectionsOptions["request"]} requestOptions
- * @returns {(waypointsCoordinates: [number, number][]) => string[]}
- */
-export function buildGetRequestPayloadFactory(requestOptions: MaplibreGlDirectionsOptions["request"]) {
-  const newRequestPayload = Object.entries(requestOptions).reduce((acc, [key, value]) => {
-    if (!(key in DefaultMaplibreGlDirectionsOptions.request)) {
-      acc = acc.concat(`${key}=${value}`);
-    }
-
-    return acc;
-  }, [] as string[]);
-
-  function buildGetRequestPayload(waypointsCoordinates: [number, number][]): string[] {
-    newRequestPayload.push(`coordinates=${waypointsCoordinates.map((waypoint) => waypoint.join(",")).join(";")}`);
-    return newRequestPayload;
-  }
-
-  return buildGetRequestPayload;
+  return { method, url, payload };
 }
 
 /**
@@ -187,7 +156,7 @@ export function buildSnaplines(
  * @param {MaplibreGlDirectionsOptions["request"]} requestOptions
  * @returns {(routes: Route[], selectedRouteIndex: number, snappointsCoordinates: [number, number][]) => Feature<LineString>[][]}
  */
-export function buildRoutelinesFactory(requestOptions: MaplibreGlDirectionsOptions["request"]) {
+export function buildRoutelinesFactory(requestOptions: typeof DefaultMaplibreGlDirectionsOptions["request"]) {
   const geometryDecoder = geometryDecoderFactory(requestOptions);
   const coordinatesComparator = coordinatesComparatorFactory(requestOptions);
   const congestionLevelDecoder = congestionLevelDecoderFactory(requestOptions);

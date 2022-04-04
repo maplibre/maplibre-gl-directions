@@ -1,0 +1,8 @@
+{
+  "entryPoints": ["src/main.ts"],
+  "out": "doc_dist",
+  "readme": "doc/MAIN.md",
+  "includes": "doc",
+  "includeVersion": true,
+  "githubPages": true
+}

@@ -1,5 +1,6 @@
-import type { GeoJSONGeometry, Geometry, Leg, MaplibreGlDirectionsOptions, PolylineGeometry } from "./types";
+import type { GeoJSONGeometry, Geometry, Leg, PolylineGeometry } from "./types";
 import { decode } from "@mapbox/polyline";
+import { DefaultMaplibreGlDirectionsOptions } from "./types";
 
 /**
  * Creates a helper function that decodes the geometry of a route to the form of a coordinates array.
@@ -7,7 +8,7 @@ import { decode } from "@mapbox/polyline";
  * @param {MaplibreGlDirectionsOptions["request"]} requestOptions
  * @returns {(geometry: Geometry) => [number, number][]}
  */
-export function geometryDecoderFactory(requestOptions: MaplibreGlDirectionsOptions["request"]) {
+export function geometryDecoderFactory(requestOptions: typeof DefaultMaplibreGlDirectionsOptions["request"]) {
   let geometryDecoder: (geometry: Geometry) => [number, number][];
 
   if (requestOptions.geometries === "geojson") {
@@ -33,7 +34,7 @@ export function geometryDecoderFactory(requestOptions: MaplibreGlDirectionsOptio
  * @param {MaplibreGlDirectionsOptions["request"]} requestOptions
  * @returns {(annotation: ({congestion?: ("unknown" | "low" | "moderate" | "heavy" | "severe")[], congestion_numeric?: (number | null)[]} | undefined), segmentIndex: number) => number}
  */
-export function congestionLevelDecoderFactory(requestOptions: MaplibreGlDirectionsOptions["request"]) {
+export function congestionLevelDecoderFactory(requestOptions: typeof DefaultMaplibreGlDirectionsOptions["request"]) {
   let congestionLevelDecoder: (annotation: Leg["annotation"] | undefined, segmentIndex: number) => number;
 
   if (
@@ -79,7 +80,7 @@ export function congestionLevelDecoderFactory(requestOptions: MaplibreGlDirectio
  * @param {MaplibreGlDirectionsOptions["request"]} requestOptions
  * @return {(a: [number, number], b: [number, number]) => boolean}
  */
-export function coordinatesComparatorFactory(requestOptions: MaplibreGlDirectionsOptions["request"]) {
+export function coordinatesComparatorFactory(requestOptions: typeof DefaultMaplibreGlDirectionsOptions["request"]) {
   let coordinatesComparator: (a: [number, number], b: [number, number]) => boolean;
 
   if (!requestOptions.geometries || requestOptions.geometries === "polyline") {

@@ -1,0 +1,1 @@
+The files in this folder are used by TypeDoc to build the API documentation for the plugin. The MAIN.md file is a composition of all the other files in the same folder where each one represents a separate section of the main page of the API documentation.

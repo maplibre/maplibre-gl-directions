@@ -1,8 +1,8 @@
 import type maplibregl from "maplibre-gl";
 import type { MaplibreGlDirectionsOptions } from "../../src/directions/types";
 import MaplibreGlDirections from "../../src/directions/main";
-import * as utils from "../../src/directions/utils";
-import layersFactory from "../../src/directions/layers";
+import { utils } from "maplibre-gl-directions";
+import { layersFactory } from "maplibre-gl-directions";
 
 export default class CustomMaplibreGlDirections extends MaplibreGlDirections {
   constructor(map: maplibregl.Map, options?: Partial<MaplibreGlDirectionsOptions>) {
@@ -10,7 +10,7 @@ export default class CustomMaplibreGlDirections extends MaplibreGlDirections {
   }
 
   // originalBuildPostRequestPayload = utils.buildPostRequestPayloadFactory(this.options.request);
-  originalBuildPoint = utils.buildPointFactory(this.options.request);
+  originalBuildPoint = utils.buildPoint;
 
   // augmented implementation
 
@@ -27,27 +27,27 @@ export default class CustomMaplibreGlDirections extends MaplibreGlDirections {
   //   return requestPayload;
   // };
 
-  protected buildPoint = (
-    coordinate: [number, number],
-    type: "WAYPOINT" | "SNAPPOINT" | "HOVERPOINT",
-    properties?: Record<string, unknown>,
-  ) => {
-    const feature = this.originalBuildPoint(coordinate, type, properties);
-
-    if ((type === "HOVERPOINT" || type === "WAYPOINT") && feature.properties) {
-      feature.properties.straightLinesMode = this.straightLinesMode;
-    }
-
-    return feature;
-  };
-
-  updateHoverpointProperties() {
-    if (this.hoverpoint?.properties) {
-      this.hoverpoint.properties.straightLinesMode = this.straightLinesMode;
-    }
-
-    this.draw();
-  }
+  // protected buildPoint = (
+  //   coordinate: [number, number],
+  //   type: "WAYPOINT" | "SNAPPOINT" | "HOVERPOINT",
+  //   properties?: Record<string, unknown>,
+  // ) => {
+  //   const feature = this.originalBuildPoint(coordinate, type, properties);
+  //
+  //   if ((type === "HOVERPOINT" || type === "WAYPOINT") && feature.properties) {
+  //     feature.properties.straightLinesMode = this.straightLinesMode;
+  //   }
+  //
+  //   return feature;
+  // };
+  //
+  // updateHoverpointProperties() {
+  //   if (this.hoverpoint?.properties) {
+  //     this.hoverpoint.properties.straightLinesMode = this.straightLinesMode;
+  //   }
+  //
+  //   this.draw();
+  // }
 
   // augmented public interface
 
