@@ -1,49 +1,16 @@
-import type { Feature, FeatureCollection, LineString, Point } from "geojson";
 import type maplibregl from "maplibre-gl";
-import type { Directions, MaplibreGlDirectionsOptions, Route, Waypoint } from "./types";
+import type { Directions, MaplibreGlDirectionsConfiguration, Route, Snappoint } from "./types";
+import type { Feature, FeatureCollection, LineString, Point } from "geojson";
+import { buildConfiguration, buildRequest, buildPoint, buildSnaplines, buildRoutelines } from "./utils";
 import axios from "axios";
-import { buildRequest, buildPoint, buildRoutelinesFactory, buildSnaplines, buildOptions } from "./utils";
-import { DefaultMaplibreGlDirectionsOptions } from "./types";
 
 /**
- * The main class responsible for the routing itself.
- *
- * @example
- *
- * ```
- * <div id='map' style='width: 400px; height: 300px;'></div>
- * <script>
- * var map = new maplibregl.Map({
- * container: 'map',
- * style: 'https://demotiles.maplibre.org/style.json', // stylesheet location
- * center: [-74.5, 40], // starting position [lng, lat]
- * zoom: 9 // starting zoom
- * });
- * </script>
- * ```
- *
- * @example
- * ```
- * test.test();
- * ```
+ * The main class responsible for all the user interaction and for the routing itself.
  */
 export default class MaplibreGlDirections {
-  /**
-   * Creates an instance of the `MaplibreGlDirections` class.
-   */
-  constructor(map: maplibregl.Map, options?: Partial<typeof DefaultMaplibreGlDirectionsOptions>) {
+  constructor(map: maplibregl.Map, configuration?: Partial<MaplibreGlDirectionsConfiguration>) {
     this.map = map;
-    this.options = buildOptions(options);
-
-    /*
-     * Kind of meta-programming stuff. The factory functions below return custom context-aware functions specific for
-     * the current `MaplibreGlDirections` instance. The function returned by the factory function depends on the request
-     * options passed to the constructor and does one specific thing which allows to reduce the runtime-payload.
-     */
-    this.buildRequest = buildRequest;
-    this.buildPoint = buildPoint;
-    this.buildSnaplines = buildSnaplines;
-    this.buildRoutelines = buildRoutelinesFactory(this.options.request);
+    this.configuration = buildConfiguration(configuration);
 
     /*
      * Bind the event listeners to `this` since e.g. `map.off("type", onMove)` won't work if it was registered
@@ -63,12 +30,14 @@ export default class MaplibreGlDirections {
    * Everything is `protected` to allow access from a subclass.
    */
   protected readonly map: maplibregl.Map;
-  protected readonly options: MaplibreGlDirectionsOptions;
+  protected readonly configuration: MaplibreGlDirectionsConfiguration;
+
   protected _interactive = false;
-  protected buildRequest: typeof buildRequest;
-  protected buildPoint: typeof buildPoint;
-  protected buildSnaplines: typeof buildSnaplines;
-  protected buildRoutelines: ReturnType<typeof buildRoutelinesFactory>;
+  protected buildRequest = buildRequest;
+  protected buildPoint = buildPoint;
+  protected buildSnaplines = buildSnaplines;
+  protected buildRoutelines = buildRoutelines;
+
   protected onMoveHandler: (e: maplibregl.MapMouseEvent) => void;
   protected onDragDownHandler: (e: maplibregl.MapMouseEvent) => void;
   protected onDragMoveHandler: (e: maplibregl.MapMouseEvent) => void;
@@ -112,7 +81,7 @@ export default class MaplibreGlDirections {
       },
     });
 
-    this.options.layers.forEach((layer) => {
+    this.configuration.layers.forEach((layer) => {
       this.map.addLayer(layer);
     });
   }
@@ -121,9 +90,9 @@ export default class MaplibreGlDirections {
     this.interactive = false;
 
     if (this.waypoints.length >= 2) {
-      const { method, url, payload } = this.buildRequest(this.options, this.waypointsCoordinates);
+      const { method, url, payload } = this.buildRequest(this.configuration, this.waypointsCoordinates);
 
-      let snappoints: Waypoint[];
+      let snappoints: Snappoint[];
       let routes: Route[];
 
       if (method === "get") {
@@ -150,7 +119,12 @@ export default class MaplibreGlDirections {
         }),
       );
 
-      this.routelines = this.buildRoutelines(routes, this.selectedRouteIndex, this.snappoints);
+      this.routelines = this.buildRoutelines(
+        this.configuration.requestOptions,
+        routes,
+        this.selectedRouteIndex,
+        this.snappoints,
+      );
       if (routes.length <= this.selectedRouteIndex) this.selectedRouteIndex = 0;
     } else {
       this.snappoints = [];
@@ -231,10 +205,10 @@ export default class MaplibreGlDirections {
   protected onMove(e: maplibregl.MapMouseEvent) {
     const feature: (Feature & { layer: { id: string } }) | undefined = this.map.queryRenderedFeatures(e.point, {
       layers: [
-        ...this.options.sensitiveWaypointLayers,
-        ...this.options.sensitiveSnappointLayers,
-        ...this.options.sensitiveRoutelineLayers,
-        ...this.options.sensitiveAltRoutelineLayers,
+        ...this.configuration.sensitiveWaypointLayers,
+        ...this.configuration.sensitiveSnappointLayers,
+        ...this.configuration.sensitiveRoutelineLayers,
+        ...this.configuration.sensitiveAltRoutelineLayers,
       ],
     })[0];
 
@@ -243,7 +217,7 @@ export default class MaplibreGlDirections {
      */
     this.deHighlight();
 
-    if (this.options.sensitiveWaypointLayers.includes(feature?.layer.id ?? "")) {
+    if (this.configuration.sensitiveWaypointLayers.includes(feature?.layer.id ?? "")) {
       /*
        *  If the cursor moves over a waypoint then change its shape to "pointer", disable the map's standard drag-pan
        *  functionality (the user should be able to drag the waypoint itself, not the map), set the waypoint's
@@ -271,7 +245,7 @@ export default class MaplibreGlDirections {
       }
 
       if (this.hoverpoint) this.hoverpoint = undefined;
-    } else if (this.options.sensitiveSnappointLayers.includes(feature?.layer.id ?? "")) {
+    } else if (this.configuration.sensitiveSnappointLayers.includes(feature?.layer.id ?? "")) {
       /*
        *  If the cursor moves over a snappoint then change its shape to "pointer" and set the snappoint's "highlight"
        *  property to `true`. Set its respective waypoint's "highlight" property to `true` as well. Save the highlighted
@@ -297,7 +271,7 @@ export default class MaplibreGlDirections {
       }
 
       if (this.hoverpoint) this.hoverpoint = undefined;
-    } else if (this.options.sensitiveRoutelineLayers.includes(feature?.layer.id ?? "")) {
+    } else if (this.configuration.sensitiveRoutelineLayers.includes(feature?.layer.id ?? "")) {
       /*
        * If the cursor moves over the selected route line then change its shape to "pointer",  disable the map's
        * standard drag-pan functionality (the user should be able to drag the routeline itself, not the map), add a
@@ -327,7 +301,7 @@ export default class MaplibreGlDirections {
           }
         });
       });
-    } else if (this.options.sensitiveAltRoutelineLayers.includes(feature?.layer.id ?? "")) {
+    } else if (this.configuration.sensitiveAltRoutelineLayers.includes(feature?.layer.id ?? "")) {
       /*
        * If the cursor moves over an alternative route line then change its shape to "pointer" and set the routeline's
        * "highlight" property to `true`.
@@ -367,7 +341,7 @@ export default class MaplibreGlDirections {
     if (e.type === "mousedown" && e.originalEvent.which !== 1) return;
 
     const feature: (Feature & { layer: { id: string } }) | undefined = this.map.queryRenderedFeatures(e.point, {
-      layers: [...this.options.sensitiveWaypointLayers, ...this.options.sensitiveRoutelineLayers],
+      layers: [...this.configuration.sensitiveWaypointLayers, ...this.configuration.sensitiveRoutelineLayers],
     })[0];
 
     /*
@@ -375,7 +349,7 @@ export default class MaplibreGlDirections {
      */
     this.dragDownPosition = e.point;
 
-    if (this.options.sensitiveWaypointLayers.includes(feature?.layer.id ?? "")) {
+    if (this.configuration.sensitiveWaypointLayers.includes(feature?.layer.id ?? "")) {
       /*
        * When a waypoint is being dragged, save it and its current coordinates outside.
        */
@@ -387,7 +361,7 @@ export default class MaplibreGlDirections {
       this.waypointBeingDraggedInitialCoordinates = this.waypointBeingDragged?.geometry.coordinates as
         | [number, number]
         | undefined;
-    } else if (this.options.sensitiveRoutelineLayers.includes(feature?.layer.id ?? "")) {
+    } else if (this.configuration.sensitiveRoutelineLayers.includes(feature?.layer.id ?? "")) {
       /*
        * the "touchstart" event ("mousemove" equivalent) is not always fired before this `onDragDown` (which is also the
        * "touchstart"), therefore the hoverpoint might not exist yet. If it indeed does not, then create it and then
@@ -491,9 +465,9 @@ export default class MaplibreGlDirections {
      */
     if (
       Math.abs(e.point.x - this.dragDownPosition?.x) >
-        (this.options.dragThreshold >= 0 ? this.options.dragThreshold : 0) ||
+        (this.configuration.dragThreshold >= 0 ? this.configuration.dragThreshold : 0) ||
       Math.abs(e.point.y - this.dragDownPosition?.y) >
-        (this.options.dragThreshold >= 0 ? this.options.dragThreshold : 0)
+        (this.configuration.dragThreshold >= 0 ? this.configuration.dragThreshold : 0)
     ) {
       if (this.waypointBeingDragged) {
         /*
@@ -571,14 +545,14 @@ export default class MaplibreGlDirections {
   protected onClick(e: maplibregl.MapMouseEvent) {
     const feature: (Feature<Point> & { layer: { id: string } }) | undefined = this.map.queryRenderedFeatures(e.point, {
       layers: [
-        ...this.options.sensitiveWaypointLayers,
-        ...this.options.sensitiveSnappointLayers,
-        ...this.options.sensitiveAltRoutelineLayers,
-        ...this.options.sensitiveRoutelineLayers,
+        ...this.configuration.sensitiveWaypointLayers,
+        ...this.configuration.sensitiveSnappointLayers,
+        ...this.configuration.sensitiveAltRoutelineLayers,
+        ...this.configuration.sensitiveRoutelineLayers,
       ],
     })[0];
 
-    if (this.options.sensitiveWaypointLayers.includes(feature?.layer.id ?? "")) {
+    if (this.configuration.sensitiveWaypointLayers.includes(feature?.layer.id ?? "")) {
       /*
        * If a waypoint is clicked, remove it.
        */
@@ -590,7 +564,7 @@ export default class MaplibreGlDirections {
       if (~respectiveWaypointIndex) {
         this.removeWaypoint(respectiveWaypointIndex);
       }
-    } else if (this.options.sensitiveSnappointLayers.includes(feature?.layer.id ?? "")) {
+    } else if (this.configuration.sensitiveSnappointLayers.includes(feature?.layer.id ?? "")) {
       /*
        * If a snappoint is clicked, find its respective waypoint and remove it.
        */
@@ -602,7 +576,7 @@ export default class MaplibreGlDirections {
       if (~respectiveWaypointIndex) {
         this.removeWaypoint(respectiveWaypointIndex);
       }
-    } else if (this.options.sensitiveAltRoutelineLayers.includes(feature?.layer.id ?? "")) {
+    } else if (this.configuration.sensitiveAltRoutelineLayers.includes(feature?.layer.id ?? "")) {
       /*
        * If an alternative route line is clicked, set its index as the selected route's one.
        */
@@ -612,7 +586,7 @@ export default class MaplibreGlDirections {
           return segment.properties?.id === feature?.properties?.id;
         });
       });
-    } else if (!this.options.sensitiveRoutelineLayers.includes(feature?.layer.id ?? "")) {
+    } else if (!this.configuration.sensitiveRoutelineLayers.includes(feature?.layer.id ?? "")) {
       /*
        * If the selected route line is clicked, don't add a new waypoint. Else do.
        */
@@ -712,7 +686,7 @@ export default class MaplibreGlDirections {
    * de-initializing the instance.
    */
   destroy() {
-    this.options.layers.forEach((layer) => {
+    this.configuration.layers.forEach((layer) => {
       this.map.removeLayer(layer.id);
     });
 

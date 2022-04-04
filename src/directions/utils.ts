@@ -1,9 +1,9 @@
 import type { MaplibreGlDirectionsConfiguration, PointType, Route } from "./types";
-import { MaplibreGlDirectionsDefaultConfiguration } from "./types";
 import type { Feature, LineString, Point } from "geojson";
+import { MaplibreGlDirectionsDefaultConfiguration } from "./types";
+import layersFactory from "./layers";
 import { nanoid } from "nanoid";
 import { congestionLevelDecoder, coordinatesComparator, geometryDecoder } from "./helpers";
-import layersFactory from "./layers";
 
 /**
  * @protected
