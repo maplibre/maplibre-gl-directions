@@ -1,39 +1,49 @@
-import type { MaplibreGlDirectionsOptions, PointType, Route } from "./types";
+import type { MaplibreGlDirectionsConfiguration, PointType, Route } from "./types";
+import { MaplibreGlDirectionsDefaultConfiguration } from "./types";
 import type { Feature, LineString, Point } from "geojson";
 import { nanoid } from "nanoid";
-import { congestionLevelDecoderFactory, coordinatesComparatorFactory, geometryDecoderFactory } from "./helpers";
-import { DefaultMaplibreGlDirectionsOptions } from "./types";
+import { congestionLevelDecoder, coordinatesComparator, geometryDecoder } from "./helpers";
 import layersFactory from "./layers";
 
-export function buildOptions(customOptions?: Partial<MaplibreGlDirectionsOptions>): MaplibreGlDirectionsOptions {
-  const layers = layersFactory(customOptions?.pointsScalingFactor, customOptions?.linesScalingFactor);
-  return Object.assign({}, DefaultMaplibreGlDirectionsOptions, { layers }, customOptions);
+/**
+ * @protected
+ *
+ * Takes a missing or an incomplete {@link MaplibreGlDirectionsConfiguration|configuration object}, augments it with the
+ * default values and returns the complete configuration object.
+ */
+export function buildConfiguration(
+  customConfiguration?: Partial<MaplibreGlDirectionsConfiguration>,
+): MaplibreGlDirectionsConfiguration {
+  const layers = layersFactory(customConfiguration?.pointsScalingFactor, customConfiguration?.linesScalingFactor);
+  return Object.assign({}, MaplibreGlDirectionsDefaultConfiguration, { layers }, customConfiguration);
 }
 
 /**
- * Takes the {@link DefaultMaplibreGlDirectionsOptions} object and the waypoints' coordinates and returns the request method,
- * URL and parameters.
+ * @protected
+ *
+ * Builds the routing-request method, URL and payload based on the provided
+ * {@link MaplibreGlDirectionsConfiguration|configuration} and the waypoints' coordinates.
  */
 export function buildRequest(
-  options: typeof DefaultMaplibreGlDirectionsOptions,
+  configuration: MaplibreGlDirectionsConfiguration,
   waypointsCoordinates: [number, number][],
-): { method: "get" | "post"; url: string; payload: URLSearchParams | FormData } {
-  const method = options.makePostRequest ? "post" : "get";
+): { method: "get" | "post"; url: string; payload: URLSearchParams } {
+  const method = configuration.makePostRequest ? "post" : "get";
 
   let url: string;
   let payload: URLSearchParams;
 
   if (method === "get") {
-    url = `${options.api}/${options.profile}/${waypointsCoordinates.join(";")}`;
-    payload = new URLSearchParams(options.request);
+    url = `${configuration.api}/${configuration.profile}/${waypointsCoordinates.join(";")}`;
+    payload = new URLSearchParams(configuration.requestOptions as Record<string, string>);
   } else {
-    url = `${options.api}/${options.profile}${
-      options.request.access_token ? `?access_token=${options.request.access_token}` : ""
+    url = `${configuration.api}/${configuration.profile}${
+      configuration.requestOptions.access_token ? `?access_token=${configuration.requestOptions.access_token}` : ""
     }`;
 
     const formData = new FormData();
 
-    Object.entries(options.request).forEach(([key, value]) => {
+    Object.entries(configuration.requestOptions as Record<string, string>).forEach(([key, value]) => {
       if (key !== "access_token") {
         formData.set(key, value);
       }
@@ -51,12 +61,10 @@ export function buildRequest(
 }
 
 /**
- * Creates a GeoJSON Point Feature of one of the known types at a given coordinate.
+ * @protected
  *
- * @param {[number, number]} coordinate
- * @param {PointType} type
- * @param {Record<string, unknown>} properties
- * @return {Feature<Point>}
+ * Creates a {@link Feature<Point>|GeoJSON Point Feature} of one of the ${@link PointType|known types} with a given
+ * coordinate.
  */
 export function buildPoint(
   coordinate: [number, number],
@@ -78,15 +86,10 @@ export function buildPoint(
 }
 
 /**
- * Creates a context-aware function that creates a GeoJSON LineString Features array where each feature represents a
- * line connecting a waypoint with its respective snappoint and a hoverpoint with its respective snappoints.
+ * @protected
  *
- * @param {[number, number][]} waypointsCoordinates
- * @param {[number, number][]} snappointsCoordinates
- * @param {[number, number] | undefined} hoverpointCoordinates
- * @param {number} departSnappointIndex
- * @param {boolean} showHoverpointSnaplines
- * @return {Feature<LineString>[]}
+ * Creates a ${@link Feature<LineString>|GeoJSON LineString Features} array where each feature represents a
+ * line connecting a waypoint with its respective snappoint and the hoverpoint with its respective snappoints.
  */
 export function buildSnaplines(
   waypointsCoordinates: [number, number][],
@@ -147,108 +150,100 @@ export function buildSnaplines(
 }
 
 /**
- * Creates a context-aware function that creates routelines from the server response.
+ * @protected
  *
- * Each routeline is an array of legs, where each leg is an array of segments. A segment is a GeoJSON LineString
- * Feature. Route legs are divided into segments by their congestion levels. If there's no congestions, each route leg
- * consists of a single segment.
+ * Creates route lines from the server response.
  *
- * @param {MaplibreGlDirectionsOptions["request"]} requestOptions
- * @returns {(routes: Route[], selectedRouteIndex: number, snappointsCoordinates: [number, number][]) => Feature<LineString>[][]}
+ * Each route line is an array of legs, where each leg is an array of segments. A segment is a
+ * {@link Feature<LineString>|GeoJSON LineString Feature}. Route legs are divided into segments by their congestion
+ * levels. If there's no congestions, each route leg consists of a single segment.
  */
-export function buildRoutelinesFactory(requestOptions: typeof DefaultMaplibreGlDirectionsOptions["request"]) {
-  const geometryDecoder = geometryDecoderFactory(requestOptions);
-  const coordinatesComparator = coordinatesComparatorFactory(requestOptions);
-  const congestionLevelDecoder = congestionLevelDecoderFactory(requestOptions);
+export function buildRoutelines(
+  requestOptions: MaplibreGlDirectionsConfiguration["requestOptions"],
+  routes: Route[],
+  selectedRouteIndex: number,
+  snappoints: Feature<Point>[],
+): Feature<LineString>[][] {
+  // do the following stuff for each route (there are multiple when `alternatives=true` request option is set)
+  return routes.map((route, routeIndex) => {
+    // a list of coordinates pairs (longitude-latitude) the route goes by
+    const coordinates = geometryDecoder(requestOptions, route.geometry);
 
-  function buildRoutelines(
-    routes: Route[],
-    selectedRouteIndex: number,
-    snappoints: Feature<Point>[],
-  ): Feature<LineString>[][] {
-    // do the following stuff for each route (there are multiple when `alternatives=true` request option is set)
-    return routes.map((route, routeIndex) => {
-      // a list of coordinates pairs (longitude-latitude) the route goes by
-      const coordinates = geometryDecoder(route.geometry);
+    // get coordinates from the snappoint-features
+    const snappointsCoordinates = snappoints.map((snappoint) => snappoint.geometry.coordinates);
 
-      // get coordinates from the snappoint-features
-      const snappointsCoordinates = snappoints.map((snappoint) => snappoint.geometry.coordinates);
-
-      // indices of coordinate pairs that match existing snappoints (except for the first one)
-      const snappointsCoordinatesIndices = snappointsCoordinates
-        .map((snappointLngLat) => {
-          return coordinates.findIndex((lngLat) => {
-            // there might be an error in 0.00001 degree between snappoint and decoded coordinate when using the
-            // "polyline" geometries. The comparator neglects that
-            return coordinatesComparator(lngLat, snappointLngLat as [number, number]);
-          });
-        })
-        .slice(1); // because the first one is always 0
-
-      // split the coordinates array by legs. Each leg consists of coordinates between snappoints
-      let initialIndex = 0;
-      const legsCoordinates = snappointsCoordinatesIndices.map((waypointCoordinatesIndex) => {
-        return coordinates.slice(initialIndex, (initialIndex = waypointCoordinatesIndex + 1));
-      });
-
-      // an array to store the resulting route's features in
-      const features: Feature<LineString>[] = [];
-
-      legsCoordinates.forEach((legCoordinates, legIndex) => {
-        const legId = nanoid();
-
-        // for each pair of leg's coordinates
-        legCoordinates.forEach((lngLat, i) => {
-          // find the previous segment
-          const previousSegment = features[features.length - 1] as Feature<LineString> | undefined;
-          // determine the current segment's congestion level
-          const segmentCongestion = congestionLevelDecoder(route.legs[legIndex]?.annotation, i);
-
-          // only allow to continue the previous segment if it exists and if it's the same leg and if it's the same
-          // congestion level
-          if (
-            legIndex === previousSegment?.properties?.legIndex &&
-            previousSegment.properties?.congestion === segmentCongestion
-          ) {
-            previousSegment.geometry.coordinates.push(lngLat);
-          } else {
-            const departSnappointProperties = snappoints[legIndex].properties ?? {};
-            const arriveSnappointProperties = snappoints[legIndex + 1].properties ?? {};
-
-            const segment = {
-              type: "Feature",
-              geometry: {
-                type: "LineString",
-                coordinates: [],
-              },
-              properties: {
-                id: legId, // used to highlight the whole leg when hovered, not a single segment
-                routeIndex, // used to switch between alternative and selected routes
-                route: routeIndex === selectedRouteIndex ? "SELECTED" : "ALT",
-                legIndex, // used across forEach iterations to check whether it's safe to continue a segment
-                congestion: segmentCongestion, // the current segment's congestion level
-                departSnappointProperties, // include depart and arrive snappoints' properties to allow customization...
-                arriveSnappointProperties, // ...of behavior via a subclass
-              },
-            } as Feature<LineString>;
-
-            // a new segment starts with previous segment's last coordinate
-            if (previousSegment) {
-              segment.geometry.coordinates.push(
-                previousSegment.geometry.coordinates[previousSegment.geometry.coordinates.length - 1],
-              );
-            }
-
-            segment.geometry.coordinates.push(lngLat);
-
-            features.push(segment);
-          }
+    // indices of coordinate pairs that match existing snappoints (except for the first one)
+    const snappointsCoordinatesIndices = snappointsCoordinates
+      .map((snappointLngLat) => {
+        return coordinates.findIndex((lngLat) => {
+          // there might be an error in 0.00001 degree between snappoint and decoded coordinate when using the
+          // "polyline" geometries. The comparator neglects that
+          return coordinatesComparator(requestOptions, lngLat, snappointLngLat as [number, number]);
         });
-      });
+      })
+      .slice(1); // because the first one is always 0
 
-      return features;
+    // split the coordinates array by legs. Each leg consists of coordinates between snappoints
+    let initialIndex = 0;
+    const legsCoordinates = snappointsCoordinatesIndices.map((waypointCoordinatesIndex) => {
+      return coordinates.slice(initialIndex, (initialIndex = waypointCoordinatesIndex + 1));
     });
-  }
 
-  return buildRoutelines;
+    // an array to store the resulting route's features in
+    const features: Feature<LineString>[] = [];
+
+    legsCoordinates.forEach((legCoordinates, legIndex) => {
+      const legId = nanoid();
+
+      // for each pair of leg's coordinates
+      legCoordinates.forEach((lngLat, i) => {
+        // find the previous segment
+        const previousSegment = features[features.length - 1] as Feature<LineString> | undefined;
+        // determine the current segment's congestion level
+        const segmentCongestion = congestionLevelDecoder(requestOptions, route.legs[legIndex]?.annotation, i);
+
+        // only allow to continue the previous segment if it exists and if it's the same leg and if it's the same
+        // congestion level
+        if (
+          legIndex === previousSegment?.properties?.legIndex &&
+          previousSegment.properties?.congestion === segmentCongestion
+        ) {
+          previousSegment.geometry.coordinates.push(lngLat);
+        } else {
+          const departSnappointProperties = snappoints[legIndex].properties ?? {};
+          const arriveSnappointProperties = snappoints[legIndex + 1].properties ?? {};
+
+          const segment = {
+            type: "Feature",
+            geometry: {
+              type: "LineString",
+              coordinates: [],
+            },
+            properties: {
+              id: legId, // used to highlight the whole leg when hovered, not a single segment
+              routeIndex, // used to switch between alternative and selected routes
+              route: routeIndex === selectedRouteIndex ? "SELECTED" : "ALT",
+              legIndex, // used across forEach iterations to check whether it's safe to continue a segment
+              congestion: segmentCongestion, // the current segment's congestion level
+              departSnappointProperties, // include depart and arrive snappoints' properties to allow customization...
+              arriveSnappointProperties, // ...of behavior via a subclass
+            },
+          } as Feature<LineString>;
+
+          // a new segment starts with previous segment's last coordinate
+          if (previousSegment) {
+            segment.geometry.coordinates.push(
+              previousSegment.geometry.coordinates[previousSegment.geometry.coordinates.length - 1],
+            );
+          }
+
+          segment.geometry.coordinates.push(lngLat);
+
+          features.push(segment);
+        }
+      });
+    });
+
+    return features;
+  });
 }
