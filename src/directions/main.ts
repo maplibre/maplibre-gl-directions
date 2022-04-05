@@ -304,7 +304,7 @@ export default class MaplibreGlDirections {
     } else if (this.configuration.sensitiveAltRoutelineLayers.includes(feature?.layer.id ?? "")) {
       /*
        * If the cursor moves over an alternative route line then change its shape to "pointer" and set the routeline's
-       * "highlight" property to `true`.
+       * "highlight" property to `true`. Remove the existing hoverpoint.
        */
 
       this.map.getCanvas().style.cursor = "pointer";
@@ -316,6 +316,8 @@ export default class MaplibreGlDirections {
           }
         });
       });
+
+      if (this.hoverpoint) this.hoverpoint = undefined;
     } else {
       /*
        * If the cursor moves somewhere else then re-enable the drag-pan functionality, restore the cursor original shape
@@ -341,7 +343,11 @@ export default class MaplibreGlDirections {
     if (e.type === "mousedown" && e.originalEvent.which !== 1) return;
 
     const feature: (Feature & { layer: { id: string } }) | undefined = this.map.queryRenderedFeatures(e.point, {
-      layers: [...this.configuration.sensitiveWaypointLayers, ...this.configuration.sensitiveRoutelineLayers],
+      layers: [
+        ...this.configuration.sensitiveWaypointLayers,
+        ...this.configuration.sensitiveSnappointLayers,
+        ...this.configuration.sensitiveRoutelineLayers,
+      ],
     })[0];
 
     /*
