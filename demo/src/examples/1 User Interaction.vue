@@ -2,6 +2,11 @@
   <app-sidebar>
     <template #title>{{ name }}</template>
 
+    <label class="flex items-center gap-3">
+      <input v-model="interactive" type="checkbox" />
+      <strong>Interactivity enabled</strong>
+    </label>
+
     <ul>
       <li>Click somewhere on the map to add a waypoint</li>
       <li>Click a waypoint to remove it and its related snappoint</li>
@@ -22,15 +27,17 @@
 </template>
 
 <script setup lang="ts">
-  import { onMounted, ref } from "vue";
+  import { computed, onMounted, ref } from "vue";
   import { useRoute } from "vue-router";
   import AppSidebar from "../components/AppSidebar.vue";
   import maplibregl from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
-  import style from "../assets/map/style/style.json";
+  import style from "../assets/map/style/style.json?url";
   import MaplibreGlDirections from "maplibre-gl-directions";
 
   const name = ref(useRoute().matched[0].name);
+
+  const directions = ref<MaplibreGlDirections>();
 
   const mapRef = ref();
   onMounted(() => {
@@ -42,12 +49,25 @@
     });
 
     map.on("load", () => {
-      const directions = new MaplibreGlDirections(map, {
+      directions.value = new MaplibreGlDirections(map, {
         requestOptions: {
           alternatives: "true",
         },
       });
-      directions.interactive = true;
+
+      directions.value.interactive = true;
     });
+  });
+
+  const interactive = computed({
+    get() {
+      return directions.value?.interactive ?? false;
+    },
+
+    set(value: boolean) {
+      if (directions.value) {
+        directions.value.interactive = value;
+      }
+    },
   });
 </script>

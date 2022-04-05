@@ -17,15 +17,15 @@ __Please, select the `dev` branch as a PR base.__
 
 ## NPM Scripts
 
+- `npm run dev:lib` - starts a vite-powered development server for the library source files. Continuously rebuilds the contents of the `/dist` folder while you make changes to contents of the `/src` folder.
+- `npm run dev:doc` - starts a typedoc-powered development server for the API documentation. Continuously rebuilds the contents of the `/doc_dist` folder parsing the source code JSDoc-like comments.
+- `npm run dev:demo` - starts a Vite-powered development server for the Demo project. The Demo project targets the plugin from the `/dist` folder via a symlinked `maplibre-gl-directions` package.
+- `npm run build`
 
-* `npm run dev:lib` - starts a vite-powered development server for the library source files. Continuously rebuilds the contents of the `/dist` folder while you make changes to contents of the `/src` folder.
-* `npm run dev:doc` - starts a typedoc-powered development server for the API documentation. Continuously rebuilds the contents of the `/doc_dist` folder parsing the source code JSDoc-like comments.
-* `npm run dev:demo` - starts a Vite-powered development server for the Demo project. The Demo project targets the plugin from the `/dist` folder via a symlinked `maplibre-gl-directions` package.
-* `npm run build`
+  Combines `npm run build:lib`, `npm run build:doc` and `npm run build:demo` into a single call.
 
-    Combines `npm run build:lib`, `npm run build:doc` and `npm run build:demo` into a single call.
-  * `npm run build:lib` - builds the `/src` folder contents and outputs the resulting es-module and its type declarations to the `/dist` folder.
-  * `npm run build:doc` - builds the `/doc` folder contents using the TypeDoc compiler and outputs the result to the `/doc_dist` folder.
-  * `npm run build:demo` - builds the Demo project and outputs the resulting static-site into the `/demo/dist` folder.
+  - `npm run build:lib` - builds the `/src` folder contents and outputs the resulting es-module and its type declarations to the `/dist` folder.
+  - `npm run build:doc` - builds the `/doc` folder contents using the TypeDoc compiler and outputs the result to the `/doc_dist` folder.
+  - `npm run build:demo` - builds the Demo project and outputs the resulting static-site into the `/demo/dist` folder.
 
 There's no build pipeline configured yet, so you don't have to build the library manually before creating the PR.

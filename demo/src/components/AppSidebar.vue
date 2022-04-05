@@ -1,13 +1,13 @@
 <template>
   <aside class="basis-1/3 overflow-hidden shadow-xl">
-    <div class="h-full flex flex-col bg-inherit overflow-y-auto">
+    <div class="h-full flex flex-col bg-inherit overflow-x-hidden overflow-y-auto">
       <header v-if="!props.noHeader" class="p-10 pb-5 flex justify-between gap-5 sticky top-0 bg-inherit">
         <router-link :to="{ name: 'Menu' }">Back to Menu</router-link>
         <a :href="sourceLink">Source</a>
       </header>
 
       <article class="p-10 flex flex-col gap-3" :class="{ 'pt-0': !props.noHeader }">
-        <h1 class="">
+        <h1 class="break-all">
           <slot name="title" />
         </h1>
 

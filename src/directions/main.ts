@@ -44,14 +44,19 @@ export default class MaplibreGlDirections {
   protected onDragUpHandler: (e: maplibregl.MapMouseEvent) => void;
   protected onClickHandler: (e: maplibregl.MapMouseEvent) => void;
 
-  protected waypoints: Feature<Point>[] = [];
+  protected _waypoints: Feature<Point>[] = [];
   protected snappoints: Feature<Point>[] = [];
   protected routelines: Feature<LineString>[][] = [];
   protected selectedRouteIndex = 0;
   protected hoverpoint: Feature<Point> | undefined = undefined;
 
+  /**
+   * @alias {@link waypoints}
+   *
+   * Aliased for the sakes of naming-consistency.
+   */
   protected get waypointsCoordinates(): [number, number][] {
-    return this.waypoints.map((waypoint) => {
+    return this._waypoints.map((waypoint) => {
       return [waypoint.geometry.coordinates[0], waypoint.geometry.coordinates[1]];
     });
   }
@@ -87,9 +92,10 @@ export default class MaplibreGlDirections {
   }
 
   protected async fetchDirections() {
+    const prevInteractive = this.interactive;
     this.interactive = false;
 
-    if (this.waypoints.length >= 2) {
+    if (this._waypoints.length >= 2) {
       const { method, url, payload } = this.buildRequest(this.configuration, this.waypointsCoordinates);
 
       let snappoints: Snappoint[];
@@ -115,7 +121,7 @@ export default class MaplibreGlDirections {
 
       this.snappoints = snappoints.map((snappoint, i) =>
         this.buildPoint(snappoint.location, "SNAPPOINT", {
-          waypointProperties: this.waypoints[i].properties ?? {},
+          waypointProperties: this._waypoints[i].properties ?? {},
         }),
       );
 
@@ -134,12 +140,12 @@ export default class MaplibreGlDirections {
     // the selected route index might have changed
     this.draw(false);
 
-    this.interactive = true;
+    this.interactive = prevInteractive;
   }
 
   protected draw(skipSelectedRouteRedraw = true) {
     const features = [
-      ...this.waypoints,
+      ...this._waypoints,
       ...this.snappoints,
       ...this.snaplines,
       ...this.routelines.reduce((acc, routeLegs) => {
@@ -229,11 +235,11 @@ export default class MaplibreGlDirections {
       this.map.getCanvas().style.cursor = "pointer";
       this.map.dragPan.disable();
 
-      const highlightedWaypointIndex = this.waypoints.findIndex((waypoint) => {
+      const highlightedWaypointIndex = this._waypoints.findIndex((waypoint) => {
         return waypoint.properties?.id === feature?.properties?.id;
       });
 
-      this.highlightedWaypoints = [this.waypoints[highlightedWaypointIndex]];
+      this.highlightedWaypoints = [this._waypoints[highlightedWaypointIndex]];
       this.highlightedSnappoints = [this.snappoints[highlightedWaypointIndex]];
 
       if (this.highlightedWaypoints[0]?.properties) {
@@ -260,7 +266,7 @@ export default class MaplibreGlDirections {
       });
 
       this.highlightedSnappoints = [this.snappoints[highlightedSnappointIndex]];
-      this.highlightedWaypoints = [this.waypoints[highlightedSnappointIndex]];
+      this.highlightedWaypoints = [this._waypoints[highlightedSnappointIndex]];
 
       if (this.highlightedSnappoints[0].properties) {
         this.highlightedSnappoints[0].properties.highlight = true;
@@ -360,7 +366,7 @@ export default class MaplibreGlDirections {
        * When a waypoint is being dragged, save it and its current coordinates outside.
        */
 
-      this.waypointBeingDragged = this.waypoints.find((waypoint) => {
+      this.waypointBeingDragged = this._waypoints.find((waypoint) => {
         return waypoint.properties?.id === feature?.properties?.id;
       });
 
@@ -563,7 +569,7 @@ export default class MaplibreGlDirections {
        * If a waypoint is clicked, remove it.
        */
 
-      const respectiveWaypointIndex = this.waypoints.findIndex((waypoint) => {
+      const respectiveWaypointIndex = this._waypoints.findIndex((waypoint) => {
         return waypoint.properties?.id === feature?.properties?.id;
       });
 
@@ -636,13 +642,27 @@ export default class MaplibreGlDirections {
   }
 
   /**
+   * Returns all the waypoints' coordinates in the order they appear.
+   */
+  get waypoints() {
+    return this.waypointsCoordinates;
+  }
+
+  /**
+   * @alias Synchronous analogue of {@link setWaypoints}.
+   */
+  set waypoints(waypoints: [number, number][]) {
+    this.setWaypoints(waypoints);
+  }
+
+  /**
    * Replaces all the waypoints with the specified ones and re-fetches the routes.
    *
    * @param {[number, number][]} waypoints The coordinates at which the waypoints should be added
    * @return {Promise<void>} Resolved after the routing request has finished
    */
   async setWaypoints(waypoints: [number, number][]) {
-    this.waypoints = waypoints.map((waypoint) => {
+    this._waypoints = waypoints.map((waypoint) => {
       return this.buildPoint(waypoint, "WAYPOINT");
     });
 
@@ -658,8 +678,8 @@ export default class MaplibreGlDirections {
    * @return {Promise<void>} Resolved after the routing request has finished
    */
   async addWaypoint(waypoint: [number, number], index?: number) {
-    index = index ?? this.waypoints.length;
-    this.waypoints.splice(index, 0, this.buildPoint(waypoint, "WAYPOINT"));
+    index = index ?? this._waypoints.length;
+    this._waypoints.splice(index, 0, this.buildPoint(waypoint, "WAYPOINT"));
 
     this.draw();
     await this.fetchDirections();
@@ -672,7 +692,7 @@ export default class MaplibreGlDirections {
    * @return {Promise<void>} Resolved after the routing request has finished
    */
   async removeWaypoint(index: number) {
-    this.waypoints.splice(index, 1);
+    this._waypoints.splice(index, 1);
     this.snappoints.splice(index, 1);
 
     this.draw();

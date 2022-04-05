@@ -8,12 +8,13 @@
   "module": "./dist/maplibre-gl-directions.es.js",
   "types": "./dist/main.d.ts",
   "scripts": {
-    "dev:lib": "vue-tsc && vite build --watch --mode development --config vite.lib.config.ts",
-    "dev:doc": "typedoc --watch",
+    "dev:lib": "vue-tsc --project lib.tsconfig.json && vite build --watch --mode development --config vite.lib.config.ts",
+    "dev:doc": "typedoc --tsconfig lib.tsconfig.json --watch",
     "dev:demo": "vite --config vite.demo.config.ts",
     "build": "npm run build:lib && npm run build:doc && npm run build:demo",
-    "build:lib": "vue-tsc && vite build --config vite.lib.config.ts",
-    "build:doc": "typedoc",
+    "lint": "eslint --fix && prettier -w ./",
+    "build:lib": "vue-tsc --project lib.tsconfig.json && vite build --config vite.lib.config.ts",
+    "build:doc": "typedoc --tsconfig lib.tsconfig.json",
     "build:demo": "vite build --config vite.demo.config.ts"
   },
   "dependencies": {
