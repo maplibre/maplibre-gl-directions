@@ -1,12 +1,9 @@
 import type maplibregl from "maplibre-gl";
-import type { MaplibreGlDirectionsOptions } from "../../src/directions/types";
-import MaplibreGlDirections from "../../src/directions/main";
-import { utils } from "maplibre-gl-directions";
-import { layersFactory } from "maplibre-gl-directions";
+import MaplibreGlDirections, { MaplibreGlDirectionsConfiguration, utils, layersFactory } from "maplibre-gl-directions";
 
 export default class CustomMaplibreGlDirections extends MaplibreGlDirections {
-  constructor(map: maplibregl.Map, options?: Partial<MaplibreGlDirectionsOptions>) {
-    super(map, options);
+  constructor(map: maplibregl.Map, configuration?: Partial<MaplibreGlDirectionsConfiguration>) {
+    super(map, configuration);
   }
 
   // originalBuildPostRequestPayload = utils.buildPostRequestPayloadFactory(this.options.request);
@@ -46,8 +43,7 @@ export default class CustomMaplibreGlDirections extends MaplibreGlDirections {
   //     this.hoverpoint.properties.straightLinesMode = this.straightLinesMode;
   //   }
   //
-  //   this.draw();
-  // }
+  //   this.draw();  // }
 
   // augmented public interface
 

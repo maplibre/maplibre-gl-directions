@@ -4,9 +4,9 @@ __❗ Please, note that the plugin is still work in progress. Don't use it in pr
 
 A routing-plugin for the [maplibre-gl-js](https://github.com/maplibre/maplibre-gl-js) powered maps. Supports any [OSRM](http://project-osrm.org/) or [Mapbox Directions API](https://docs.mapbox.com/api/navigation/directions/) compatible Routing-provider.
 
-![1st Demo Screenshot](demo/assets/screenshots/1.png)
-![2nd Demo Screenshot](demo/assets/screenshots/2.png)
-![3rd Demo Screenshot](demo/assets/screenshots/3.png)
+![1st Demo Screenshot](demo/src/assets/screenshots/1.png)
+![2nd Demo Screenshot](demo/src/assets/screenshots/2.png)
+![3rd Demo Screenshot](demo/src/assets/screenshots/3.png)
 
 
 ## Features

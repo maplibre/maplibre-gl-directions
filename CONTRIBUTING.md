@@ -17,12 +17,10 @@ __Please, select the `dev` branch as a PR base.__
 
 ## NPM Scripts
 
-* `npm run dev`
 
-    Combines `npm run dev:lib`, `npm run dev:doc` and `npm run dev:demo` into a single call.
-  * `npm run dev:lib` - starts a vite-powered development server for the library source files. Continuously rebuilds the contents of the `/dist` folder while you make changes to contents of the `/src` folder.
-  * `npm run dev:doc` - starts a typedoc-powered development server for the API documentation. Continuously rebuilds the contents of the `/doc_dist` folder parsing the source code JSDoc-like comments.
-  * `npm run dev:demo` - starts a Vite-powered development server for the Demo project. The Demo project targets the plugin from the `/dist` folder via a symlinked `maplibre-gl-directions` package.
+* `npm run dev:lib` - starts a vite-powered development server for the library source files. Continuously rebuilds the contents of the `/dist` folder while you make changes to contents of the `/src` folder.
+* `npm run dev:doc` - starts a typedoc-powered development server for the API documentation. Continuously rebuilds the contents of the `/doc_dist` folder parsing the source code JSDoc-like comments.
+* `npm run dev:demo` - starts a Vite-powered development server for the Demo project. The Demo project targets the plugin from the `/dist` folder via a symlinked `maplibre-gl-directions` package.
 * `npm run build`
 
     Combines `npm run build:lib`, `npm run build:doc` and `npm run build:demo` into a single call.

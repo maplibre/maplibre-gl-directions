@@ -8,7 +8,6 @@
   "module": "./dist/maplibre-gl-directions.es.js",
   "types": "./dist/main.d.ts",
   "scripts": {
-    "dev": "npm run dev:lib && npm run dev:doc && npm run dev:demo",
     "dev:lib": "vue-tsc && vite build --watch --mode development --config vite.lib.config.ts",
     "dev:doc": "typedoc --watch",
     "dev:demo": "vite --config vite.demo.config.ts",

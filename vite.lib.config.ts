@@ -8,9 +8,7 @@ export default defineConfig({
 
     lib: {
       entry: "src/main.ts",
-      name: "MaplibreGlDirections",
       formats: ["es"],
-      fileName: "maplibre-gl-directions",
     },
   },
 });

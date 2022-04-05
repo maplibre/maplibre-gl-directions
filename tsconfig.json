@@ -12,13 +12,9 @@
     "sourceMap": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "lib": ["esnext", "dom"]
+    "lib": ["esnext", "dom"],
+    "types": ["vite/client"]
   },
-  "references": [
-    {
-      "maplibre-gld": "/"
-    }
-  ],
   "include": ["src/**/*.ts", "src/**/*.d.ts"],
-  "exclude": ["dist/**/*", "node_modules/**/*"]
+  "exclude": ["dist/**/*", "node_modules/**/*", "doc/**/*", "doc_dist/**/*"]
 }
