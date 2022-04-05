@@ -1,4 +1,5 @@
 # Fiord Color
+
 [![Build Status](https://travis-ci.org/openmaptiles/fiord-color-gl-style.svg?branch=master)](https://travis-ci.org/openmaptiles/fiord-color-gl-style)
 
 A basemap style useful with fiord color ideal as background map for data visualizations. It is using the vector tile
@@ -24,7 +25,6 @@ After you've started Maputnik open the editor on `localhost:8000`.
 ```
 maputnik --watch --file style.json
 ```
-
 
 ## License
 

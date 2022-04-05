@@ -3,35 +3,38 @@
 @tailwind utilities;
 
 @layer base {
-    * {
-        box-sizing: border-box;
-    }
+  * {
+    box-sizing: border-box;
+  }
 
-    html, body, #app, main {
-        @apply h-full bg-slate-800 text-slate-200 font-sans
-    }
+  html,
+  body,
+  #app,
+  main {
+    @apply h-full bg-slate-800 text-slate-200 font-sans;
+  }
 
-    main > * {
-        @apply w-full bg-slate-700 rounded-3xl
-    }
+  main > * {
+    @apply w-full bg-slate-700 rounded-3xl;
+  }
 
-    a {
-        @apply hover:underline underline-offset-4
-    }
+  a {
+    @apply hover:underline underline-offset-4;
+  }
 
-    h1 {
-        @apply text-5xl
-    }
+  h1 {
+    @apply text-5xl;
+  }
 
-    ul {
-        @apply list-disc list-inside
-    }
+  ul {
+    @apply list-disc list-inside;
+  }
 
-    ul li {
-        @apply my-2 ml-6 -indent-6
-    }
+  ul li {
+    @apply my-2 ml-6 -indent-6;
+  }
 
-    small {
-        @apply text-sm text-slate-400
-    }
+  small {
+    @apply text-sm text-slate-400;
+  }
 }

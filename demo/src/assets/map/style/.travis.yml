@@ -1,7 +1,7 @@
 language: node_js
 sudo: required
 node_js:
-  - '4'
+  - "4"
 branches:
   only:
     - master
@@ -14,7 +14,7 @@ addons:
     packages:
       - libstdc++6
 script:
-  - 'git clone https://github.com/klokantech/gl-style-package-spec.git'
+  - "git clone https://github.com/klokantech/gl-style-package-spec.git"
   - cd gl-style-package-spec
   - bash ./task/run.sh
 env:
@@ -23,10 +23,10 @@ env:
         XeQHO3LqTXJtOhko9TT54HlBkvUM60ToGviYzNZzzrvM6W1ReURGjOovRXf0hZY3RO5W2zdBRy7FmFo6F2uO4c1BespNpMrgqY8tbZdk1LNvhrpaLjGEZPAcX32JnFDnEJs1USZHNQlhF5blHg76R/6QyNxt7uJGy7um86B2PWZORGjnky7Ct6/6FIIYToK3V2qrnVsasL0I7M5jEMnPQ6Bh/DjGGmIR9q3mbAFb9DSmqKoVoZX7uAv4hbilM7milRkWhUtHHhxOUNWPoQChSdOkAYXZj1FZ5eFToOdwqCQdr/YdXsnKcLgp4w+oadnjcBHeq8WRzKqrcabHeBEGqc9OApryaAzubd+1r4pXTQcYcDuZTftGtMt6ZFlwH4FMMfofuzPFU0nvoh6H29Qlk8u75h9TjV5sTHA5VRzS9vQ5Tvo2UFhi50xyzbm0Ra2sQAHH9sw8wkg6hrLtqppIJ4mEVmvJg3Rk15au2XSbZixfzBE6fpVf1SnFxwKGV4H/Zc1zJHFlDA5v9FTDSq51fdHxUPiDX98U6FfURJ4HuGhinhADmYoRSdhn6e0ls3QKn+jZ1B3htrgJhSLQ8ZLj3yNFsqRsPYfSLf2S8R5Yn6zT5bypbyddk5jZUKW5eOcbru89UXtSyBlpnb73CJkIxwrxzkcwDa6JHtw8E/IeObY=
 deploy:
   provider: releases
-  api_key: '${GITHUB_TOKEN}'
-  file: 'build/${TRAVIS_TAG}.zip'
+  api_key: "${GITHUB_TOKEN}"
+  file: "build/${TRAVIS_TAG}.zip"
   skip_cleanup: true
-  'on':
+  "on":
     tags: true
 services:
   - docker
