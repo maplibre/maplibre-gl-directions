@@ -3,16 +3,15 @@
 1. Fork the repo
 2. Clone the fork
 3. Install the dependencies: `npm i`
-4. Run `npm run build:lib`
-5. Run `npm link`
-6. Run `npm link @maplibre/maplibre-gl-directions`
-7. Run `npm run build:lib`
-8. Introduce some changes (see the section below)
-9. Make sure the `npm run build` passes
-10. Commit and push the changes
-11. Create a PR
+4. Run `npm link`
+5. Run `npm link @maplibre/maplibre-gl-directions`
+6. Run `npm run build:lib`
+7. Introduce some changes (see the section below)
+8. Make sure the `npm run build` passes
+9. Commit and push the changes
+10. Create a PR
 
-The steps 5 and 6 must be performed in order to have the `@maplibre/maplibre-gl-directions` as a local symlinked dependency, because the Demo project uses not the library sources, but the locally-built `/dist` folder to make sure that the instance being tested is the same instance which is deployed to the end user.
+The steps 4 and 5 must be performed in order to have the `@maplibre/maplibre-gl-directions` as a local symlinked dependency, because the Demo project uses not the library sources, but the locally-built `/dist` folder to make sure that the instance being tested is the same instance which is deployed to the end user.
 
 ## Project Structure
 
@@ -36,7 +35,7 @@ You may keep any examples you add when creating a PR if you think the changes yo
 
 - `npm run dev:lib` - starts a vite-powered development server for the library source files. Continuously rebuilds the contents of the `/dist` folder while you make changes to the `/src` folder. **Does not rebuild types!** Must be restarted in order to rebuild them.
 
-- `npm run dev:doc` - continuously rebuilds the contents of the `/doc_dist` folder parsing comments inside the `/src` folder.
+- `npm run dev:doc` - continuously rebuilds the documentation static-website while you make changes to the library source files and puts the result under the `/docs/api`. **Note** that for some reason it must be restarted in order to detect the changes you made to the `/doc` folder.
 
 - `npm run dev:demo` - starts a vite-powered development server for the Demo project. The Demo project targets the library from the `/dist` folder via a symlinked `@maplibre/maplibre-gl-directions` package.
 
@@ -46,6 +45,8 @@ You may keep any examples you add when creating a PR if you think the changes yo
 
   2. `npm run build:lib` - builds the library (the `/src` folder contents) and outputs the resulting es-module and its type declarations into the `/dist` folder.
 
-  3. `npm run build:doc` - builds the documentation (the `/doc` folder contents) using the TypeDoc compiler and outputs the resulting static-website into the `/doc_dist` folder.
+  3. `npm run build:doc` - builds the documentation (the `/doc` folder contents and the source code comments) using the TypeDoc compiler and outputs the resulting static-website into the `/docs/api` folder.
 
-  4. `npm run build:demo` - builds the Demo project (the `/demo` folder contents) and outputs the resulting static-website into the `/demo/dist` folder.
+  4. `npm run build:demo` - builds the Demo project (the `/demo` folder contents) and outputs the resulting static-website into the `/docs` folder.
+
+Since the deployment process is configured to be performed automatically, you don't have to make sure that the `/docs` folder is up-to-date (it's actually ignored by Git). You run `npm run build` manually only to make sure that the build doesn't fail.
