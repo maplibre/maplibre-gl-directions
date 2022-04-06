@@ -8,7 +8,7 @@ export default defineConfig({
   root: "demo",
 
   build: {
-    base: "https://smellyshovel.github.io/maplibre-gl-directions/",
+    base: "/maplibre-gl-directions/",
     outDir: "../docs",
   },
 });
