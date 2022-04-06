@@ -7,9 +7,10 @@ const routes = [{ path: "/", name: "Menu", component: () => import("./Menu.vue")
 
 export const examples = Object.entries(import.meta.glob("./examples/**.vue")).map(([path, component]) => {
   const name = path.match(/\/\d+\s([^/]+)\./)?.[1].toString() ?? "";
+  console.log(path);
 
   return {
-    path: "/" + name.toLowerCase().replaceAll(/\s/g, "-"),
+    path: "/examples/" + name.toLowerCase().replaceAll(/\s/g, "-"),
     name: name,
     component: component as () => Promise<never>,
     meta: {
