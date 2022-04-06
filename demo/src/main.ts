@@ -19,7 +19,7 @@ export const examples = Object.entries(import.meta.glob("./examples/**.vue")).ma
 });
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: routes.concat(examples),
 });
 
