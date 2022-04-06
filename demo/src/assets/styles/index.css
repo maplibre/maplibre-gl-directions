@@ -45,4 +45,8 @@
   input[type="checkbox"] {
     @apply accent-[#6d26d7];
   }
+
+  button {
+    @apply transition-all p-5 bg-accent-500 hover:bg-accent-400 active:bg-accent-600 rounded-full shadow-lg hover:shadow-xl active:shadow-md active:bg-blend-darken;
+  }
 }
