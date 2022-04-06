@@ -6,7 +6,6 @@ export default defineConfig({
   plugins: [vue()],
 
   root: "demo",
-  base: "/maplibre-gl-directions/",
 
   build: {
     outDir: "../docs",
