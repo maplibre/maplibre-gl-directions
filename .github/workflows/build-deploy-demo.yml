@@ -5,7 +5,7 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  build-and-deploy-demo:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️

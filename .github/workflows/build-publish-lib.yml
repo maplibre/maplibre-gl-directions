@@ -1,16 +1,15 @@
-name: publish
-
+name: Build and Publish the Library
 on:
   push:
     tags:
       - v*
 
 jobs:
-  publish:
-    name: Publish
+  build-and-deploy-lib:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
 
       - name: Use Node 16 x64
         uses: actions/setup-node@v3
@@ -19,13 +18,14 @@ jobs:
           architecture: x64
           registry-url: "https://registry.npmjs.org"
 
-      - name: Install dependencies
+      - name: Install and Build 🔧
         run: |
-          npm install
-      - name: Build project
-        run: |
+          npm ci
+          npm link
+          npm link @maplibre/maplibre-gl-directions
           npm run build
-      - name: Publish
+
+      - name: Deploy 🚀
         run: |
           npm publish --access=public --non-interactive
         env:
