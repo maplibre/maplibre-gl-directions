@@ -3,7 +3,7 @@
     <div class="h-full flex flex-col bg-inherit overflow-x-hidden overflow-y-auto">
       <header v-if="!props.noHeader" class="p-10 pb-5 flex justify-between gap-5 sticky top-0 bg-inherit">
         <router-link :to="{ name: 'Menu' }">Back to Menu</router-link>
-        <a :href="sourceLink">Source</a>
+        <a :href="sourceLink" target="_blank">Source</a>
       </header>
 
       <article class="p-10 flex flex-col gap-3" :class="{ 'pt-0': !props.noHeader }">
