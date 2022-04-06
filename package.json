@@ -1,6 +1,5 @@
 {
-  "name": "maplibre-gl-directions",
-  "private": true,
+  "name": "@maplibre/maplibre-gl-directions",
   "version": "0.1.0",
   "files": [
     "dist"

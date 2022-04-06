@@ -3,17 +3,16 @@
 1. Fork the repo
 2. Clone the fork
 3. Install the dependencies: `npm i`
-4. Run `npm link`
-5. Run `npm link maplibre-gl-directions`
-6. Run `npm run build:lib`
-7. Introduce some changes (see the section below)
-8. Make sure the `npm run build` passes
-9. Commit and push the changes
-10. Create a PR
+4. Run `npm run build:lib`
+5. Run `npm link`
+6. Run `npm link @maplibre/maplibre-gl-directions`
+7. Run `npm run build:lib`
+8. Introduce some changes (see the section below)
+9. Make sure the `npm run build` passes
+10. Commit and push the changes
+11. Create a PR
 
-The steps 4 and 5 must be performed in order to have the `maplibre-gl-directions` as a local symlinked dependency, because the Demo project uses not the library sources, but the locally-built `/dist` folder to make sure that the instance being tested is the same instance which is deployed to the end user.
-
-**Please, select the `dev` branch as a PR base.**
+The steps 5 and 6 must be performed in order to have the `@maplibre/maplibre-gl-directions` as a local symlinked dependency, because the Demo project uses not the library sources, but the locally-built `/dist` folder to make sure that the instance being tested is the same instance which is deployed to the end user.
 
 ## Project Structure
 
@@ -31,7 +30,7 @@ Changes to the library sources should be introduced while there's a running `dev
 
 The Demo project might be used as a test-stand while working on the library sources. The `dev:demo` process serves the demo project at `localhost:3000` (by default). The Demo project uses the built `/dist` folder to refer to the library (instead of using sources from the `/src` directly), so you may also want to have a running `dev:lib` at the same time.
 
-You may keep the any examples you add when creating a PR if you think the changes you were working on are worth a separate example. An additional example by itself (without modifying the library sources) is a good PR candidate as well. The only thing you should remember when introducing any changes to the Demo project is that they are about to be seen by any other person, a potential end-user, so don't go too crazy and provide human-readable explanations of what the example is really meant to show.
+You may keep any examples you add when creating a PR if you think the changes you were working on are worth a separate example. An additional example by itself (without modifying the library sources) is a good PR candidate as well. The only thing you should remember when introducing any changes to the Demo project is that they are about to be seen by any other person, a potential end-user, so don't go too crazy and provide human-readable explanations of what the example is really meant to show.
 
 ## NPM Scripts
 
@@ -39,7 +38,7 @@ You may keep the any examples you add when creating a PR if you think the change
 
 - `npm run dev:doc` - continuously rebuilds the contents of the `/doc_dist` folder parsing comments inside the `/src` folder.
 
-- `npm run dev:demo` - starts a vite-powered development server for the Demo project. The Demo project targets the library from the `/dist` folder via a symlinked `maplibre-gl-directions` package.
+- `npm run dev:demo` - starts a vite-powered development server for the Demo project. The Demo project targets the library from the `/dist` folder via a symlinked `@maplibre/maplibre-gl-directions` package.
 
 - `npm run build` - Combines `npm run format`, `npm run build:lib`, `npm run build:doc` and `npm run build:demo` into a single call.
 

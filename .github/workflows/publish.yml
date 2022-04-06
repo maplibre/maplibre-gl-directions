@@ -1,0 +1,32 @@
+name: publish
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node 16 x64
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          architecture: x64
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install dependencies
+        run: |
+          npm install
+      - name: Build project
+        run: |
+          npm run build
+      - name: Publish
+        run: |
+          npm publish --access=public --non-interactive
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_ORG_TOKEN }}

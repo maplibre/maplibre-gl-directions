@@ -12,8 +12,7 @@
 
 # But still ignore the following folders
 dist
-doc_dist
-demo/dist
+docs
 
 # Check subdirectories too
 !*/
