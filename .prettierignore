@@ -10,9 +10,9 @@
 !*.json
 !*.md
 
-# But still ignore the following folders
-dist
-docs
+# But still ignore dist and docs
+dist/**
+docs/**
 
 # Check subdirectories too
 !*/
