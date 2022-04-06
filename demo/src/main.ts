@@ -1,5 +1,5 @@
 import { createApp } from "vue";
-import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
+import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
 import App from "./App.vue";
 import "./assets/styles/index.css";
 
@@ -24,11 +24,11 @@ export const examples = Object.entries(import.meta.glob("./examples/**.vue")).ma
     meta: {
       originPath: path,
     },
-  };
+  } as RouteRecordRaw;
 });
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: routes.concat(examples),
 });
 
