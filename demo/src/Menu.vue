@@ -16,7 +16,7 @@
 
     <div class="flex flex-col gap-5 justify-center items-center">
       <a href="https://github.com/maplibre/maplibre-gl-directions">GitHub</a>
-      <router-link to="/api">API</router-link>
+      <a href="/api">API</a>
     </div>
   </div>
 </template>
