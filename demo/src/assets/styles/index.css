@@ -43,10 +43,18 @@
   }
 
   input[type="checkbox"] {
-    @apply accent-[#6d26d7];
+    @apply transition-all w-6 h-6 bg-slate-500 hover:bg-slate-400 active:bg-slate-600 border-none rounded-md shadow-lg hover:shadow-xl active:shadow-md focus:ring-0 focus:ring-offset-0;
+  }
+
+  input[type="checkbox"]:checked {
+    @apply transition-all bg-accent-500 hover:bg-accent-400 active:bg-accent-600 focus:bg-accent-500;
   }
 
   button {
     @apply transition-all p-5 bg-accent-500 hover:bg-accent-400 active:bg-accent-600 rounded-full shadow-lg hover:shadow-xl active:shadow-md active:bg-blend-darken;
+  }
+
+  select {
+    @apply transition-all px-3 py-2 bg-accent-500 hover:bg-accent-400 active:bg-accent-600 border-none rounded-md shadow-lg hover:shadow-xl active:shadow-md focus:ring-0 focus:ring-offset-0;
   }
 }
