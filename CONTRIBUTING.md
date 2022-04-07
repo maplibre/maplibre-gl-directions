@@ -50,3 +50,11 @@ You may keep any examples you add when creating a PR if you think the changes yo
   4. `npm run build:demo` - builds the Demo project (the `/demo` folder contents) and outputs the resulting static-website into the `/docs` folder.
 
 Since the deployment process is configured to be performed automatically, you don't have to make sure that the `/docs` folder is up-to-date (it's actually ignored by Git). You run `npm run build` manually only to make sure that the build doesn't fail.
+
+## Troubleshooting
+
+### "Failed to resolve import "@maplibre/maplibre-gl-directions" from "demo/<...>". Does the file exist?
+
+That happens when the package is not self-symlinked. Perhaps you did `npm i` or installed some new dependencies (NPM removes all the symlinked deps after updating the `node_modules).
+
+**Solution**: run `npm link` and `npm link @maplibre/maplibre-gl-directions` once again.
