@@ -26,9 +26,7 @@
   }>();
 
   const sourceLink = ref(
-    `https://github.com/smellyshovel/maplibre-gl-directions/tree/main/demo/src/${
-      useRoute().matched[0].meta["originPath"]
-    }`,
+    `https://github.com/maplibre/maplibre-gl-directions/tree/main/demo/src/${useRoute().matched[0].meta["originPath"]}`,
   );
 </script>
 
