@@ -6,7 +6,7 @@ A plugin to show routing directions on a MapLibre GL JS map. Supports any [OSRM]
 ![2nd Demo Screenshot](demo/src/assets/screenshots/2.png)
 ![3rd Demo Screenshot](demo/src/assets/screenshots/3.png)
 
-[Live Demo](https://maplibre.github.io/maplibre-gl-directions/#/).
+[Live Demo](https://maplibre.org/maplibre-gl-directions/#/).
 
 ---
 
