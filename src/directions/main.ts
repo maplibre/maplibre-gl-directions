@@ -209,7 +209,7 @@ export default class MaplibreGlDirections {
   }
 
   protected onMove(e: maplibregl.MapMouseEvent) {
-    const feature: (Feature & { layer: { id: string } }) | undefined = this.map.queryRenderedFeatures(e.point, {
+    const feature: maplibregl.MapGeoJSONFeature | undefined = this.map.queryRenderedFeatures(e.point, {
       layers: [
         ...this.configuration.sensitiveWaypointLayers,
         ...this.configuration.sensitiveSnappointLayers,
@@ -348,7 +348,7 @@ export default class MaplibreGlDirections {
     if (e.type === "touchstart" && e.originalEvent.touches.length !== 1) return;
     if (e.type === "mousedown" && e.originalEvent.which !== 1) return;
 
-    const feature: (Feature & { layer: { id: string } }) | undefined = this.map.queryRenderedFeatures(e.point, {
+    const feature: maplibregl.MapGeoJSONFeature | undefined = this.map.queryRenderedFeatures(e.point, {
       layers: [
         ...this.configuration.sensitiveWaypointLayers,
         ...this.configuration.sensitiveSnappointLayers,
@@ -441,11 +441,8 @@ export default class MaplibreGlDirections {
 
   protected onDragMove(e: maplibregl.MapMouseEvent | maplibregl.MapTouchEvent) {
     /*
-     * `preventDefault` here prevents drag down gesture in mobile chrome from updating the page
+     * `preventDefault` here prevents drag down gesture in mobile Chrome from updating the page.
      */
-    // TODO: remove the @ts-ignore when https://github.com/maplibre/maplibre-gl-js/pull/1131 is merged
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     if (e.type === "touchmove" && e.originalEvent.touches.length !== 1) return e.originalEvent.preventDefault();
     if (e.type === "mousemove" && e.originalEvent.which !== 1) return;
 
@@ -555,7 +552,7 @@ export default class MaplibreGlDirections {
   }
 
   protected onClick(e: maplibregl.MapMouseEvent) {
-    const feature: (Feature<Point> & { layer: { id: string } }) | undefined = this.map.queryRenderedFeatures(e.point, {
+    const feature: maplibregl.MapGeoJSONFeature | undefined = this.map.queryRenderedFeatures(e.point, {
       layers: [
         ...this.configuration.sensitiveWaypointLayers,
         ...this.configuration.sensitiveSnappointLayers,

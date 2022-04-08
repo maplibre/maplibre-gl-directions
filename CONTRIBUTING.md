@@ -1,17 +1,21 @@
 # Contributing Guide
 
-1. Fork the repo
-2. Clone the fork
-3. Install the dependencies: `npm i`
-4. Run `npm link`
-5. Run `npm link @maplibre/maplibre-gl-directions`
-6. Run `npm run build:lib`
-7. Introduce some changes (see the section below)
-8. Make sure the `npm run build` passes
-9. Commit and push the changes
-10. Create a PR
+## Prepare the Development Environment
 
-The steps 4 and 5 must be performed in order to have the `@maplibre/maplibre-gl-directions` as a local symlinked dependency, because the Demo project uses not the library sources, but the locally-built `/dist` folder to make sure that the instance being tested is the same instance which is deployed to the end user.
+1. Make sure you've got Node (v. ^16) and NPM (v. ^8) installed
+2. Fork the repo
+3. Clone the fork
+4. Install the dependencies: `npm i`
+5. Run `npm run build:lib`
+6. Run `npm link`
+7. Run `npm link @maplibre/maplibre-gl-directions`
+8. Run `npm run build:lib`
+9. Introduce some changes (see the section below)
+10. Make sure the `npm run build` passes
+11. Commit and push the changes
+12. Create a PR
+
+The steps 6 and 7 must be performed in order to have the `@maplibre/maplibre-gl-directions` as a local symlinked dependency, because the Demo project uses not the library sources, but the locally-built `/dist` folder to make sure that the instance being tested is the same instance which is deployed to the end user.
 
 ## Project Structure
 
@@ -57,4 +61,4 @@ Since the deployment process is configured to be performed automatically, you do
 
 That happens when the package is not self-symlinked. Perhaps you did `npm i` or installed some new dependencies (NPM removes all the symlinked deps after updating the `node_modules).
 
-**Solution**: run `npm link` and `npm link @maplibre/maplibre-gl-directions` once again.
+**Solution**: run `npm run build:lib`, then run `npm link` and `npm link @maplibre/maplibre-gl-directions` once again.
