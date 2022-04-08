@@ -209,7 +209,7 @@ export default class MaplibreGlDirections {
   }
 
   protected onMove(e: maplibregl.MapMouseEvent) {
-    const feature = this.map.queryRenderedFeatures(e.point, {
+    const feature: maplibregl.MapGeoJSONFeature | undefined = this.map.queryRenderedFeatures(e.point, {
       layers: [
         ...this.configuration.sensitiveWaypointLayers,
         ...this.configuration.sensitiveSnappointLayers,
@@ -348,7 +348,7 @@ export default class MaplibreGlDirections {
     if (e.type === "touchstart" && e.originalEvent.touches.length !== 1) return;
     if (e.type === "mousedown" && e.originalEvent.which !== 1) return;
 
-    const feature = this.map.queryRenderedFeatures(e.point, {
+    const feature: maplibregl.MapGeoJSONFeature | undefined = this.map.queryRenderedFeatures(e.point, {
       layers: [
         ...this.configuration.sensitiveWaypointLayers,
         ...this.configuration.sensitiveSnappointLayers,
@@ -552,7 +552,7 @@ export default class MaplibreGlDirections {
   }
 
   protected onClick(e: maplibregl.MapMouseEvent) {
-    const feature = this.map.queryRenderedFeatures(e.point, {
+    const feature: maplibregl.MapGeoJSONFeature | undefined = this.map.queryRenderedFeatures(e.point, {
       layers: [
         ...this.configuration.sensitiveWaypointLayers,
         ...this.configuration.sensitiveSnappointLayers,
