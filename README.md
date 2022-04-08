@@ -70,7 +70,7 @@ directions.addWaypoint([-73.8671258, 40.82234996], 0);
 directions.clear();
 ```
 
-Check out the [Demo](https://maplibre.github.io/maplibre-gl-directions/#/) or dive right into the [API Docs](https://maplibre.github.io/maplibre-gl-directions/api) for more!
+Check out the [Demo](https://maplibre.org/maplibre-gl-directions/#/) or dive right into the [API Docs](https://maplibre.org/maplibre-gl-directions/api) for more!
 
 ## Future plans
 
