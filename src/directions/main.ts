@@ -1,4 +1,5 @@
 import type maplibregl from "maplibre-gl";
+import type { MapGeoJSONFeature } from "maplibre-gl";
 import type { Directions, MaplibreGlDirectionsConfiguration, Route, Snappoint } from "./types";
 import type { Feature, FeatureCollection, LineString, Point } from "geojson";
 import { buildConfiguration, buildRequest, buildPoint, buildSnaplines, buildRoutelines } from "./utils";
@@ -209,7 +210,7 @@ export default class MaplibreGlDirections {
   }
 
   protected onMove(e: maplibregl.MapMouseEvent) {
-    const feature = this.map.queryRenderedFeatures(e.point, {
+    const feature: MapGeoJSONFeature | undefined = this.map.queryRenderedFeatures(e.point, {
       layers: [
         ...this.configuration.sensitiveWaypointLayers,
         ...this.configuration.sensitiveSnappointLayers,
@@ -348,7 +349,7 @@ export default class MaplibreGlDirections {
     if (e.type === "touchstart" && e.originalEvent.touches.length !== 1) return;
     if (e.type === "mousedown" && e.originalEvent.which !== 1) return;
 
-    const feature = this.map.queryRenderedFeatures(e.point, {
+    const feature: MapGeoJSONFeature | undefined = this.map.queryRenderedFeatures(e.point, {
       layers: [
         ...this.configuration.sensitiveWaypointLayers,
         ...this.configuration.sensitiveSnappointLayers,
@@ -552,7 +553,7 @@ export default class MaplibreGlDirections {
   }
 
   protected onClick(e: maplibregl.MapMouseEvent) {
-    const feature = this.map.queryRenderedFeatures(e.point, {
+    const feature: MapGeoJSONFeature | undefined = this.map.queryRenderedFeatures(e.point, {
       layers: [
         ...this.configuration.sensitiveWaypointLayers,
         ...this.configuration.sensitiveSnappointLayers,
