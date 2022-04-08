@@ -1,4 +1,3 @@
-<link rel="stylesheet" href="../assets/styles/index.css">
 <template>
   <app-sidebar>
     <template #title>{{ name }}</template>
@@ -26,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-  import { onMounted, ref, watch } from "vue";
+  import { ref, watch } from "vue";
   import { useRoute } from "vue-router";
   import AppSidebar from "../components/AppSidebar.vue";
   import maplibregl from "maplibre-gl";
