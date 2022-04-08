@@ -19,7 +19,11 @@
   }
 
   a {
-    @apply hover:underline underline-offset-4;
+    @apply underline underline-offset-4 hover:text-slate-400;
+  }
+
+  a[target="_blank"]::after {
+    content: " 🔗";
   }
 
   h1 {
@@ -36,5 +40,13 @@
 
   small {
     @apply text-sm text-slate-400;
+  }
+
+  input[type="checkbox"] {
+    @apply accent-[#6d26d7];
+  }
+
+  button {
+    @apply transition-all p-5 bg-accent-500 hover:bg-accent-400 active:bg-accent-600 rounded-full shadow-lg hover:shadow-xl active:shadow-md active:bg-blend-darken;
   }
 }

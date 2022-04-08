@@ -4,22 +4,24 @@
 
     <small><strong>Note</strong> that interactivity is disabled for this example</small>
 
-    <div class="flex flex-col gap-2 items-center">
+    <div class="flex flex-col gap-2">
       <p>Set waypoints to a predefined set</p>
-      <button :disabled="!map || !directions" @click="setPredefinedWaypoints">Set Waypoints</button>
+      <button :disabled="!map || !directions" class="self-center" @click="setPredefinedWaypoints">Set Waypoints</button>
     </div>
 
-    <div class="flex flex-col gap-2 items-center">
+    <div class="flex flex-col gap-2">
       <p>Add a random waypoint at some random index</p>
-      <button :disabled="!map || !directions" @click="addRandomWaypoint">Add Waypoint</button>
+      <button :disabled="!map || !directions" class="self-center" @click="addRandomWaypoint">Add Waypoint</button>
     </div>
-    <div class="flex flex-col gap-2 items-center">
+
+    <div class="flex flex-col gap-2">
       <p>Delete a random waypoint</p>
-      <button :disabled="!map || !directions" @click="deleteRandomWaypoint">Delete Waypoint</button>
+      <button :disabled="!map || !directions" class="self-center" @click="deleteRandomWaypoint">Delete Waypoint</button>
     </div>
-    <div class="flex flex-col gap-2 items-center">
+
+    <div class="flex flex-col gap-2">
       <p>Clear the map from all the stuff added by the plugin</p>
-      <button :disabled="!map || !directions" @click="clear">Clear</button>
+      <button :disabled="!map || !directions" class="self-center" @click="clear">Clear</button>
     </div>
   </app-sidebar>
 
@@ -33,7 +35,7 @@
   import maplibregl from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
   import style from "../assets/map/style/style.json?url";
-  import MaplibreGlDirections from "maplibre-gl-directions";
+  import MaplibreGlDirections from "@maplibre/maplibre-gl-directions";
 
   const name = ref(useRoute().matched[0].name);
 

@@ -15,8 +15,8 @@
     <span class="text-slate-500">or navigate to</span>
 
     <div class="flex flex-col gap-5 justify-center items-center">
-      <a href="">GitHub</a>
-      <a href="">API Docs</a>
+      <a href="https://github.com/maplibre/maplibre-gl-directions" target="_blank">GitHub</a>
+      <a :href="`${BASE_URL}/api`" target="_blank">API</a>
     </div>
   </div>
 </template>
@@ -24,4 +24,6 @@
 <script setup lang="ts">
   import AppSidebar from "./components/AppSidebar.vue";
   import { examples } from "./main";
+
+  const BASE_URL = import.meta.env.BASE_URL;
 </script>

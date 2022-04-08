@@ -1,28 +1,32 @@
-# Maplibre Gl Directions plugin
+# Maplibre GL Directions
 
-**❗ Please, note that the plugin is still work in progress. Don't use it in production util it reaches its stable state! ❗**
-
-A routing-plugin for the [maplibre-gl-js](https://github.com/maplibre/maplibre-gl-js) powered maps. Supports any [OSRM](http://project-osrm.org/) or [Mapbox Directions API](https://docs.mapbox.com/api/navigation/directions/) compatible Routing-provider.
+A plugin to show routing directions on a MapLibre GL JS map. Supports any [OSRM](http://project-osrm.org/) or [Mapbox Directions API](https://docs.mapbox.com/api/navigation/directions/) compatible Routing-provider.
 
 ![1st Demo Screenshot](demo/src/assets/screenshots/1.png)
 ![2nd Demo Screenshot](demo/src/assets/screenshots/2.png)
 ![3rd Demo Screenshot](demo/src/assets/screenshots/3.png)
 
+[Live Demo](https://maplibre.org/maplibre-gl-directions/#/).
+
+---
+
 ## Features
 
 ### Different Routing-providers
 
-The plugin Supports any OSRM- or Mapbox Directions API-compatible Routing-provider out of the box!
+The plugin supports any OSRM- or Mapbox Directions API-compatible Routing-provider out of the box!
+
+### Sane Defaults
+
+Works without any configuration at all out of the box, though at the same time configurable enough to support most of the imaginable scenarios.
 
 ### User interaction
 
-Add and remove waypoints by clicking them, add waypoints in-between existing ones by simply dragging the selected route line, change the selected route by clicking an alternative route line. Everything is touch-friendly!
-
-You can also completely disable the user interaction anytime you want.
+Add waypoints by clicking the map, click a waypoint to remove it, drag waypoints to move them, add waypoints in-between existing ones by dragging the selected route line, change the selected route by clicking an alternative route line or completely disable the user interaction with a single call. Everything is touch-friendly!
 
 ### Congestions
 
-Support for Mapbox Directions API congestions (both plain and numeric!)
+Supports the Mapbox Directions API congestions (both plain and numeric!)
 
 ### Customization
 
@@ -30,11 +34,9 @@ The powerful customization interface allows to customize everything starting fro
 
 ### TypeScript support
 
-The plugin is written 100% in TypeScript and therefore ships with built-in types support.
+The plugin is written 100% in TypeScript and therefore ships with built-in types.
 
 ## Installation
-
-**❗ The plugin is awaiting to become included under the @maplibre scope. Until that there's no option to install it as an NPM package ❗**
 
 ```shell
 $ npm i @maplibre/maplibre-gl-directions
@@ -46,10 +48,8 @@ $ npm i @maplibre/maplibre-gl-directions
 // Import the plugin
 import MaplibreGlDirections from "@maplibre/maplibre-gl-directions";
 
-// Create an instance
-const directions = new MaplibreGlDirections(map, {
-  // optional settings
-});
+// Create an instance of the default class
+const directions = new MaplibreGlDirections(map);
 
 // Enable interactivity (if needed)
 directions.interactive = true;
@@ -70,7 +70,7 @@ directions.addWaypoint([-73.8671258, 40.82234996], 0);
 directions.clear();
 ```
 
-Refer to the API docs (_here goes a link to deployed API docs_) for more!
+Check out the [Demo](https://maplibre.org/maplibre-gl-directions/#/) or dive right into the [API Docs](https://maplibre.org/maplibre-gl-directions/api) for more!
 
 ## Future plans
 
