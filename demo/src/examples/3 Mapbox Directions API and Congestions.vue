@@ -67,6 +67,14 @@
         });
 
         directions.value.interactive = true;
+
+        // map.value.on("load", (e) => {
+        //   e.lngLat;
+        // });
+
+        directions.value.on("fetchdirections", (e) => {
+          console.log(e);
+        });
       });
     }
   });

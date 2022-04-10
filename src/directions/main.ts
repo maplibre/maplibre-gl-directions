@@ -1,14 +1,17 @@
 import type maplibregl from "maplibre-gl";
 import type { Directions, MaplibreGlDirectionsConfiguration, Route, Snappoint } from "./types";
 import type { Feature, FeatureCollection, LineString, Point } from "geojson";
+import { MaplibreGlDirectionsEvented, MaplibreGlDirectionsRoutingEvent } from "./events";
 import { buildConfiguration, buildRequest, buildPoint, buildSnaplines, buildRoutelines } from "./utils";
 import axios from "axios";
 
 /**
  * The main class responsible for all the user interaction and for the routing itself.
  */
-export default class MaplibreGlDirections {
+export default class MaplibreGlDirections extends MaplibreGlDirectionsEvented {
   constructor(map: maplibregl.Map, configuration?: Partial<MaplibreGlDirectionsConfiguration>) {
+    super();
+
     this.map = map;
     this.configuration = buildConfiguration(configuration);
 
@@ -24,6 +27,8 @@ export default class MaplibreGlDirections {
     this.onClickHandler = this.onClick.bind(this);
 
     this.init();
+
+    this.fire("load");
   }
 
   /*
@@ -132,6 +137,13 @@ export default class MaplibreGlDirections {
         this.snappoints,
       );
       if (routes.length <= this.selectedRouteIndex) this.selectedRouteIndex = 0;
+
+      this.fire(
+        new MaplibreGlDirectionsRoutingEvent("fetchdirections", this.map, undefined, {
+          routes,
+          snappoints,
+        }),
+      );
     } else {
       this.snappoints = [];
       this.routelines = [];
