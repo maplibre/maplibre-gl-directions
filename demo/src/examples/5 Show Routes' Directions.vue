@@ -8,7 +8,7 @@
 
     <small
       ><strong>Note</strong> that you have to manually load and add the images you intend to use for the custom layers
-      you add.</small
+      you add</small
     >
   </app-sidebar>
 
@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, ref } from "vue";
+  import { onMounted, ref } from "vue";
   import { useRoute } from "vue-router";
   import AppSidebar from "../components/AppSidebar.vue";
   import maplibregl from "maplibre-gl";
