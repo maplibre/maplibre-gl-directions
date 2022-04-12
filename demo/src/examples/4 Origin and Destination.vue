@@ -10,7 +10,7 @@
     <p>
       <strong>Note</strong> how you don't need to re-define all the layers from scratch thanks to the exported
       <code>layersFactory</code> function that returns all the default layers allowing for their augmentation and
-      modification.
+      modification
     </p>
   </app-sidebar>
 
@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, ref } from "vue";
+  import { onMounted, ref } from "vue";
   import { useRoute } from "vue-router";
   import AppSidebar from "../components/AppSidebar.vue";
   import maplibregl from "maplibre-gl";
