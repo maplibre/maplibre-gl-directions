@@ -1,4 +1,4 @@
-# Maplibre GL Directions
+# MapLibre GL Directions
 
 A plugin to show routing directions on a MapLibre GL JS map. Supports any [OSRM](http://project-osrm.org/) or [Mapbox Directions API](https://docs.mapbox.com/api/navigation/directions/) compatible Routing-provider.
 
