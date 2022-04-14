@@ -619,6 +619,13 @@ export default class MaplibreGlDirections extends MaplibreGlDirectionsEvented {
     this.draw(false);
   }
 
+  protected assignWaypointsCategories() {
+    this._waypoints.forEach((waypoint, index) => {
+      const category = index === 0 ? "ORIGIN" : index === this._waypoints.length - 1 ? "DESTINATION" : undefined;
+      if (waypoint.properties) waypoint.properties.category = category;
+    });
+  }
+
   // the public interface begins here
 
   /**
@@ -675,6 +682,8 @@ export default class MaplibreGlDirections extends MaplibreGlDirectionsEvented {
       return this.buildPoint(waypoint, "WAYPOINT");
     });
 
+    this.assignWaypointsCategories();
+
     this.draw();
     await this.fetchDirections();
   }
@@ -688,7 +697,10 @@ export default class MaplibreGlDirections extends MaplibreGlDirectionsEvented {
    */
   async addWaypoint(waypoint: [number, number], index?: number) {
     index = index ?? this._waypoints.length;
+
     this._waypoints.splice(index, 0, this.buildPoint(waypoint, "WAYPOINT"));
+
+    this.assignWaypointsCategories();
 
     this.draw();
     await this.fetchDirections();
@@ -703,6 +715,8 @@ export default class MaplibreGlDirections extends MaplibreGlDirectionsEvented {
   async removeWaypoint(index: number) {
     this._waypoints.splice(index, 1);
     this.snappoints.splice(index, 1);
+
+    this.assignWaypointsCategories();
 
     this.draw();
     await this.fetchDirections();

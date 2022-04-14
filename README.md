@@ -1,10 +1,10 @@
-# Maplibre GL Directions
+# MapLibre GL Directions
 
 A plugin to show routing directions on a MapLibre GL JS map. Supports any [OSRM](http://project-osrm.org/) or [Mapbox Directions API](https://docs.mapbox.com/api/navigation/directions/) compatible Routing-provider.
 
-![1st Demo Screenshot](demo/src/assets/screenshots/1.png)
-![2nd Demo Screenshot](demo/src/assets/screenshots/2.png)
-![3rd Demo Screenshot](demo/src/assets/screenshots/3.png)
+![1st Demo Screenshot](https://raw.githubusercontent.com/maplibre/maplibre-gl-directions/main/demo/src/assets/screenshots/1.png)
+![2nd Demo Screenshot](https://raw.githubusercontent.com/maplibre/maplibre-gl-directions/main/demo/src/assets/screenshots/2.png)
+![3rd Demo Screenshot](https://raw.githubusercontent.com/maplibre/maplibre-gl-directions/main/demo/src/assets/screenshots/3.png)
 
 [Live Demo](https://maplibre.org/maplibre-gl-directions/#/).
 
@@ -48,26 +48,29 @@ $ npm i @maplibre/maplibre-gl-directions
 // Import the plugin
 import MaplibreGlDirections from "@maplibre/maplibre-gl-directions";
 
-// Create an instance of the default class
-const directions = new MaplibreGlDirections(map);
+// Make sure to create a MaplibreGlDirections instance only after the map is loaded
+map.on("load", () => {
+  // Create an instance of the default class
+  const directions = new MaplibreGlDirections(map);
 
-// Enable interactivity (if needed)
-directions.interactive = true;
+  // Enable interactivity (if needed)
+  directions.interactive = true;
 
-// Set the waypoints programmatically
-directions.setWaypoints([
-  [-73.8271025, 40.8032906],
-  [-73.8671258, 40.82234996],
-]);
+  // Set the waypoints programmatically
+  directions.setWaypoints([
+    [-73.8271025, 40.8032906],
+    [-73.8671258, 40.82234996],
+  ]);
 
-// Remove waypoints
-directions.removeWaypoint(0);
+  // Remove waypoints
+  directions.removeWaypoint(0);
 
-// Add waypoints
-directions.addWaypoint([-73.8671258, 40.82234996], 0);
+  // Add waypoints
+  directions.addWaypoint([-73.8671258, 40.82234996], 0);
 
-// Remove everything plugin-related from the map
-directions.clear();
+  // Remove everything plugin-related from the map
+  directions.clear();
+});
 ```
 
 Check out the [Demo](https://maplibre.org/maplibre-gl-directions/#/) or dive right into the [API Docs](https://maplibre.org/maplibre-gl-directions/api) for more!
