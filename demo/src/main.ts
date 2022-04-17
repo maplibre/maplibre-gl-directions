@@ -15,7 +15,6 @@ const routes = [
 
 export const examples = Object.entries(import.meta.glob("./examples/**.vue")).map(([path, component]) => {
   const name = path.match(/\/\d+\s([^/]+)\./)?.[1].toString() ?? "";
-  console.log(path);
 
   return {
     path: "/examples/" + name.toLowerCase().replaceAll(/\s/g, "-"),
