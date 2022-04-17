@@ -1,39 +1,36 @@
-import { Event, Evented, Map, MapMouseEvent, MapTouchEvent } from "maplibre-gl";
-import { Route, Snappoint } from "./types";
-
-// console.log(new Event("test"));
+import { Evented, Map, MapMouseEvent, MapTouchEvent } from "maplibre-gl";
 
 export class MaplibreGlDirectionsEvented extends Evented {
-  constructor() {
+  constructor(map: Map) {
     super();
+
+    this.map = map;
+  }
+
+  protected map: Map;
+
+  fire<T extends keyof MaplibreGlDirectionsEventType>(event: MaplibreGlDirectionsEventType[T]): this {
+    event.target = this.map;
+    return super.fire(event.type, event);
   }
 
   on<T extends keyof MaplibreGlDirectionsEventType>(type: T, listener: (ev: MaplibreGlDirectionsEventType[T]) => void) {
     return super.on(type, listener);
   }
 
-  off<T extends keyof MaplibreGlDirectionsEventType>(
-    type: T,
-    listener: (ev: MaplibreGlDirectionsEventType[T]) => void,
-  ) {
+  off<T extends keyof MaplibreGlDirectionsEventType>(type: T, listener: (e: MaplibreGlDirectionsEventType[T]) => void) {
     return super.off(type, listener);
   }
 
   once<T extends keyof MaplibreGlDirectionsEventType>(
     type: T,
-    listener: (ev: MaplibreGlDirectionsEventType[T]) => void,
+    listener: (e: MaplibreGlDirectionsEventType[T]) => void,
   ) {
     return super.once(type, listener);
-  }
-
-  fire<T extends keyof MaplibreGlDirectionsEventType | Event>(event: T, properties?: any): this {
-    return super.fire(event, properties);
   }
 }
 
 type MaplibreGlDirectionsEventType = {
-  load: MaplibreGlDirectionsEvent;
-  fetchdirections: MaplibreGlDirectionsRoutingEvent;
   addwaypoint: MaplibreGlDirectionsWaypointEvent;
 };
 
@@ -43,47 +40,21 @@ export interface MaplibreGlDirectionsEvent<TOrig = undefined> {
   originalEvent: TOrig;
 }
 
-export class MaplibreGlDirectionsRoutingEvent
-  extends Event
-  implements MaplibreGlDirectionsEvent<MapMouseEvent | MapTouchEvent | undefined>
-{
-  constructor(
-    type: "fetchdirections",
-    map: Map,
-    originalEvent: MapMouseEvent | MapTouchEvent | undefined,
-    data: {
-      routes: Route[];
-      snappoints: Snappoint[];
-    },
-  ) {
-    super(type, data);
-    this.originalEvent = originalEvent;
-    this.target = map;
-  }
-
-  declare type: "addwaypoint" | "removewaypoint";
-
-  target: Map;
-
-  originalEvent: MapMouseEvent | MapTouchEvent | undefined;
-}
-
 export class MaplibreGlDirectionsWaypointEvent
   implements MaplibreGlDirectionsEvent<MapMouseEvent | MapTouchEvent | undefined>
 {
   constructor(
     type: "addwaypoint" | "removewaypoint",
-    map: Map,
     originalEvent: MapMouseEvent | MapTouchEvent | undefined,
-    data?: any,
+    index: number,
   ) {
+    this.type = type;
     this.originalEvent = originalEvent;
-    this.target = map;
+    this.index = index;
   }
 
   declare type: "addwaypoint" | "removewaypoint";
-
-  target: Map;
-
+  target!: Map;
   originalEvent: MapMouseEvent | MapTouchEvent | undefined;
+  index: number;
 }
