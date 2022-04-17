@@ -34,8 +34,16 @@
     @apply list-disc list-inside;
   }
 
+  ol {
+    @apply list-decimal list-inside;
+  }
+
   ul li {
     @apply my-2 ml-6 -indent-6;
+  }
+
+  ol li {
+    @apply my-2 ml-4 -indent-4;
   }
 
   small {
