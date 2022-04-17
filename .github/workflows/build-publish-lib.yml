@@ -62,3 +62,37 @@ jobs:
           npm publish --tag next --access public --non-interactive
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_ORG_TOKEN }}
+
+      - name: Create Archive
+        run: |
+          zip -r dist dist
+
+      - name: Create GitHub Release (regular)
+        id: create_regular_release
+        if: ${{ steps.prepare_release.outputs.release_type == 'regular' }}
+        uses: ncipollo/release-action@v1.10.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag: ${{ steps.prepare_release.outputs.version_tag }}
+          name: ${{steps.prepare_release.outputs.version_tag }}
+          generateReleaseNotes: true
+          draft: false
+          prerelease: false
+          artifacts: "./dist.zip"
+          artifactContentType: "application/zip"
+
+      - name: Create GitHub Release (prerelease)
+        id: create_prerelease
+        if: ${{ steps.prepare_release.outputs.release_type == 'prerelease' }}
+        uses: ncipollo/release-action@v1.10.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag: ${{ steps.prepare_release.outputs.version_tag }}
+          name: ${{steps.prepare_release.outputs.version_tag }}
+          generateReleaseNotes: true
+          draft: false
+          prerelease: true
+          artifacts: "./dist.zip"
+          artifactContentType: "application/zip"

@@ -36,6 +36,7 @@
       style,
       center: [-74.1197632, 40.6974034],
       zoom: 11,
+      customAttribution: "<a href='http://project-osrm.org/' target='_blank'>&copy; OSRM</a>",
     });
 
     map.loadImage(DirectionArrowImageSrc, (error, image) => {
