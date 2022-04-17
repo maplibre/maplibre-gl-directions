@@ -32,10 +32,11 @@ export class MaplibreGlDirectionsEvented extends Evented {
 
 type MaplibreGlDirectionsEventType = {
   addwaypoint: MaplibreGlDirectionsWaypointEvent;
+  removewaypoint: MaplibreGlDirectionsEventType;
 };
 
 export interface MaplibreGlDirectionsEvent<TOrig = undefined> {
-  type: string;
+  type: keyof MaplibreGlDirectionsEventType;
   target: Map;
   originalEvent: TOrig;
 }
@@ -53,7 +54,7 @@ export class MaplibreGlDirectionsWaypointEvent
     this.index = index;
   }
 
-  declare type: "addwaypoint" | "removewaypoint";
+  type;
   target!: Map;
   originalEvent: MapMouseEvent | MapTouchEvent | undefined;
   index: number;
