@@ -1,8 +1,6 @@
 name: Build and Publish the Library
 on:
-  push:
-    branches:
-      - test-gh-releases
+  workflow_dispatch
 
 jobs:
   build-and-deploy-lib:
