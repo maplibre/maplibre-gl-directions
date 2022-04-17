@@ -4,6 +4,13 @@
   "license": "MIT",
   "homepage": "https://maplibre.org/maplibre-gl-directions/#/",
   "repository": "https://github.com/maplibre/maplibre-gl-directions",
+  "keywords": [
+    "directions",
+    "osrm",
+    "routing",
+    "mapbox",
+    "maplibre"
+  ],
   "files": [
     "dist"
   ],
