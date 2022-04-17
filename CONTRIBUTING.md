@@ -6,16 +6,13 @@
 2. Fork the repo
 3. Clone the fork
 4. Install the dependencies: `npm i`
-5. Run `npm run build:lib`
-6. Run `npm link`
-7. Run `npm link @maplibre/maplibre-gl-directions`
-8. Run `npm run build:lib`
-9. Introduce some changes (see the section below)
-10. Make sure the `npm run build` passes
-11. Commit and push the changes
-12. Create a PR
+5. Run `npm run env:prep`
+6. Introduce some changes (see the section below)
+7. Make sure the `npm run build` passes
+8. Commit and push the changes
+9. Create a PR
 
-The steps 6 and 7 must be performed in order to have the `@maplibre/maplibre-gl-directions` as a local symlinked dependency, because the Demo project uses not the library sources, but the locally-built `/dist` folder to make sure that the instance being tested is the same instance which is deployed to the end user.
+The step 5 is a shorthand for `npm run build:lib && npm link && npm link @maplibre/maplibre-gl-directions` where the last two commands must be performed in order to have the `@maplibre/maplibre-gl-directions` as a local symlinked dependency, because the Demo project uses not the library sources, but the locally-built `/dist` folder to make sure that the instance being tested is the same instance which is deployed to the end user.
 
 ## Project Structure
 
