@@ -34,6 +34,14 @@ directions.removeWaypoint(0);
 directions.addWaypoint([-73.8671258, 40.82234996], 0);
 ```
 
+Listen to the plugin's events.
+
+```typescript
+directions.on("movewaypoint", () => {
+  console.log("A waypoint has been moved!");
+});
+```
+
 Call the {@link clear|`clear`} method to remove all the plugin's traces from the map.
 
 ```typescript
