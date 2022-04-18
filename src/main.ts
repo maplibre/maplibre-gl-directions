@@ -4,6 +4,7 @@ import layersFactory from "./directions/layers";
 import type { LayerSpecification } from "maplibre-gl";
 import * as utils from "./directions/utils";
 import type { Feature, Point, LineString } from "geojson";
+import LoadingControl from "./controls/loading/main";
 
 export default MapLibreGlDirections;
 export type { MapLibreGlDirectionsConfiguration };
@@ -22,3 +23,5 @@ export { utils };
  * @protected
  */
 export type { Feature, Point, PointType, LineString };
+
+export { LoadingControl };
