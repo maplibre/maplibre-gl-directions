@@ -1,9 +1,9 @@
 import type { LayerSpecification } from "maplibre-gl";
 
 /**
- * The {@link default|MaplibreGlDirections} configuration object's interface.
+ * The {@link default|MapLibreGlDirections} configuration object's interface.
  */
-export interface MaplibreGlDirectionsConfiguration {
+export interface MapLibreGlDirectionsConfiguration {
   /**
    * An API-provider URL to make the routing requests to.
    *
@@ -238,7 +238,7 @@ export interface MaplibreGlDirectionsConfiguration {
   dragThreshold: number;
 }
 
-export const MaplibreGlDirectionsDefaultConfiguration: Omit<MaplibreGlDirectionsConfiguration, "layers"> = {
+export const MapLibreGlDirectionsDefaultConfiguration: Omit<MapLibreGlDirectionsConfiguration, "layers"> = {
   api: "https://router.project-osrm.org/route/v1",
   profile: "driving",
   requestOptions: {},

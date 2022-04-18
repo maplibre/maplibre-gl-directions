@@ -24,11 +24,11 @@
   import maplibregl from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
   import style from "../assets/map/style/style.json?url";
-  import MaplibreGlDirections, { layersFactory } from "@maplibre/maplibre-gl-directions";
+  import MapLibreGlDirections, { layersFactory } from "@maplibre/maplibre-gl-directions";
 
   const name = ref(useRoute().matched[0].name);
 
-  const directions = ref<MaplibreGlDirections>();
+  const directions = ref<MapLibreGlDirections>();
 
   const mapRef = ref();
   onMounted(() => {
@@ -68,7 +68,7 @@
     });
 
     map.on("load", () => {
-      directions.value = new MaplibreGlDirections(map, {
+      directions.value = new MapLibreGlDirections(map, {
         requestOptions: {
           alternatives: "true",
         },

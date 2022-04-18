@@ -1,12 +1,10 @@
-# Basic Usage
-
-Start by importing the plugin. Then, when the map is loaded, create an instance of the imported {@link default|`MaplibreGlDirections`} class passing to the constructor a map instance and optionally a {@link MaplibreGlDirectionsOptions|configuration object}.
+Start by importing the plugin. Then, when the map is loaded, create an instance of the imported {@link default|`MapLibreGlDirections`} class passing to the constructor a map instance and optionally a {@link MapLibreGlDirectionsOptions|configuration object}.
 
 ```typescript
-import MaplibreGlDirections from "@maplibre/maplibre-gl-directions";
+import MapLibreGlDirections from "@maplibre/maplibre-gl-directions";
 
 map.on("load", () => {
-  const directions = new MaplibreGlDirections(map, {
+  const directions = new MapLibreGlDirections(map, {
     // optional configuration
   });
 });

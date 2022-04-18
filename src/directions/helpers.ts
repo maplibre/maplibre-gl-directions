@@ -1,11 +1,11 @@
-import type { GeoJSONGeometry, Geometry, Leg, MaplibreGlDirectionsConfiguration, PolylineGeometry } from "./types";
+import type { GeoJSONGeometry, Geometry, Leg, MapLibreGlDirectionsConfiguration, PolylineGeometry } from "./types";
 import { decode } from "@mapbox/polyline";
 
 /**
  * Decodes the geometry of a route to the form of a coordinates array.
  */
 export function geometryDecoder(
-  requestOptions: MaplibreGlDirectionsConfiguration["requestOptions"],
+  requestOptions: MapLibreGlDirectionsConfiguration["requestOptions"],
   geometry: Geometry,
 ): [number, number][] {
   if (requestOptions.geometries === "geojson") {
@@ -21,7 +21,7 @@ export function geometryDecoder(
  * Decodes the congestion level of a specific segment of a route leg.
  */
 export function congestionLevelDecoder(
-  requestOptions: MaplibreGlDirectionsConfiguration["requestOptions"],
+  requestOptions: MapLibreGlDirectionsConfiguration["requestOptions"],
   annotation: Leg["annotation"] | undefined,
   segmentIndex: number,
 ): number {
@@ -52,7 +52,7 @@ export function congestionLevelDecoder(
  * 0.00001 degree when using "polyline" geometries (5 fractional-digits precision).
  */
 export function coordinatesComparator(
-  requestOptions: MaplibreGlDirectionsConfiguration["requestOptions"],
+  requestOptions: MapLibreGlDirectionsConfiguration["requestOptions"],
   a: [number, number],
   b: [number, number],
 ): boolean {

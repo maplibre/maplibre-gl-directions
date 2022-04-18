@@ -33,12 +33,12 @@
   import maplibregl from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
   import style from "../assets/map/style/style.json?url";
-  import MaplibreGlDirections from "@maplibre/maplibre-gl-directions";
+  import MapLibreGlDirections from "@maplibre/maplibre-gl-directions";
   import { layersFactory } from "@maplibre/maplibre-gl-directions";
 
   const name = ref(useRoute().matched[0].name);
 
-  const directions = ref<MaplibreGlDirections>();
+  const directions = ref<MapLibreGlDirections>();
 
   const mapRef = ref();
   watch(mapRef, () => {
@@ -54,7 +54,7 @@
       const layers = layersFactory(isTouchDeviceProxy.value ? 1.5 : 1, isTouchDeviceProxy.value ? 2 : 1);
 
       map.on("load", () => {
-        directions.value = new MaplibreGlDirections(map, {
+        directions.value = new MapLibreGlDirections(map, {
           requestOptions: {
             alternatives: "true",
           },

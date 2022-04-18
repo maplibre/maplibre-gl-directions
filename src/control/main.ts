@@ -2,7 +2,7 @@
 // import { createApp } from "vue";
 // import ControlComponent from "./ControlComponent.vue";
 //
-// export default class MaplibreGlDirectionsControl implements IControl {
+// export default class MapLibreGlDirectionsControl implements IControl {
 //   private controlElement!: HTMLElement;
 //
 //   onAdd(map: Map) {

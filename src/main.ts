@@ -1,12 +1,12 @@
-import MaplibreGlDirections from "./directions/main";
-import type { MaplibreGlDirectionsConfiguration, PointType } from "./directions/types";
+import MapLibreGlDirections from "./directions/main";
+import type { MapLibreGlDirectionsConfiguration, PointType } from "./directions/types";
 import layersFactory from "./directions/layers";
 import type { LayerSpecification } from "maplibre-gl";
 import * as utils from "./directions/utils";
 import type { Feature, Point, LineString } from "geojson";
 
-export default MaplibreGlDirections;
-export type { MaplibreGlDirectionsConfiguration };
+export default MapLibreGlDirections;
+export type { MapLibreGlDirectionsConfiguration };
 
 export { layersFactory };
 /**
