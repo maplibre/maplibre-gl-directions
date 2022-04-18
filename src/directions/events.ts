@@ -1,4 +1,5 @@
 import { Evented, Map, MapMouseEvent, MapTouchEvent } from "maplibre-gl";
+import { Directions } from "./types";
 
 export class MaplibreGlDirectionsEvented extends Evented {
   constructor(map: Map) {
@@ -31,8 +32,12 @@ export class MaplibreGlDirectionsEvented extends Evented {
 }
 
 type MaplibreGlDirectionsEventType = {
+  setwaypoints: MaplibreGlDirectionsWaypointEvent;
   addwaypoint: MaplibreGlDirectionsWaypointEvent;
-  removewaypoint: MaplibreGlDirectionsEventType;
+  removewaypoint: MaplibreGlDirectionsWaypointEvent;
+  movewaypoint: MaplibreGlDirectionsWaypointEvent;
+  fetchroutesstart: MaplibreGlDirectionsRoutingEvent;
+  fetchroutesend: MaplibreGlDirectionsRoutingEvent;
 };
 
 export interface MaplibreGlDirectionsEvent<TOrig = undefined> {
@@ -41,21 +46,47 @@ export interface MaplibreGlDirectionsEvent<TOrig = undefined> {
   originalEvent: TOrig;
 }
 
+type MaplibreGlDirectionsWaypointEventData = Partial<{
+  index: number;
+  initialCoordinates: [number, number];
+}>;
+
 export class MaplibreGlDirectionsWaypointEvent
   implements MaplibreGlDirectionsEvent<MapMouseEvent | MapTouchEvent | undefined>
 {
   constructor(
-    type: "addwaypoint" | "removewaypoint",
+    type: "setwaypoints" | "addwaypoint" | "removewaypoint" | "movewaypoint",
     originalEvent: MapMouseEvent | MapTouchEvent | undefined,
-    index: number,
+    data?: MaplibreGlDirectionsWaypointEventData,
   ) {
     this.type = type;
     this.originalEvent = originalEvent;
-    this.index = index;
+    this.data = data;
   }
 
   type;
   target!: Map;
   originalEvent: MapMouseEvent | MapTouchEvent | undefined;
-  index: number;
+  data?: MaplibreGlDirectionsWaypointEventData;
+}
+
+type MaplibreGlDirectionsRoutingEventData = Partial<{
+  code: Directions["code"];
+}>;
+
+export class MaplibreGlDirectionsRoutingEvent implements MaplibreGlDirectionsEvent<MaplibreGlDirectionsWaypointEvent> {
+  constructor(
+    type: "fetchroutesstart" | "fetchroutesend",
+    originalEvent: MaplibreGlDirectionsWaypointEvent,
+    data?: MaplibreGlDirectionsRoutingEventData,
+  ) {
+    this.type = type;
+    this.originalEvent = originalEvent;
+    this.data = data;
+  }
+
+  type;
+  target!: Map;
+  originalEvent: MaplibreGlDirectionsWaypointEvent;
+  data?: MaplibreGlDirectionsRoutingEventData;
 }

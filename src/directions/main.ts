@@ -1,7 +1,11 @@
 import type maplibregl from "maplibre-gl";
 import type { Directions, MaplibreGlDirectionsConfiguration, Route, Snappoint } from "./types";
 import type { Feature, FeatureCollection, LineString, Point } from "geojson";
-import { MaplibreGlDirectionsEvented, MaplibreGlDirectionsWaypointEvent } from "./events";
+import {
+  MaplibreGlDirectionsEvented,
+  MaplibreGlDirectionsRoutingEvent,
+  MaplibreGlDirectionsWaypointEvent,
+} from "./events";
 import { buildConfiguration, buildRequest, buildPoint, buildSnaplines, buildRoutelines } from "./utils";
 import axios from "axios";
 import { MapMouseEvent, MapTouchEvent } from "maplibre-gl";
@@ -95,19 +99,23 @@ export default class MaplibreGlDirections extends MaplibreGlDirectionsEvented {
     });
   }
 
-  protected async fetchDirections() {
+  protected async fetchDirections(originalEvent: MaplibreGlDirectionsWaypointEvent) {
     const prevInteractive = this.interactive;
     this.interactive = false;
 
     if (this._waypoints.length >= 2) {
+      this.fire(new MaplibreGlDirectionsRoutingEvent("fetchroutesstart", originalEvent));
+
       const { method, url, payload } = this.buildRequest(this.configuration, this.waypointsCoordinates);
 
+      let code: Directions["code"];
       let snappoints: Snappoint[];
       let routes: Route[];
 
       if (method === "get") {
         const response = (await axios.get<Directions>(`${url}?${payload}`)).data;
 
+        code = response.code;
         snappoints = response.waypoints;
         routes = response.routes;
       } else {
@@ -119,6 +127,7 @@ export default class MaplibreGlDirections extends MaplibreGlDirectionsEvented {
           })
         ).data;
 
+        code = response.code;
         snappoints = response.waypoints;
         routes = response.routes;
       }
@@ -137,12 +146,11 @@ export default class MaplibreGlDirections extends MaplibreGlDirectionsEvented {
       );
       if (routes.length <= this.selectedRouteIndex) this.selectedRouteIndex = 0;
 
-      // this.fire(
-      //   new MaplibreGlDirectionsRoutingEvent("fetchdirections", this.map, undefined, {
-      //     routes,
-      //     snappoints,
-      //   }),
-      // );
+      this.fire(
+        new MaplibreGlDirectionsRoutingEvent("fetchroutesend", originalEvent, {
+          code,
+        }),
+      );
     } else {
       this.snappoints = [];
       this.routelines = [];
@@ -496,11 +504,16 @@ export default class MaplibreGlDirections extends MaplibreGlDirectionsEvented {
 
         this.waypointBeingDragged.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
 
+        const waypointEvent = new MaplibreGlDirectionsWaypointEvent("movewaypoint", e, {
+          initialCoordinates: this.waypointBeingDraggedInitialCoordinates,
+        });
+        this.fire(waypointEvent);
+
         /*
          * If the routing request has failed for some reason, restore the waypoint's original position.
          */
         try {
-          await this.fetchDirections();
+          await this.fetchDirections(waypointEvent);
         } catch (err) {
           if (this.waypointBeingDraggedInitialCoordinates) {
             this.waypointBeingDragged.geometry.coordinates = this.waypointBeingDraggedInitialCoordinates;
@@ -682,8 +695,11 @@ export default class MaplibreGlDirections extends MaplibreGlDirectionsEvented {
 
     this.assignWaypointsCategories();
 
+    const waypointEvent = new MaplibreGlDirectionsWaypointEvent("addwaypoint", undefined);
+    this.fire(waypointEvent);
+
     this.draw();
-    await this.fetchDirections();
+    await this.fetchDirections(waypointEvent);
   }
 
   /**
@@ -699,10 +715,12 @@ export default class MaplibreGlDirections extends MaplibreGlDirectionsEvented {
     this._waypoints.splice(index, 0, this.buildPoint(waypoint, "WAYPOINT"));
 
     this.assignWaypointsCategories();
-    this.fire(new MaplibreGlDirectionsWaypointEvent("addwaypoint", originalEvent, index));
+
+    const waypointEvent = new MaplibreGlDirectionsWaypointEvent("addwaypoint", originalEvent, { index });
+    this.fire(waypointEvent);
 
     this.draw();
-    await this.fetchDirections();
+    await this.fetchDirections(waypointEvent);
   }
 
   /**
@@ -716,10 +734,12 @@ export default class MaplibreGlDirections extends MaplibreGlDirectionsEvented {
     this.snappoints.splice(index, 1);
 
     this.assignWaypointsCategories();
-    this.fire(new MaplibreGlDirectionsWaypointEvent("removewaypoint", originalEvent, index));
+
+    const waypointEvent = new MaplibreGlDirectionsWaypointEvent("removewaypoint", originalEvent, { index });
+    this.fire(waypointEvent);
 
     this.draw();
-    await this.fetchDirections();
+    await this.fetchDirections(waypointEvent);
   }
 
   /**

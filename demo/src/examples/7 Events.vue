@@ -8,6 +8,7 @@
     </p>
 
     <ol>
+      <!-- eslint-disable-next-line -->
       <li v-for="message in messages" :key="message" v-html="message" />
     </ol>
 
@@ -52,16 +53,34 @@
       directions.value.interactive = true;
 
       directions.value?.on("addwaypoint", (e) => {
-        console.log(e);
         messages.value.push(
-          `<strong>${e.type}</strong>: waypoint added at index <strong>${e.index}</strong>. Original event - <strong>${e.originalEvent.type}</strong>`,
+          `<strong>${e.type}</strong>: waypoint added at index <strong>${e.data?.index}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`,
         );
       });
 
       directions.value?.on("removewaypoint", (e) => {
-        console.log(e);
         messages.value.push(
-          `<strong>${e.type}</strong>: waypoint removed at index <strong>${e.index}</strong>. Original event - <strong>${e.originalEvent.type}</strong>`,
+          `<strong>${e.type}</strong>: waypoint removed at index <strong>${e.data?.index}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`,
+        );
+      });
+
+      directions.value?.on("movewaypoint", (e) => {
+        messages.value.push(
+          `<strong>${e.type}</strong>: waypoint moved from coordinates ${e.data?.initialCoordinates
+            ?.map((c) => c.toFixed(5))
+            .join(", ")}. Original event - <strong>${e.originalEvent?.type}</strong>`,
+        );
+      });
+
+      directions.value?.on("fetchroutesstart", (e) => {
+        messages.value.push(
+          `<strong>${e.type}</strong>: routing request started. Original event - <strong>${e.originalEvent.type}</strong>`,
+        );
+      });
+
+      directions.value?.on("fetchroutesend", (e) => {
+        messages.value.push(
+          `<strong>${e.type}</strong>: routing request finished with code <strong>${e.data?.code}</strong>. Original event - <strong>${e.originalEvent.type}</strong>`,
         );
       });
     });
