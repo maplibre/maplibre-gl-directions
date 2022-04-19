@@ -1,12 +1,12 @@
 import type maplibregl from "maplibre-gl";
-import MaplibreGlDirections, {
-  MaplibreGlDirectionsConfiguration,
+import MapLibreGlDirections, {
+  MapLibreGlDirectionsConfiguration,
   utils,
   layersFactory,
 } from "@maplibre/maplibre-gl-directions";
 
-export default class CustomMaplibreGlDirections extends MaplibreGlDirections {
-  constructor(map: maplibregl.Map, configuration?: Partial<MaplibreGlDirectionsConfiguration>) {
+export default class CustomMapLibreGlDirections extends MapLibreGlDirections {
+  constructor(map: maplibregl.Map, configuration?: Partial<MapLibreGlDirectionsConfiguration>) {
     super(map, configuration);
   }
 

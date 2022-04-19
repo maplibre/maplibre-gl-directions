@@ -46,12 +46,12 @@ $ npm i @maplibre/maplibre-gl-directions
 
 ```typescript
 // Import the plugin
-import MaplibreGlDirections from "@maplibre/maplibre-gl-directions";
+import MapLibreGlDirections from "@maplibre/maplibre-gl-directions";
 
-// Make sure to create a MaplibreGlDirections instance only after the map is loaded
+// Make sure to create a MapLibreGlDirections instance only after the map is loaded
 map.on("load", () => {
   // Create an instance of the default class
-  const directions = new MaplibreGlDirections(map);
+  const directions = new MapLibreGlDirections(map);
 
   // Enable interactivity (if needed)
   directions.interactive = true;

@@ -1,6 +1,6 @@
-import type { MaplibreGlDirectionsConfiguration, PointType, Route } from "./types";
+import type { MapLibreGlDirectionsConfiguration, PointType, Route } from "./types";
 import type { Feature, LineString, Point } from "geojson";
-import { MaplibreGlDirectionsDefaultConfiguration } from "./types";
+import { MapLibreGlDirectionsDefaultConfiguration } from "./types";
 import layersFactory from "./layers";
 import { nanoid } from "nanoid";
 import { congestionLevelDecoder, coordinatesComparator, geometryDecoder } from "./helpers";
@@ -8,24 +8,24 @@ import { congestionLevelDecoder, coordinatesComparator, geometryDecoder } from "
 /**
  * @protected
  *
- * Takes a missing or an incomplete {@link MaplibreGlDirectionsConfiguration|configuration object}, augments it with the
+ * Takes a missing or an incomplete {@link MapLibreGlDirectionsConfiguration|configuration object}, augments it with the
  * default values and returns the complete configuration object.
  */
 export function buildConfiguration(
-  customConfiguration?: Partial<MaplibreGlDirectionsConfiguration>,
-): MaplibreGlDirectionsConfiguration {
+  customConfiguration?: Partial<MapLibreGlDirectionsConfiguration>,
+): MapLibreGlDirectionsConfiguration {
   const layers = layersFactory(customConfiguration?.pointsScalingFactor, customConfiguration?.linesScalingFactor);
-  return Object.assign({}, MaplibreGlDirectionsDefaultConfiguration, { layers }, customConfiguration);
+  return Object.assign({}, MapLibreGlDirectionsDefaultConfiguration, { layers }, customConfiguration);
 }
 
 /**
  * @protected
  *
  * Builds the routing-request method, URL and payload based on the provided
- * {@link MaplibreGlDirectionsConfiguration|configuration} and the waypoints' coordinates.
+ * {@link MapLibreGlDirectionsConfiguration|configuration} and the waypoints' coordinates.
  */
 export function buildRequest(
-  configuration: MaplibreGlDirectionsConfiguration,
+  configuration: MapLibreGlDirectionsConfiguration,
   waypointsCoordinates: [number, number][],
 ): { method: "get" | "post"; url: string; payload: URLSearchParams } {
   const method = configuration.makePostRequest ? "post" : "get";
@@ -159,7 +159,7 @@ export function buildSnaplines(
  * levels. If there's no congestions, each route leg consists of a single segment.
  */
 export function buildRoutelines(
-  requestOptions: MaplibreGlDirectionsConfiguration["requestOptions"],
+  requestOptions: MapLibreGlDirectionsConfiguration["requestOptions"],
   routes: Route[],
   selectedRouteIndex: number,
   snappoints: Feature<Point>[],

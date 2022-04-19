@@ -1,7 +1,7 @@
 import { Evented, Map, MapMouseEvent, MapTouchEvent } from "maplibre-gl";
 import { Directions } from "./types";
 
-export class MaplibreGlDirectionsEvented extends Evented {
+export class MapLibreGlDirectionsEvented extends Evented {
   constructor(map: Map) {
     super();
 
@@ -31,7 +31,7 @@ export class MaplibreGlDirectionsEvented extends Evented {
   /**
    * @private
    */
-  fire<T extends keyof MaplibreGlDirectionsEventType>(event: MaplibreGlDirectionsEventType[T]): this {
+  fire<T extends keyof MapLibreGlDirectionsEventType>(event: MapLibreGlDirectionsEventType[T]): this {
     event.target = this.map;
     return super.fire(event.type, event);
   }
@@ -39,23 +39,23 @@ export class MaplibreGlDirectionsEvented extends Evented {
   /**
    * Registers an event listener.
    */
-  on<T extends keyof MaplibreGlDirectionsEventType>(type: T, listener: (ev: MaplibreGlDirectionsEventType[T]) => void) {
+  on<T extends keyof MapLibreGlDirectionsEventType>(type: T, listener: (ev: MapLibreGlDirectionsEventType[T]) => void) {
     return super.on(type, listener);
   }
 
   /**
    * Un-registers an event listener.
    */
-  off<T extends keyof MaplibreGlDirectionsEventType>(type: T, listener: (e: MaplibreGlDirectionsEventType[T]) => void) {
+  off<T extends keyof MapLibreGlDirectionsEventType>(type: T, listener: (e: MapLibreGlDirectionsEventType[T]) => void) {
     return super.off(type, listener);
   }
 
   /**
    * Registers an event listener to be invoked only once.
    */
-  once<T extends keyof MaplibreGlDirectionsEventType>(
+  once<T extends keyof MapLibreGlDirectionsEventType>(
     type: T,
-    listener: (e: MaplibreGlDirectionsEventType[T]) => void,
+    listener: (e: MapLibreGlDirectionsEventType[T]) => void,
   ) {
     return super.once(type, listener);
   }
@@ -64,47 +64,47 @@ export class MaplibreGlDirectionsEvented extends Evented {
 /**
  * Supported event types.
  */
-export interface MaplibreGlDirectionsEventType {
+export interface MapLibreGlDirectionsEventType {
   /**
    * Emitted after the waypoints are set using the {@link default.setWaypoints|`setWaypoints`} method.
    */
-  setwaypoints: MaplibreGlDirectionsWaypointEvent;
+  setwaypoints: MapLibreGlDirectionsWaypointEvent;
 
   /**
    * Emitted when a waypoint is added.
    */
-  addwaypoint: MaplibreGlDirectionsWaypointEvent;
+  addwaypoint: MapLibreGlDirectionsWaypointEvent;
 
   /**
    * Emitted when a waypoint is removed.
    */
-  removewaypoint: MaplibreGlDirectionsWaypointEvent;
+  removewaypoint: MapLibreGlDirectionsWaypointEvent;
 
   /**
    * Emitted when a waypoint is moved. __Note__ that the event is not emitted if the waypoint has been dragged for an
    * amount of pixels less than specified by the {@link MapLibreGlDirectionsConfiguration.dragThreshold|`dragThreshold`}
    * configuration property.
    */
-  movewaypoint: MaplibreGlDirectionsWaypointEvent;
+  movewaypoint: MapLibreGlDirectionsWaypointEvent;
 
   /**
    * Emitted when there appears an ongoing routing-request.
    */
-  fetchroutesstart: MaplibreGlDirectionsRoutingEvent;
+  fetchroutesstart: MapLibreGlDirectionsRoutingEvent;
 
   /**
    * Emitted after the ongoing routing-request has finished.
    */
-  fetchroutesend: MaplibreGlDirectionsRoutingEvent;
+  fetchroutesend: MapLibreGlDirectionsRoutingEvent;
 }
 
-export interface MaplibreGlDirectionsEvent<TOrig = undefined> {
-  type: keyof MaplibreGlDirectionsEventType;
+export interface MapLibreGlDirectionsEvent<TOrig = undefined> {
+  type: keyof MapLibreGlDirectionsEventType;
   target: Map;
   originalEvent: TOrig;
 }
 
-export interface MaplibreGlDirectionsWaypointEventData {
+export interface MapLibreGlDirectionsWaypointEventData {
   /**
    * Index of the added/removed/moved waypoint.
    *
@@ -120,8 +120,8 @@ export interface MaplibreGlDirectionsWaypointEventData {
   initialCoordinates: [number, number];
 }
 
-export class MaplibreGlDirectionsWaypointEvent
-  implements MaplibreGlDirectionsEvent<MapMouseEvent | MapTouchEvent | undefined>
+export class MapLibreGlDirectionsWaypointEvent
+  implements MapLibreGlDirectionsEvent<MapMouseEvent | MapTouchEvent | undefined>
 {
   /**
    * @private
@@ -129,7 +129,7 @@ export class MaplibreGlDirectionsWaypointEvent
   constructor(
     type: "setwaypoints" | "addwaypoint" | "removewaypoint" | "movewaypoint",
     originalEvent: MapMouseEvent | MapTouchEvent | undefined,
-    data?: Partial<MaplibreGlDirectionsWaypointEventData>,
+    data?: Partial<MapLibreGlDirectionsWaypointEventData>,
   ) {
     this.type = type;
     this.originalEvent = originalEvent;
@@ -139,10 +139,10 @@ export class MaplibreGlDirectionsWaypointEvent
   type;
   target!: Map;
   originalEvent: MapMouseEvent | MapTouchEvent | undefined;
-  data?: Partial<MaplibreGlDirectionsWaypointEventData>;
+  data?: Partial<MapLibreGlDirectionsWaypointEventData>;
 }
 
-export interface MaplibreGlDirectionsRoutingEventData {
+export interface MapLibreGlDirectionsRoutingEventData {
   /**
    * The server response's code.
    *
@@ -151,14 +151,14 @@ export interface MaplibreGlDirectionsRoutingEventData {
   code: Directions["code"];
 }
 
-export class MaplibreGlDirectionsRoutingEvent implements MaplibreGlDirectionsEvent<MaplibreGlDirectionsWaypointEvent> {
+export class MapLibreGlDirectionsRoutingEvent implements MapLibreGlDirectionsEvent<MapLibreGlDirectionsWaypointEvent> {
   /**
    * @private
    */
   constructor(
     type: "fetchroutesstart" | "fetchroutesend",
-    originalEvent: MaplibreGlDirectionsWaypointEvent,
-    data?: Partial<MaplibreGlDirectionsRoutingEventData>,
+    originalEvent: MapLibreGlDirectionsWaypointEvent,
+    data?: Partial<MapLibreGlDirectionsRoutingEventData>,
   ) {
     this.type = type;
     this.originalEvent = originalEvent;
@@ -167,6 +167,6 @@ export class MaplibreGlDirectionsRoutingEvent implements MaplibreGlDirectionsEve
 
   type;
   target!: Map;
-  originalEvent: MaplibreGlDirectionsWaypointEvent;
-  data?: Partial<MaplibreGlDirectionsRoutingEventData>;
+  originalEvent: MapLibreGlDirectionsWaypointEvent;
+  data?: Partial<MapLibreGlDirectionsRoutingEventData>;
 }
