@@ -726,7 +726,7 @@ export default class MaplibreGlDirections extends MaplibreGlDirectionsEvented {
 
     this.assignWaypointsCategories();
 
-    const waypointEvent = new MaplibreGlDirectionsWaypointEvent("addwaypoint", undefined);
+    const waypointEvent = new MaplibreGlDirectionsWaypointEvent("setwaypoints", undefined);
     this.fire(waypointEvent);
 
     this.draw();
