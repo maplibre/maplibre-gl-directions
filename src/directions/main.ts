@@ -528,7 +528,7 @@ export default class MaplibreGlDirections extends MaplibreGlDirectionsEvented {
          * hoverpoint.
          */
 
-        this.addWaypoint(
+        this._addWaypoint(
           [e.lngLat.lng, e.lngLat.lat],
           this.departSnappointIndex !== undefined ? this.departSnappointIndex + 1 : undefined,
           e,
@@ -596,7 +596,7 @@ export default class MaplibreGlDirections extends MaplibreGlDirectionsEvented {
       });
 
       if (~respectiveWaypointIndex) {
-        this.removeWaypoint(respectiveWaypointIndex, e);
+        this._removeWaypoint(respectiveWaypointIndex, e);
       }
     } else if (this.configuration.sensitiveSnappointLayers.includes(feature?.layer.id ?? "")) {
       /*
@@ -608,7 +608,7 @@ export default class MaplibreGlDirections extends MaplibreGlDirectionsEvented {
       });
 
       if (~respectiveWaypointIndex) {
-        this.removeWaypoint(respectiveWaypointIndex, e);
+        this._removeWaypoint(respectiveWaypointIndex, e);
       }
     } else if (this.configuration.sensitiveAltRoutelineLayers.includes(feature?.layer.id ?? "")) {
       /*
@@ -625,7 +625,7 @@ export default class MaplibreGlDirections extends MaplibreGlDirectionsEvented {
        * If the selected route line is clicked, don't add a new waypoint. Else do.
        */
 
-      this.addWaypoint([e.lngLat.lng, e.lngLat.lat], undefined, e);
+      this._addWaypoint([e.lngLat.lng, e.lngLat.lat], undefined, e);
     }
 
     // the selected route might have changed, so it's important not to skip its redraw
@@ -637,6 +637,37 @@ export default class MaplibreGlDirections extends MaplibreGlDirectionsEvented {
       const category = index === 0 ? "ORIGIN" : index === this._waypoints.length - 1 ? "DESTINATION" : undefined;
       if (waypoint.properties) waypoint.properties.category = category;
     });
+  }
+
+  protected async _addWaypoint(
+    waypoint: [number, number],
+    index?: number,
+    originalEvent?: MapMouseEvent | MapTouchEvent,
+  ) {
+    index = index ?? this._waypoints.length;
+
+    this._waypoints.splice(index, 0, this.buildPoint(waypoint, "WAYPOINT"));
+
+    this.assignWaypointsCategories();
+
+    const waypointEvent = new MaplibreGlDirectionsWaypointEvent("addwaypoint", originalEvent, { index });
+    this.fire(waypointEvent);
+
+    this.draw();
+    await this.fetchDirections(waypointEvent);
+  }
+
+  protected async _removeWaypoint(index: number, originalEvent?: MapMouseEvent | MapTouchEvent) {
+    this._waypoints.splice(index, 1);
+    this.snappoints.splice(index, 1);
+
+    this.assignWaypointsCategories();
+
+    const waypointEvent = new MaplibreGlDirectionsWaypointEvent("removewaypoint", originalEvent, { index });
+    this.fire(waypointEvent);
+
+    this.draw();
+    await this.fetchDirections(waypointEvent);
   }
 
   // the public interface begins here
@@ -709,18 +740,8 @@ export default class MaplibreGlDirections extends MaplibreGlDirectionsEvented {
    * @param index The index the waypoint should be inserted at. If omitted, the waypoint is inserted at the end
    * @return Resolved after the routing request has finished
    */
-  async addWaypoint(waypoint: [number, number], index?: number, originalEvent?: MapMouseEvent | MapTouchEvent) {
-    index = index ?? this._waypoints.length;
-
-    this._waypoints.splice(index, 0, this.buildPoint(waypoint, "WAYPOINT"));
-
-    this.assignWaypointsCategories();
-
-    const waypointEvent = new MaplibreGlDirectionsWaypointEvent("addwaypoint", originalEvent, { index });
-    this.fire(waypointEvent);
-
-    this.draw();
-    await this.fetchDirections(waypointEvent);
+  async addWaypoint(waypoint: [number, number], index?: number) {
+    await this._addWaypoint(waypoint, index);
   }
 
   /**
@@ -729,17 +750,8 @@ export default class MaplibreGlDirections extends MaplibreGlDirectionsEvented {
    * @param index The index of the waypoint to remove
    * @return Resolved after the routing request has finished
    */
-  async removeWaypoint(index: number, originalEvent?: MapMouseEvent | MapTouchEvent) {
-    this._waypoints.splice(index, 1);
-    this.snappoints.splice(index, 1);
-
-    this.assignWaypointsCategories();
-
-    const waypointEvent = new MaplibreGlDirectionsWaypointEvent("removewaypoint", originalEvent, { index });
-    this.fire(waypointEvent);
-
-    this.draw();
-    await this.fetchDirections(waypointEvent);
+  async removeWaypoint(index: number) {
+    await this._removeWaypoint(index);
   }
 
   /**
