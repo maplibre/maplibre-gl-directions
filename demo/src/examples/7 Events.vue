@@ -66,7 +66,9 @@
 
       directions.value.on("movewaypoint", (e) => {
         messages.value.push(
-          `<strong>${e.type}</strong>: waypoint moved from coordinates ${e.data?.initialCoordinates
+          `<strong>${e.type}</strong>: waypoint at index <strong>${
+            e.data?.index
+          }</strong> moved from coordinates ${e.data?.initialCoordinates
             ?.map((c) => c.toFixed(5))
             .join(", ")}. Original event - <strong>${e.originalEvent?.type}</strong>`,
         );

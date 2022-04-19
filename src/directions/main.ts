@@ -505,6 +505,7 @@ export default class MaplibreGlDirections extends MaplibreGlDirectionsEvented {
         this.waypointBeingDragged.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
 
         const waypointEvent = new MaplibreGlDirectionsWaypointEvent("movewaypoint", e, {
+          index: this._waypoints.indexOf(this.waypointBeingDragged),
           initialCoordinates: this.waypointBeingDraggedInitialCoordinates,
         });
         this.fire(waypointEvent);
