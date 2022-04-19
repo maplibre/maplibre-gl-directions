@@ -21,6 +21,8 @@ jobs:
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_TOKEN }}
 
       - name: Use Node 16 x64
         uses: actions/setup-node@v3
@@ -45,8 +47,6 @@ jobs:
           git config user.email github-actions@github.com
           npm version ${{ github.event.inputs.version }} --tag-version-prefix=v -m "Update version (${{ github.event.inputs.version }})"
           git push && git push --tags
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get Version
         id: package-version
