@@ -106,7 +106,9 @@ export interface MaplibreGlDirectionsEvent<TOrig = undefined> {
 
 export interface MaplibreGlDirectionsWaypointEventData {
   /**
-   * Index of the added/removed waypoint.
+   * Index of the added/removed/moved waypoint.
+   *
+   * Never presents for the {@link MapLibreGlDirectionsEventType.setwaypoints|`setwaypoints`} event.
    */
   index: number;
 
