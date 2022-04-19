@@ -41,8 +41,8 @@ jobs:
 
       - name: Bump Version
         run: |
-          git config --global user.email "g.smellyshovel@gmail.com"
-          git config --global user.name "Matthew Mamonov"
+          git config user.name github-actions
+          git config user.email github-actions@github.com
           npm version ${{ github.event.inputs.version }} --tag-version-prefix=v -m "Update version (${{ github.event.inputs.version }})"
           git push && git push --tags
         env:
