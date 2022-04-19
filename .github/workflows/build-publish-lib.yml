@@ -1,6 +1,15 @@
 name: Build and Publish the Library
 on:
-  workflow_dispatch
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Choose a release type
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
 
 jobs:
   build-and-deploy-lib:
@@ -20,46 +29,32 @@ jobs:
           architecture: x64
           registry-url: "https://registry.npmjs.org"
 
-      - name: Get version
-        id: package-version
-        uses: martinbeentjes/npm-get-version-action@v1.1.0
-
-      - name: Check tag does not exist yet
-        run: if git rev-list v${{ steps.package-version.outputs.current-version }}; then echo "Tag already exists. Aborting the release process."; exit 1; fi
-
-      - name: Tag commit and push
-        uses: mathieudutour/github-tag-action@v5.6
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          custom_tag: ${{ steps.package-version.outputs.current-version }}
-
-      - name: Install and link 🔗
+      - name: Install and Link 🔗
         run: |
           npm ci
           npm link
           npm link @maplibre/maplibre-gl-directions
 
-      - name: Prepare release
-        id: prepare_release
-        run: |
-          echo ::set-output name=version_tag::v${{ steps.package-version.outputs.current-version }}
-          echo ::set-output name=release_type::$(node -e "console.log(require('semver').prerelease('${{ steps.package-version.outputs.current-version }}') ? 'prerelease' : 'regular')")
-
       - name: Build 🔧
         run: |
           npm run build
 
-      - name: Publish NPM package (regular)
-        if: ${{ steps.prepare_release.outputs.release_type == 'regular' }}
+      - name: Bump Version
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          npm version ${{ github.event.inputs.version }} --tag-version-prefix=v -m "Update version (${{ github.event.inputs.version }})"
+          git push && git push --tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get Version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@v1.1.0
+
+      - name: Publish to NPM
         run: |
           npm publish --access public --non-interactive
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_ORG_TOKEN }}
-
-      - name: Publish NPM package (pre-release)
-        if: ${{ steps.prepare_release.outputs.release_type == 'prerelease' }}
-        run: |
-          npm publish --tag next --access public --non-interactive
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_ORG_TOKEN }}
 
@@ -67,32 +62,14 @@ jobs:
         run: |
           zip -r dist dist
 
-      - name: Create GitHub Release (regular)
-        id: create_regular_release
-        if: ${{ steps.prepare_release.outputs.release_type == 'regular' }}
+      - name: Create GitHub Release
+        id: create_github_release
         uses: ncipollo/release-action@v1.10.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag: ${{ steps.prepare_release.outputs.version_tag }}
-          name: ${{steps.prepare_release.outputs.version_tag }}
+          tag: v${{ steps.package-version.outputs.current-version }}
+          name: v${{ steps.package-version.outputs.current-version }}
           generateReleaseNotes: true
-          draft: false
-          prerelease: false
-          artifacts: "./dist.zip"
-          artifactContentType: "application/zip"
-
-      - name: Create GitHub Release (prerelease)
-        id: create_prerelease
-        if: ${{ steps.prepare_release.outputs.release_type == 'prerelease' }}
-        uses: ncipollo/release-action@v1.10.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag: ${{ steps.prepare_release.outputs.version_tag }}
-          name: ${{steps.prepare_release.outputs.version_tag }}
-          generateReleaseNotes: true
-          draft: false
-          prerelease: true
           artifacts: "./dist.zip"
           artifactContentType: "application/zip"
