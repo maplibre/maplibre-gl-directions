@@ -14,7 +14,8 @@ import {
  *
  * @example
  * ```typescript
- * map.addControl(new MapLibreGlDirectionsLoadingControl(new MapLibreGlDirections(map)));
+ * import MapLibreGlDirections, { LoadingControl } from "@maplibre/maplibre-gl-directions";
+ * map.addControl(new LoadingControl(new MapLibreGlDirections(map)));
  * ```
  */
 export default class MapLibreGlDirectionsLoadingControl implements IControl {
