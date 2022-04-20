@@ -42,7 +42,7 @@
   watch([directions, position], () => {
     if (directions.value && position.value) {
       map.removeControl(control);
-      map.addControl((control = new LoadingControl(directions.value)), position.value);
+      map.addControl((control = new LoadingControl(directions.value, { class: "m-2" })), position.value);
     }
   });
 
