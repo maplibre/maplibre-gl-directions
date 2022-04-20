@@ -1,5 +1,7 @@
 import { Map, IControl } from "maplibre-gl";
 import { createApp } from "vue";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import LoadingControlComponent from "./LoadingControlComponent.vue";
 import MapLibreGlDirections from "../../directions/main";
 import {
@@ -7,6 +9,14 @@ import {
   MapLibreGlDirectionsLoadingControlDefaultConfiguration,
 } from "./types";
 
+/**
+ * Creates an instance of MapLibreGlDirectionsLoadingControl that can be added to the map using the `addControl` method.
+ *
+ * @example
+ * ```typescript
+ * map.addControl(new MapLibreGlDirectionsLoadingControl(new MapLibreGlDirections(map)));
+ * ```
+ */
 export default class MapLibreGlDirectionsLoadingControl implements IControl {
   constructor(
     directions: MapLibreGlDirections,
@@ -18,8 +28,11 @@ export default class MapLibreGlDirectionsLoadingControl implements IControl {
 
   private controlElement!: HTMLElement;
   private directions: MapLibreGlDirections;
-  configuration: MapLibreGlDirectionsLoadingControlConfiguration;
+  private configuration: MapLibreGlDirectionsLoadingControlConfiguration;
 
+  /**
+   * @private
+   */
   onAdd(map: Map) {
     this.controlElement = document.createElement("div");
 
@@ -31,6 +44,9 @@ export default class MapLibreGlDirectionsLoadingControl implements IControl {
     return this.controlElement;
   }
 
+  /**
+   * @private
+   */
   onRemove() {
     this.controlElement.remove();
   }

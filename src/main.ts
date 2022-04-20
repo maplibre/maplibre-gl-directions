@@ -11,12 +11,14 @@ import layersFactory from "./directions/layers";
 import type { LayerSpecification, MapMouseEvent, MapTouchEvent } from "maplibre-gl";
 import * as utils from "./directions/utils";
 import type { Feature, Point, LineString } from "geojson";
-import LoadingControl from "./controls/loading/main";
 
 export default MapLibreGlDirections;
 export type { MapLibreGlDirectionsConfiguration };
 export type { MapLibreGlDirectionsEventType };
 export { layersFactory };
+
+import LoadingControl from "./controls/loading/main";
+import type { MapLibreGlDirectionsLoadingControlConfiguration } from "./controls/loading/types";
 
 /**
  * @protected
@@ -49,3 +51,4 @@ export { utils };
 export type { Feature, Point, PointType, LineString };
 
 export { LoadingControl };
+export type { MapLibreGlDirectionsLoadingControlConfiguration };

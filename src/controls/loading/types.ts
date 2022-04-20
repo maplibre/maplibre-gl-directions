@@ -15,6 +15,8 @@ export interface MapLibreGlDirectionsLoadingControlConfiguration {
 
   /**
    * Class-string passed as-is to the `class=""` attribute of the loader SVG.
+   *
+   * @default ""
    */
   class: string;
 }
