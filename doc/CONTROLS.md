@@ -1,0 +1,3 @@
+### LoadingControl
+
+The {@link LoadingControl}

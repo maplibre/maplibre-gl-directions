@@ -47,11 +47,11 @@
 <script setup lang="ts">
   import { ref } from "vue";
   import MapLibreGlDirections from "../../directions/main";
-  import { MapLibreGlDirectionsLoadingControlConfiguration } from "./types";
+  import { LoadingControlConfiguration } from "./types";
 
   const props = defineProps<{
     directions: MapLibreGlDirections;
-    configuration: MapLibreGlDirectionsLoadingControlConfiguration;
+    configuration: LoadingControlConfiguration;
   }>();
 
   props.directions.on("fetchroutesstart", () => {

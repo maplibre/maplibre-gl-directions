@@ -18,7 +18,7 @@ export type { MapLibreGlDirectionsEventType };
 export { layersFactory };
 
 import LoadingControl from "./controls/loading/main";
-import type { MapLibreGlDirectionsLoadingControlConfiguration } from "./controls/loading/types";
+import type { LoadingControlConfiguration } from "./controls/loading/types";
 
 /**
  * @protected
@@ -51,4 +51,4 @@ export { utils };
 export type { Feature, Point, PointType, LineString };
 
 export { LoadingControl };
-export type { MapLibreGlDirectionsLoadingControlConfiguration };
+export type { LoadingControlConfiguration };

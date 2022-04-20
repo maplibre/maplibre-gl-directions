@@ -1,4 +1,4 @@
-export interface MapLibreGlDirectionsLoadingControlConfiguration {
+export interface LoadingControlConfiguration {
   /**
    * Fill-color for the loader. Any valid CSS-value.
    *
@@ -21,7 +21,7 @@ export interface MapLibreGlDirectionsLoadingControlConfiguration {
   class: string;
 }
 
-export const MapLibreGlDirectionsLoadingControlDefaultConfiguration: MapLibreGlDirectionsLoadingControlConfiguration = {
+export const LoadingControlDefaultConfiguration: LoadingControlConfiguration = {
   fill: "#6d26d7",
   size: "24px",
   class: "",

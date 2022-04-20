@@ -12,6 +12,12 @@ For the sakes of your convenience, make sure you've enabled the "Public" filter:
 
 ---
 
+## Controls
+
+[[include:CONTROLS.md]]
+
+---
+
 ## Customization
 
 [[include:CUSTOMIZATION.md]]
