@@ -1,4 +1,4 @@
-name: Pull Request Labels
+name: Pull Request Checks
 on:
   pull_request:
     types: [opened, labeled, unlabeled, synchronize]
