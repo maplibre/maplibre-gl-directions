@@ -18,8 +18,6 @@ jobs:
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.GH_TOKEN }}
 
       - name: Use Node 16 x64
         uses: actions/setup-node@v3
