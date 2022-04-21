@@ -1,0 +1,34 @@
+name: Pull Request Checks
+on:
+  pull_request:
+    types: [opened, labeled, unlabeled, synchronize]
+
+jobs:
+  check-labels:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: mheap/github-action-required-labels@v1
+        with:
+          mode: exactly
+          count: 1
+          labels: "semver:major, semver:minor, semver:patch, release:ignore"
+
+  check-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
+
+      - name: Use Node 16 x64
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          architecture: x64
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Try to Build
+        run: |
+          npm ci
+          npm link
+          npm link @maplibre/maplibre-gl-directions
+          npm run build
