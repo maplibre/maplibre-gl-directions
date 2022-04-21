@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          npm ci
+          npm i
           npm link
           npm link @maplibre/maplibre-gl-directions
           npm run build
