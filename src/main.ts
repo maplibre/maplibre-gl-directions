@@ -19,6 +19,7 @@ export { layersFactory };
 
 import LoadingControl from "./controls/loading/main";
 import type { LoadingControlConfiguration } from "./controls/loading/types";
+import "./controls/common.css";
 
 /**
  * @protected
