@@ -17,6 +17,10 @@ export type { MapLibreGlDirectionsConfiguration };
 export type { MapLibreGlDirectionsEventType };
 export { layersFactory };
 
+import LoadingControl from "./controls/loading/main";
+import type { LoadingControlConfiguration } from "./controls/loading/types";
+import "./controls/common.css";
+
 /**
  * @protected
  */
@@ -46,3 +50,6 @@ export { utils };
  * @protected
  */
 export type { Feature, Point, PointType, LineString };
+
+export { LoadingControl };
+export type { LoadingControlConfiguration };

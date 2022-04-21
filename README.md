@@ -32,6 +32,10 @@ Supports the Mapbox Directions API congestions (both plain and numeric!)
 
 The powerful customization interface allows to customize everything starting from visual aspects all the way up to request logic.
 
+### Standard Controls
+
+Provides standard map-controls. Currently, there's only 1 (loading-indicator), but there are more to come.
+
 ### TypeScript support
 
 The plugin is written 100% in TypeScript and therefore ships with built-in types.
@@ -46,7 +50,7 @@ $ npm i @maplibre/maplibre-gl-directions
 
 ```typescript
 // Import the plugin
-import MapLibreGlDirections from "@maplibre/maplibre-gl-directions";
+import MapLibreGlDirections, { LoadingControl } from "@maplibre/maplibre-gl-directions";
 
 // Make sure to create a MapLibreGlDirections instance only after the map is loaded
 map.on("load", () => {
@@ -55,6 +59,9 @@ map.on("load", () => {
 
   // Enable interactivity (if needed)
   directions.interactive = true;
+
+  // Optionally add the standard loading-indicator-control
+  map.addControl(new LoadingControl(directions));
 
   // Set the waypoints programmatically
   directions.setWaypoints([
@@ -77,6 +84,5 @@ Check out the [Demo](https://maplibre.org/maplibre-gl-directions/#/) or dive rig
 
 ## Future plans
 
-- Emit events
 - Implement default control
 - Write tests
