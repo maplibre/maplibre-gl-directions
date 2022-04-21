@@ -1,0 +1,23 @@
+name: Pull Request Labels
+on:
+  pull_request:
+    types: [opened, labeled, unlabeled, synchronize]
+
+jobs:
+  check-labels:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: mheap/github-action-required-labels@v1
+        with:
+          mode: exactly
+          count: 1
+          labels: "semver:major, semver:minor, semver:patch, release:ignore"
+
+  check-build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          npm ci
+          npm link
+          npm link @maplibre/maplibre-gl-directions
+          npm run build
