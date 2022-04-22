@@ -61,6 +61,6 @@
     "vite": "^2.9.5",
     "vue-eslint-parser": "^8.3.0",
     "vue-router": "^4.0.14",
-    "vue-tsc": "^0.29.8"
+    "vue-tsc": "^0.34.9"
   }
 }
