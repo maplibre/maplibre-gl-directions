@@ -6,12 +6,12 @@ module.exports = {
     node: true,
     "vue/setup-compiler-macros": true,
   },
-  plugins: ["@typescript-eslint", 'svelte3'],
+  plugins: ["@typescript-eslint", "svelte3"],
   overrides: [
     {
-      files: ['*.svelte'],
-      processor: 'svelte3/svelte3'
-    }
+      files: ["*.svelte"],
+      processor: "svelte3/svelte3",
+    },
   ],
   parser: "vue-eslint-parser",
   parserOptions: {
