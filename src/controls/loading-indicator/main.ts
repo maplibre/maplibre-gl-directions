@@ -1,4 +1,4 @@
-import type { Map, IControl } from "maplibre-gl";
+import type { IControl } from "maplibre-gl";
 import LoadingIndicatorControlComponent from "./LoadingIndicatorControl.svelte";
 import { LoadingIndicatorControlDefaultConfiguration } from "./types";
 import type { LoadingIndicatorControlConfiguration } from "./types";
@@ -21,13 +21,13 @@ export default class LoadingControl implements IControl {
   }
 
   private controlElement!: HTMLElement;
-  private directions: MapLibreGlDirections;
-  private configuration: LoadingIndicatorControlConfiguration;
+  private readonly directions: MapLibreGlDirections;
+  private readonly configuration: LoadingIndicatorControlConfiguration;
 
   /**
    * @private
    */
-  onAdd(map: Map) {
+  onAdd() {
     this.controlElement = document.createElement("div");
 
     new LoadingIndicatorControlComponent({
