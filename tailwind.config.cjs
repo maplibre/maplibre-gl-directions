@@ -1,7 +1,7 @@
 const defaultTheme = require("tailwindcss/defaultTheme");
 
 module.exports = {
-  content: ["./demo/index.html", "./demo/**/*.vue", "./src/controls/**/*.vue"],
+  content: ["./demo/index.html", "./demo/**/*.vue", "./src/controls/**/*.svelte"],
   theme: {
     extend: {
       fontFamily: {

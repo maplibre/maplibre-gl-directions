@@ -17,8 +17,8 @@ export type { MapLibreGlDirectionsConfiguration };
 export type { MapLibreGlDirectionsEventType };
 export { layersFactory };
 
-import LoadingControl from "./controls/loading/main";
-import type { LoadingControlConfiguration } from "./controls/loading/types";
+import LoadingIndicatorControl from "./controls/loading-indicator/main";
+import type { LoadingIndicatorControlConfiguration } from "./controls/loading-indicator/types";
 import "./controls/common.css";
 
 /**
@@ -51,5 +51,9 @@ export { utils };
  */
 export type { Feature, Point, PointType, LineString };
 
-export { LoadingControl };
-export type { LoadingControlConfiguration };
+/**
+ * @deprecated in favor of {@link LoadingIndicatorControl}
+ */
+export { LoadingIndicatorControl as LoadingControl };
+export { LoadingIndicatorControl };
+export type { LoadingIndicatorControlConfiguration };

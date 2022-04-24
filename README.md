@@ -50,7 +50,7 @@ $ npm i @maplibre/maplibre-gl-directions
 
 ```typescript
 // Import the plugin
-import MapLibreGlDirections, { LoadingControl } from "@maplibre/maplibre-gl-directions";
+import MapLibreGlDirections, { LoadingIndicatorControl } from "@maplibre/maplibre-gl-directions";
 
 // Make sure to create a MapLibreGlDirections instance only after the map is loaded
 map.on("load", () => {
@@ -60,8 +60,8 @@ map.on("load", () => {
   // Enable interactivity (if needed)
   directions.interactive = true;
 
-  // Optionally add the standard loading-indicator-control
-  map.addControl(new LoadingControl(directions));
+  // Optionally add the standard loading-indicator control
+  map.addControl(new LoadingIndicatorControl(directions));
 
   // Set the waypoints programmatically
   directions.setWaypoints([

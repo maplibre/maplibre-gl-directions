@@ -13,8 +13,8 @@
     </label>
 
     <p>
-      The <code>LoadingControl</code> adds a simple spinning loader-icon which automatically appears whenever there's an
-      ongoing routing-request.
+      The <code>LoadingIndicatorControl</code> adds a simple spinning loader-icon which automatically appears whenever
+      there's an ongoing routing-request.
     </p>
   </app-sidebar>
 
@@ -29,20 +29,20 @@
   import "maplibre-gl/dist/maplibre-gl.css";
   import style from "../assets/map/style/style.json?url";
   import MapLibreGlDirections from "@maplibre/maplibre-gl-directions";
-  import { LoadingControl } from "@maplibre/maplibre-gl-directions";
+  import { LoadingIndicatorControl } from "@maplibre/maplibre-gl-directions";
   import "@maplibre/maplibre-gl-directions/dist/style.css";
 
   const name = ref(useRoute().matched[0].name);
 
   let map: maplibregl.Map;
   const directions = ref<MapLibreGlDirections>();
-  let control: LoadingControl;
+  let control: LoadingIndicatorControl;
 
   const position = ref<maplibregl.ControlPosition>("top-right");
   watch([directions, position], () => {
     if (directions.value && position.value) {
-      map.removeControl(control);
-      map.addControl((control = new LoadingControl(directions.value, { class: "m-2" })), position.value);
+      if (control) map.removeControl(control);
+      map.addControl((control = new LoadingIndicatorControl(directions.value, { class: "m-2" })), position.value);
     }
   });
 

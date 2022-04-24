@@ -1,9 +1,10 @@
 import { defineConfig } from "vite";
-import vue from "@vitejs/plugin-vue";
+import { svelte } from "@sveltejs/vite-plugin-svelte";
+import { visualizer } from "rollup-plugin-visualizer";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [svelte(), visualizer()],
 
   build: {
     outDir: "dist",

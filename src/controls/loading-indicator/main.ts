@@ -1,10 +1,8 @@
-import { Map, IControl } from "maplibre-gl";
-import { createApp } from "vue";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import LoadingControlComponent from "./LoadingControlComponent.vue";
-import MapLibreGlDirections from "../../directions/main";
-import { LoadingControlConfiguration, LoadingControlDefaultConfiguration } from "./types";
+import type { Map, IControl } from "maplibre-gl";
+import LoadingIndicatorControlComponent from "./LoadingIndicatorControl.svelte";
+import { LoadingIndicatorControlDefaultConfiguration } from "./types";
+import type { LoadingIndicatorControlConfiguration } from "./types";
+import type MapLibreGlDirections from "../../directions/main";
 
 /**
  * Creates an instance of LoadingControl that could be added to the map using the
@@ -17,14 +15,14 @@ import { LoadingControlConfiguration, LoadingControlDefaultConfiguration } from 
  * ```
  */
 export default class LoadingControl implements IControl {
-  constructor(directions: MapLibreGlDirections, configuration?: Partial<LoadingControlConfiguration>) {
+  constructor(directions: MapLibreGlDirections, configuration?: Partial<LoadingIndicatorControlConfiguration>) {
     this.directions = directions;
-    this.configuration = Object.assign({}, LoadingControlDefaultConfiguration, configuration);
+    this.configuration = Object.assign({}, LoadingIndicatorControlDefaultConfiguration, configuration);
   }
 
   private controlElement!: HTMLElement;
   private directions: MapLibreGlDirections;
-  private configuration: LoadingControlConfiguration;
+  private configuration: LoadingIndicatorControlConfiguration;
 
   /**
    * @private
@@ -32,10 +30,10 @@ export default class LoadingControl implements IControl {
   onAdd(map: Map) {
     this.controlElement = document.createElement("div");
 
-    createApp(LoadingControlComponent, {
-      directions: this.directions,
-      configuration: this.configuration,
-    }).mount(this.controlElement);
+    new LoadingIndicatorControlComponent({
+      target: this.controlElement,
+      props: { directions: this.directions, configuration: this.configuration },
+    });
 
     return this.controlElement;
   }

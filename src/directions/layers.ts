@@ -5,9 +5,8 @@ import type { LayerSpecification } from "maplibre-gl";
  * {@link https://github.com/smellyshovel/maplibre-gl-directions/blob/main/src/directions/layers.ts#L3|standard
  * `MapLibreGlDirections` layers} with optionally scaled features.
  *
- * @param {number=} pointsScalingFactor A number to multiply the initial points' dimensions by
- * @param {number=} linesScalingFactor A number to multiply the initial lines' dimensions by
- * @returns {LayerSpecification[]}
+ * @param pointsScalingFactor A number to multiply the initial points' dimensions by
+ * @param linesScalingFactor A number to multiply the initial lines' dimensions by
  */
 export default function layersFactory(pointsScalingFactor = 1, linesScalingFactor = 1): LayerSpecification[] {
   return [

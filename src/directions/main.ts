@@ -7,8 +7,7 @@ import {
   MapLibreGlDirectionsWaypointEvent,
 } from "./events";
 import { buildConfiguration, buildRequest, buildPoint, buildSnaplines, buildRoutelines } from "./utils";
-import axios from "axios";
-import { MapMouseEvent, MapTouchEvent } from "maplibre-gl";
+import type { MapMouseEvent, MapTouchEvent } from "maplibre-gl";
 
 /**
  * The main class responsible for all the user interaction and for the routing itself.
@@ -113,19 +112,19 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       let routes: Route[];
 
       if (method === "get") {
-        const response = (await axios.get<Directions>(`${url}?${payload}`)).data;
+        const response = await fetch(`${url}?${payload}`).then((res) => res.json() as Promise<Directions>);
 
         code = response.code;
         snappoints = response.waypoints;
         routes = response.routes;
       } else {
-        const response = (
-          await axios.post<Directions>(`${url}`, payload, {
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-          })
-        ).data;
+        const response = await fetch(`${url}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: JSON.stringify(payload),
+        }).then((res) => res.json() as Promise<Directions>);
 
         code = response.code;
         snappoints = response.waypoints;
