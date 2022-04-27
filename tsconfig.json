@@ -1,8 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "dist",
-    "declaration": true,
-    "emitDeclarationOnly": true,
+    "noEmit": true,
     "target": "esnext",
     "useDefineForClassFields": true,
     "module": "esnext",
