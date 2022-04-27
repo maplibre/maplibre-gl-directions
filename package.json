@@ -20,12 +20,12 @@
     "env:prep": "npm run build:lib && npm link && npm link @maplibre/maplibre-gl-directions",
     "dev:lib": "vue-tsc --project tsconfig.lib.json && vite build --watch --mode development --config vite.lib.config.ts",
     "dev:doc": "typedoc --tsconfig tsconfig.lib.json --watch",
-    "dev:demo": "vite --config vite.demo.config.ts",
+    "dev:demo": "vue-tsc && vite --config vite.demo.config.ts",
     "build": "npm run format && npm run build:lib && npm run build:doc && npm run build:demo",
     "format": "eslint --fix && prettier --write ./",
     "build:lib": "vue-tsc --project tsconfig.lib.json && vite build --config vite.lib.config.ts",
     "build:doc": "typedoc --tsconfig tsconfig.lib.json",
-    "build:demo": "vite build --config vite.demo.config.ts --base /maplibre-gl-directions/"
+    "build:demo": "vue-tsc && vite build --config vite.demo.config.ts --base /maplibre-gl-directions/"
   },
   "dependencies": {
     "@mapbox/polyline": "^1.1.1",
