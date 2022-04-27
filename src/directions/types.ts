@@ -97,6 +97,10 @@ export interface MapLibreGlDirectionsConfiguration {
   /**
    * A name of the source used by the instance. Also used as a prefix for the default layers' names.
    *
+   * __Note__ that if you decide to set this field to some custom value, you'd also need to update the following
+   * setting accordingly: {@link sensitiveWaypointLayers}, {@link sensitiveSnappointLayers},
+   * {@link sensitiveRoutelineLayers} and {@link sensitiveAltRoutelineLayers}.
+   *
    * @default `"maplibre-gl-directions"`
    *
    * @example
