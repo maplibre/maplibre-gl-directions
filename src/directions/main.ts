@@ -86,7 +86,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   }
 
   protected init() {
-    this.map.addSource("maplibre-gl-directions", {
+    this.map.addSource(this.configuration.sourceName, {
       type: "geojson",
       data: {
         type: "FeatureCollection",
@@ -197,8 +197,8 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       features,
     };
 
-    if (this.map.getSource("maplibre-gl-directions")) {
-      (this.map.getSource("maplibre-gl-directions") as maplibregl.GeoJSONSource).setData(geoJson);
+    if (this.map.getSource(this.configuration.sourceName)) {
+      (this.map.getSource(this.configuration.sourceName) as maplibregl.GeoJSONSource).setData(geoJson);
     }
   }
 
@@ -772,6 +772,6 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       this.map.removeLayer(layer.id);
     });
 
-    this.map.removeSource("maplibre-gl-directions");
+    this.map.removeSource(this.configuration.sourceName);
   }
 }

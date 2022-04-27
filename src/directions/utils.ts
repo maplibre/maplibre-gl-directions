@@ -14,7 +14,11 @@ import { congestionLevelDecoder, coordinatesComparator, geometryDecoder } from "
 export function buildConfiguration(
   customConfiguration?: Partial<MapLibreGlDirectionsConfiguration>,
 ): MapLibreGlDirectionsConfiguration {
-  const layers = layersFactory(customConfiguration?.pointsScalingFactor, customConfiguration?.linesScalingFactor);
+  const layers = layersFactory(
+    customConfiguration?.sourceName,
+    customConfiguration?.pointsScalingFactor,
+    customConfiguration?.linesScalingFactor,
+  );
   return Object.assign({}, MapLibreGlDirectionsDefaultConfiguration, { layers }, customConfiguration);
 }
 
