@@ -8,7 +8,7 @@ changelog:
       labels:
         - "semver:major"
 
-    - title: Minor Updates (New Features 🎉 and other non-breacking API changes)
+    - title: Minor Updates (New Features 🎉 and other non-breaking API changes)
       labels:
         - "semver:minor"
 
