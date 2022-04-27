@@ -1,5 +1,5 @@
 import { Evented, Map, MapMouseEvent, MapTouchEvent } from "maplibre-gl";
-import { Directions } from "./types";
+import { Directions, Route } from "./types";
 
 export class MapLibreGlDirectionsEvented extends Evented {
   constructor(map: Map) {
@@ -142,14 +142,7 @@ export class MapLibreGlDirectionsWaypointEvent
   data?: Partial<MapLibreGlDirectionsWaypointEventData>;
 }
 
-export interface MapLibreGlDirectionsRoutingEventData {
-  /**
-   * The server response's code.
-   *
-   * @see http://project-osrm.org/docs/v5.24.0/api/#responses
-   */
-  code: Directions["code"];
-}
+export type MapLibreGlDirectionsRoutingEventData = Directions;
 
 export class MapLibreGlDirectionsRoutingEvent implements MapLibreGlDirectionsEvent<MapLibreGlDirectionsWaypointEvent> {
   /**
@@ -158,7 +151,7 @@ export class MapLibreGlDirectionsRoutingEvent implements MapLibreGlDirectionsEve
   constructor(
     type: "fetchroutesstart" | "fetchroutesend",
     originalEvent: MapLibreGlDirectionsWaypointEvent,
-    data?: Partial<MapLibreGlDirectionsRoutingEventData>,
+    data?: MapLibreGlDirectionsRoutingEventData,
   ) {
     this.type = type;
     this.originalEvent = originalEvent;
@@ -168,5 +161,12 @@ export class MapLibreGlDirectionsRoutingEvent implements MapLibreGlDirectionsEve
   type;
   target!: Map;
   originalEvent: MapLibreGlDirectionsWaypointEvent;
-  data?: Partial<MapLibreGlDirectionsRoutingEventData>;
+  /**
+   * The server's response.
+   *
+   * Only presents when it's the {@link MapLibreGlDirectionsEventType.fetchroutesend|`fetchroutesend`} event.
+   *
+   * @see http://project-osrm.org/docs/v5.24.0/api/#responses
+   */
+  data?: MapLibreGlDirectionsRoutingEventData;
 }
