@@ -15,9 +15,9 @@ export function buildConfiguration(
   customConfiguration?: Partial<MapLibreGlDirectionsConfiguration>,
 ): MapLibreGlDirectionsConfiguration {
   const layers = layersFactory(
-    customConfiguration?.sourceName,
     customConfiguration?.pointsScalingFactor,
     customConfiguration?.linesScalingFactor,
+    customConfiguration?.sourceName,
   );
   return Object.assign({}, MapLibreGlDirectionsDefaultConfiguration, { layers }, customConfiguration);
 }

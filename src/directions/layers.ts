@@ -10,9 +10,9 @@ import type { LayerSpecification } from "maplibre-gl";
  * @param linesScalingFactor A number to multiply the initial lines' dimensions by
  */
 export default function layersFactory(
-  sourceName = "maplibre-gl-directions",
   pointsScalingFactor = 1,
   linesScalingFactor = 1,
+  sourceName = "maplibre-gl-directions",
 ): LayerSpecification[] {
   return [
     {
