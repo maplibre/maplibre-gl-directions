@@ -23,7 +23,7 @@
     >
   </app-sidebar>
 
-  <div ref="mapRef" :key="isTouchDeviceProxy" class="shadow-xl" />
+  <div ref="mapRef" :key="isTouchDeviceProxy.toString()" class="shadow-xl" />
 </template>
 
 <script setup lang="ts">
@@ -66,6 +66,9 @@
     }
   });
 
+  // `maxTouchPoints` isn't recognized by TS. Safe to ignore.
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   const isTouchDevice = ref("ontouchstart" in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0);
 
   const isTouchDeviceProxy = computed({
