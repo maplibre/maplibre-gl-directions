@@ -1,5 +1,12 @@
 import MapLibreGlDirections from "./directions/main";
-import type { MapLibreGlDirectionsConfiguration, PointType } from "./directions/types";
+import type {
+  MapLibreGlDirectionsConfiguration,
+  PointType,
+  Directions,
+  Route,
+  Leg,
+  Snappoint,
+} from "./directions/types";
 import {
   MapLibreGlDirectionsEventType,
   MapLibreGlDirectionsWaypointEvent,
@@ -12,19 +19,23 @@ import type { LayerSpecification, MapMouseEvent, MapTouchEvent } from "maplibre-
 import * as utils from "./directions/utils";
 import type { Feature, Point, LineString } from "geojson";
 
+import LoadingControl from "./controls/loading/main";
+import type { LoadingControlConfiguration } from "./controls/loading/types";
+import "./controls/common.css";
+
 export default MapLibreGlDirections;
 export type { MapLibreGlDirectionsConfiguration };
 export type { MapLibreGlDirectionsEventType };
 export { layersFactory };
 
-import LoadingControl from "./controls/loading/main";
-import type { LoadingControlConfiguration } from "./controls/loading/types";
-import "./controls/common.css";
-
 /**
  * @protected
  */
 export type {
+  Directions,
+  Route,
+  Leg,
+  Snappoint,
   MapLibreGlDirectionsWaypointEvent,
   MapLibreGlDirectionsWaypointEventData,
   MapLibreGlDirectionsRoutingEvent,
