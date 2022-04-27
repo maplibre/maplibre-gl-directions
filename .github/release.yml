@@ -4,15 +4,14 @@ changelog:
       - "release:ignore"
 
   categories:
-    - title: Breaking Changes ⚠
+    - title: Major Updates (Breaking Changes ⚠)
       labels:
         - "semver:major"
-    - title: Exciting New Features 🎉
+
+    - title: Minor Updates (New Features 🎉 and other non-breacking API changes)
       labels:
         - "semver:minor"
-    - title: Bug Fixes 🐛
+
+    - title: Patches (Bug Fixes 🐛, refactoring, and other changes that don't affect the existing API)
       labels:
         - "semver:patch"
-    - title: Other Changes
-      labels:
-        - "*"
