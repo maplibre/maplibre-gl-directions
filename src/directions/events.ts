@@ -1,5 +1,5 @@
 import { Evented, Map, MapMouseEvent, MapTouchEvent } from "maplibre-gl";
-import { Directions, Route } from "./types";
+import { Directions } from "./types";
 
 export class MapLibreGlDirectionsEvented extends Evented {
   constructor(map: Map) {
