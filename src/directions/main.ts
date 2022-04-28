@@ -108,31 +108,21 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
       const { method, url, payload } = this.buildRequest(this.configuration, this.waypointsCoordinates);
 
-      let code: Directions["code"];
-      let snappoints: Snappoint[];
-      let routes: Route[];
+      let response: Directions;
 
       if (method === "get") {
-        const response = (await axios.get<Directions>(`${url}?${payload}`)).data;
-
-        code = response.code;
-        snappoints = response.waypoints;
-        routes = response.routes;
+        response = (await axios.get<Directions>(`${url}?${payload}`)).data;
       } else {
-        const response = (
+        response = (
           await axios.post<Directions>(`${url}`, payload, {
             headers: {
               "Content-Type": "application/x-www-form-urlencoded",
             },
           })
         ).data;
-
-        code = response.code;
-        snappoints = response.waypoints;
-        routes = response.routes;
       }
 
-      this.snappoints = snappoints.map((snappoint, i) =>
+      this.snappoints = response.waypoints.map((snappoint, i) =>
         this.buildPoint(snappoint.location, "SNAPPOINT", {
           waypointProperties: this._waypoints[i].properties ?? {},
         }),
@@ -140,17 +130,13 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
       this.routelines = this.buildRoutelines(
         this.configuration.requestOptions,
-        routes,
+        response.routes,
         this.selectedRouteIndex,
         this.snappoints,
       );
-      if (routes.length <= this.selectedRouteIndex) this.selectedRouteIndex = 0;
+      if (response.routes.length <= this.selectedRouteIndex) this.selectedRouteIndex = 0;
 
-      this.fire(
-        new MapLibreGlDirectionsRoutingEvent("fetchroutesend", originalEvent, {
-          code,
-        }),
-      );
+      this.fire(new MapLibreGlDirectionsRoutingEvent("fetchroutesend", originalEvent, response));
     } else {
       this.snappoints = [];
       this.routelines = [];

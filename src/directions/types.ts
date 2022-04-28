@@ -284,11 +284,13 @@ export type GeoJSONGeometry = { coordinates: [number, number][] };
 export type PolylineGeometry = string;
 
 export interface Route {
+  [P: string]: unknown;
   geometry: Geometry;
   legs: Leg[];
 }
 
 export interface Leg {
+  [P: string]: unknown;
   annotation?: {
     congestion?: ("unknown" | "low" | "moderate" | "heavy" | "severe")[];
     congestion_numeric?: (number | null)[];
@@ -296,5 +298,6 @@ export interface Leg {
 }
 
 export interface Snappoint {
+  [P: string]: unknown;
   location: [number, number];
 }
