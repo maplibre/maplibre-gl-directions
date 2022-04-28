@@ -95,6 +95,22 @@ export interface MapLibreGlDirectionsConfiguration {
   makePostRequest: boolean;
 
   /**
+   * A name of the source used by the instance. Also used as a prefix for the default layers' names.
+   *
+   * __Note__ that if you decide to set this field to some custom value, you'd also need to update the following
+   * settings accordingly: {@link sensitiveWaypointLayers}, {@link sensitiveSnappointLayers},
+   * {@link sensitiveRoutelineLayers} and {@link sensitiveAltRoutelineLayers}.
+   *
+   * @default `"maplibre-gl-directions"`
+   *
+   * @example
+   * ```
+   * sourceName: "my-directions"
+   * ```
+   */
+  sourceName: string;
+
+  /**
    * The layers used by the plugin.
    *
    * @default The value returned by the {@link layersFactory|`layersFactory`} invoked with the passed
@@ -243,6 +259,7 @@ export const MapLibreGlDirectionsDefaultConfiguration: Omit<MapLibreGlDirections
   profile: "driving",
   requestOptions: {},
   makePostRequest: false,
+  sourceName: "maplibre-gl-directions",
   pointsScalingFactor: 1,
   linesScalingFactor: 1,
   sensitiveWaypointLayers: ["maplibre-gl-directions-waypoint", "maplibre-gl-directions-waypoint-casing"],
