@@ -32,7 +32,10 @@ export default class LoadingControl implements IControl {
 
     new LoadingIndicatorControlComponent({
       target: this.controlElement,
-      props: { directions: this.directions, configuration: this.configuration },
+      props: {
+        directions: this.directions,
+        configuration: this.configuration,
+      },
     });
 
     return this.controlElement;

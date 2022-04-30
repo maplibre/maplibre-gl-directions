@@ -1,17 +1,21 @@
 {
+  "extends": "@tsconfig/svelte/tsconfig.json",
   "compilerOptions": {
     "noEmit": true,
+    "strict": false,
     "target": "esnext",
     "useDefineForClassFields": true,
     "module": "esnext",
-    "moduleResolution": "node",
-    "strict": true,
-    "jsx": "preserve",
-    "sourceMap": true,
     "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "lib": ["esnext", "dom"],
-    "types": ["vite/client"]
+    "baseUrl": ".",
+    "allowJs": true,
+    "checkJs": true,
+    "isolatedModules": true
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "demo/src/**/*.ts", "demo/src/**/*.d.ts", "demo/src/**/*.vue"]
+  "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.svelte", "demo/**/*.d.ts", "demo/**/*.ts", "demo/**/*.svelte"],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
 }

@@ -18,7 +18,6 @@
 
 {#if loading}
   <svg
-    v-if="loading"
     xmlns="http://www.w3.org/2000/svg"
     width={configuration.size}
     height={configuration.size}

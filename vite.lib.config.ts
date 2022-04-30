@@ -4,7 +4,7 @@ import { visualizer } from "rollup-plugin-visualizer";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [svelte(), visualizer()],
+  plugins: [svelte({ configFile: "svelte.config.cjs" }), visualizer()],
 
   build: {
     outDir: "dist",

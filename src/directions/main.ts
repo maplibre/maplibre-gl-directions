@@ -1,5 +1,5 @@
-import type { Map, GeoJSONSource, MapGeoJSONFeature, MapMouseEvent, MapTouchEvent } from "maplibre-gl";
-import type { Directions, MapLibreGlDirectionsConfiguration, Route, Snappoint } from "./types";
+import type { Map, MapGeoJSONFeature, MapMouseEvent, MapTouchEvent } from "maplibre-gl";
+import type { Directions, MapLibreGlDirectionsConfiguration } from "./types";
 import type { Feature, FeatureCollection, LineString, Point } from "geojson";
 import {
   MapLibreGlDirectionsEvented,
@@ -35,7 +35,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   /*
    * Everything is `protected` to allow access from a subclass.
    */
-  protected readonly map: Map;
+  protected declare readonly map: Map;
   protected readonly configuration: MapLibreGlDirectionsConfiguration;
 
   protected _interactive = false;
@@ -106,31 +106,21 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
       const { method, url, payload } = this.buildRequest(this.configuration, this.waypointsCoordinates);
 
-      let code: Directions["code"];
-      let snappoints: Snappoint[];
-      let routes: Route[];
+      let response: Directions;
 
       if (method === "get") {
-        const response = await fetch(`${url}?${payload}`).then((res) => res.json() as Promise<Directions>);
-
-        code = response.code;
-        snappoints = response.waypoints;
-        routes = response.routes;
+        response = await fetch(`${url}?${payload}`).then((res) => res.json() as Promise<Directions>);
       } else {
-        const response = await fetch(`${url}`, {
+        response = await fetch(`${url}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
           },
-          body: JSON.stringify(payload),
+          body: payload,
         }).then((res) => res.json() as Promise<Directions>);
-
-        code = response.code;
-        snappoints = response.waypoints;
-        routes = response.routes;
       }
 
-      this.snappoints = snappoints.map((snappoint, i) =>
+      this.snappoints = response.waypoints.map((snappoint, i) =>
         this.buildPoint(snappoint.location, "SNAPPOINT", {
           waypointProperties: this._waypoints[i].properties ?? {},
         }),
@@ -138,17 +128,13 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
       this.routelines = this.buildRoutelines(
         this.configuration.requestOptions,
-        routes,
+        response.routes,
         this.selectedRouteIndex,
         this.snappoints,
       );
-      if (routes.length <= this.selectedRouteIndex) this.selectedRouteIndex = 0;
+      if (response.routes.length <= this.selectedRouteIndex) this.selectedRouteIndex = 0;
 
-      this.fire(
-        new MapLibreGlDirectionsRoutingEvent("fetchroutesend", originalEvent, {
-          code,
-        }),
-      );
+      this.fire(new MapLibreGlDirectionsRoutingEvent("fetchroutesend", originalEvent, response));
     } else {
       this.snappoints = [];
       this.routelines = [];
@@ -356,7 +342,13 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.draw();
   }
 
-  protected dragDownPosition: { x: number; y: number } = { x: 0, y: 0 };
+  protected dragDownPosition: {
+    x: number;
+    y: number;
+  } = {
+    x: 0,
+    y: 0,
+  };
   protected waypointBeingDragged?: Feature<Point>;
   protected waypointBeingDraggedInitialCoordinates?: [number, number];
   protected departSnappointIndex = -1;
@@ -649,7 +641,9 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     this.assignWaypointsCategories();
 
-    const waypointEvent = new MapLibreGlDirectionsWaypointEvent("addwaypoint", originalEvent, { index });
+    const waypointEvent = new MapLibreGlDirectionsWaypointEvent("addwaypoint", originalEvent, {
+      index,
+    });
     this.fire(waypointEvent);
 
     this.draw();
@@ -662,7 +656,9 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     this.assignWaypointsCategories();
 
-    const waypointEvent = new MapLibreGlDirectionsWaypointEvent("removewaypoint", originalEvent, { index });
+    const waypointEvent = new MapLibreGlDirectionsWaypointEvent("removewaypoint", originalEvent, {
+      index,
+    });
     this.fire(waypointEvent);
 
     this.draw();
@@ -766,6 +762,9 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
    * de-initializing the instance.
    */
   destroy() {
+    this.interactive = false;
+    this.clear();
+
     this.configuration.layers.forEach((layer) => {
       this.map.removeLayer(layer.id);
     });

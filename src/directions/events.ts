@@ -8,8 +8,8 @@ export class MapLibreGlDirectionsEvented {
 
   protected readonly map: Map;
 
-  private listeners: Partial<Record<keyof MapLibreGlDirectionsEventType, ((ev: any) => void)[]>> = {};
-  private oneTimeListeners: Partial<Record<keyof MapLibreGlDirectionsEventType, ((ev: any) => void)[]>> = {};
+  private listeners: Partial<Record<keyof MapLibreGlDirectionsEventType, ((ev: never) => void)[]>> = {};
+  private oneTimeListeners: Partial<Record<keyof MapLibreGlDirectionsEventType, ((ev: never) => void)[]>> = {};
 
   protected fire<T extends keyof MapLibreGlDirectionsEventType>(event: MapLibreGlDirectionsEventType[T]) {
     event.target = this.map;
@@ -27,7 +27,7 @@ export class MapLibreGlDirectionsEvented {
    * Registers an event listener.
    */
   on<T extends keyof MapLibreGlDirectionsEventType>(type: T, listener: (ev: MapLibreGlDirectionsEventType[T]) => void) {
-    (this.listeners[type] = this.listeners[type] ?? ([] as ((ev: any) => void)[])).push(listener);
+    (this.listeners[type] = this.listeners[type] ?? ([] as ((ev: never) => void)[])).push(listener);
   }
 
   /**
@@ -45,7 +45,7 @@ export class MapLibreGlDirectionsEvented {
     type: T,
     listener: (e: MapLibreGlDirectionsEventType[T]) => void,
   ) {
-    (this.oneTimeListeners[type] = this.oneTimeListeners[type] ?? ([] as ((ev: any) => void)[])).push(listener);
+    (this.oneTimeListeners[type] = this.oneTimeListeners[type] ?? ([] as ((ev: never) => void)[])).push(listener);
   }
 }
 
@@ -130,14 +130,7 @@ export class MapLibreGlDirectionsWaypointEvent
   data?: Partial<MapLibreGlDirectionsWaypointEventData>;
 }
 
-export interface MapLibreGlDirectionsRoutingEventData {
-  /**
-   * The server response's code.
-   *
-   * @see http://project-osrm.org/docs/v5.24.0/api/#responses
-   */
-  code: Directions["code"];
-}
+export type MapLibreGlDirectionsRoutingEventData = Directions;
 
 export class MapLibreGlDirectionsRoutingEvent implements MapLibreGlDirectionsEvent<MapLibreGlDirectionsWaypointEvent> {
   /**
@@ -146,7 +139,7 @@ export class MapLibreGlDirectionsRoutingEvent implements MapLibreGlDirectionsEve
   constructor(
     type: "fetchroutesstart" | "fetchroutesend",
     originalEvent: MapLibreGlDirectionsWaypointEvent,
-    data?: Partial<MapLibreGlDirectionsRoutingEventData>,
+    data?: MapLibreGlDirectionsRoutingEventData,
   ) {
     this.type = type;
     this.originalEvent = originalEvent;
@@ -156,5 +149,12 @@ export class MapLibreGlDirectionsRoutingEvent implements MapLibreGlDirectionsEve
   type;
   target!: Map;
   originalEvent: MapLibreGlDirectionsWaypointEvent;
-  data?: Partial<MapLibreGlDirectionsRoutingEventData>;
+  /**
+   * The server's response.
+   *
+   * Only presents when it's the {@link MapLibreGlDirectionsEventType.fetchroutesend|`fetchroutesend`} event.
+   *
+   * @see http://project-osrm.org/docs/v5.24.0/api/#responses
+   */
+  data?: MapLibreGlDirectionsRoutingEventData;
 }

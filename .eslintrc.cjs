@@ -1,35 +1,31 @@
 module.exports = {
-  root: true,
-  env: {
-    browser: true,
-    es2021: true,
-    node: true,
-    "vue/setup-compiler-macros": true,
+  parser: "@typescript-eslint/parser",
+  extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+  parserOptions: {
+    ecmaVersion: 2021,
+    sourceType: "module",
+    tsconfigRootDir: __dirname,
+    project: ["./tsconfig.json"],
+    extraFileExtensions: [".svelte"],
   },
-  plugins: ["@typescript-eslint", "svelte3"],
+  env: {
+    es6: true,
+    browser: true,
+  },
   overrides: [
     {
       files: ["*.svelte"],
       processor: "svelte3/svelte3",
     },
   ],
-  parser: "vue-eslint-parser",
-  parserOptions: {
-    parser: "@typescript-eslint/parser",
-    sourceType: "module",
-    ecmaVersion: 2021,
+  settings: {
+    "svelte3/typescript": () => require("typescript"),
+    // ignore style tags in Svelte because of Tailwind CSS
+    // see https://github.com/sveltejs/eslint-plugin-svelte3/issues/70
+    "svelte3/ignore-styles": () => true,
   },
-  extends: [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:vue/vue3-recommended",
-    "@vue/typescript/recommended",
-    "@vue/prettier",
-  ],
-
-  rules: {
-    "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
-    "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
-    "prettier/prettier": ["warn", {}, { usePrettierrc: true }],
-  },
+  plugins: ["svelte3", "@typescript-eslint"],
+  // ignore the node_modules folder and all the root-level .ts, .js and .cjs files because the custom eslint parser
+  // doesn't know how to work with them for some reason
+  ignorePatterns: ["node_modules", "/*.ts", "/*.js", "/*.cjs"],
 };
