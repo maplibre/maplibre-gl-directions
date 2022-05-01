@@ -49,7 +49,7 @@
     "@vue/eslint-config-prettier": "^7.0.0",
     "@vue/eslint-config-typescript": "^10.0.0",
     "autoprefixer": "^10.4.4",
-    "eslint": "^8.13.0",
+    "eslint": "^8.14.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-vue": "^8.7.0",
     "maplibre-gl": "^2.1.9",
