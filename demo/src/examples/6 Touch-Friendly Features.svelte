@@ -33,7 +33,7 @@
     });
   });
 
-  $: if (map) {
+  $: if (map && directions) {
     if (directions) directions.destroy();
 
     const layers = layersFactory(isTouchDevice ? 1.5 : 1, isTouchDevice ? 2 : 1);
