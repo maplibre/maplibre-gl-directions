@@ -269,7 +269,7 @@ export const MapLibreGlDirectionsDefaultConfiguration: Omit<MapLibreGlDirections
   dragThreshold: 10,
 };
 
-export type PointType = "WAYPOINT" | "SNAPPOINT" | "HOVERPOINT";
+export type PointType = "WAYPOINT" | "SNAPPOINT" | "HOVERPOINT" | string;
 
 // server response. Only the necessary for the plugin fields
 
@@ -280,7 +280,9 @@ export interface Directions {
 }
 
 export type Geometry = PolylineGeometry | GeoJSONGeometry;
-export type GeoJSONGeometry = { coordinates: [number, number][] };
+export type GeoJSONGeometry = {
+  coordinates: [number, number][];
+};
 export type PolylineGeometry = string;
 
 export interface Route {

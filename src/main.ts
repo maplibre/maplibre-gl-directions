@@ -19,8 +19,8 @@ import type { LayerSpecification, MapMouseEvent, MapTouchEvent } from "maplibre-
 import * as utils from "./directions/utils";
 import type { Feature, Point, LineString } from "geojson";
 
-import LoadingControl from "./controls/loading/main";
-import type { LoadingControlConfiguration } from "./controls/loading/types";
+import LoadingIndicatorControl from "./controls/loading-indicator/main";
+import type { LoadingIndicatorControlConfiguration } from "./controls/loading-indicator/types";
 import "./controls/common.css";
 
 export default MapLibreGlDirections;
@@ -62,5 +62,9 @@ export { utils };
  */
 export type { Feature, Point, PointType, LineString };
 
-export { LoadingControl };
-export type { LoadingControlConfiguration };
+/**
+ * @deprecated in favor of {@link LoadingIndicatorControl}
+ */
+export { LoadingIndicatorControl as LoadingControl };
+export { LoadingIndicatorControl };
+export type { LoadingIndicatorControlConfiguration };

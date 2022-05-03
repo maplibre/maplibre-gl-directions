@@ -1,53 +1,41 @@
-import { Evented, Map, MapMouseEvent, MapTouchEvent } from "maplibre-gl";
-import { Directions } from "./types";
+import type { Map, MapMouseEvent, MapTouchEvent } from "maplibre-gl";
+import type { Directions } from "./types";
 
-export class MapLibreGlDirectionsEvented extends Evented {
+export class MapLibreGlDirectionsEvented {
   constructor(map: Map) {
-    super();
-
     this.map = map;
   }
 
-  protected map: Map;
+  protected readonly map: Map;
 
-  // hide the following intrinsics from the docs
-  /**
-   * @private
-   */
-  declare _eventedParent;
-  /**
-   * @private
-   */
-  declare _eventedParentData;
-  /**
-   * @private
-   */
-  declare _listeners;
-  /**
-   * @private
-   */
-  declare _oneTimeListeners;
+  private listeners: Partial<Record<keyof MapLibreGlDirectionsEventType, ((ev: never) => void)[]>> = {};
+  private oneTimeListeners: Partial<Record<keyof MapLibreGlDirectionsEventType, ((ev: never) => void)[]>> = {};
 
-  /**
-   * @private
-   */
-  fire<T extends keyof MapLibreGlDirectionsEventType>(event: MapLibreGlDirectionsEventType[T]): this {
+  protected fire<T extends keyof MapLibreGlDirectionsEventType>(event: MapLibreGlDirectionsEventType[T]) {
     event.target = this.map;
-    return super.fire(event.type, event);
+
+    this.listeners[event.type]?.forEach((listener) => listener(event));
+    this.oneTimeListeners[event.type]?.forEach((listener) => {
+      listener(event);
+
+      const index = this.oneTimeListeners[event.type]?.indexOf(listener);
+      if (index && ~index) this.oneTimeListeners[event.type]?.splice(index, 1);
+    });
   }
 
   /**
    * Registers an event listener.
    */
   on<T extends keyof MapLibreGlDirectionsEventType>(type: T, listener: (ev: MapLibreGlDirectionsEventType[T]) => void) {
-    return super.on(type, listener);
+    (this.listeners[type] = this.listeners[type] ?? ([] as ((ev: never) => void)[])).push(listener);
   }
 
   /**
    * Un-registers an event listener.
    */
   off<T extends keyof MapLibreGlDirectionsEventType>(type: T, listener: (e: MapLibreGlDirectionsEventType[T]) => void) {
-    return super.off(type, listener);
+    const index = this.listeners[type]?.indexOf(listener);
+    if (index && ~index) this.listeners[type]?.splice(index, 1);
   }
 
   /**
@@ -57,7 +45,7 @@ export class MapLibreGlDirectionsEvented extends Evented {
     type: T,
     listener: (e: MapLibreGlDirectionsEventType[T]) => void,
   ) {
-    return super.once(type, listener);
+    (this.oneTimeListeners[type] = this.oneTimeListeners[type] ?? ([] as ((ev: never) => void)[])).push(listener);
   }
 }
 

@@ -1,4 +1,4 @@
-export interface LoadingControlConfiguration {
+export interface LoadingIndicatorControlConfiguration {
   /**
    * Fill-color for the loader. Any valid CSS-value.
    *
@@ -21,7 +21,7 @@ export interface LoadingControlConfiguration {
   class: string;
 }
 
-export const LoadingControlDefaultConfiguration: LoadingControlConfiguration = {
+export const LoadingIndicatorControlDefaultConfiguration: LoadingIndicatorControlConfiguration = {
   fill: "#6d26d7",
   size: "24px",
   class: "",

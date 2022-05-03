@@ -34,21 +34,35 @@ You may keep any examples you add when creating a PR if you think the changes yo
 
 ## NPM Scripts
 
+- `npm run prepare` - is run automatically when the project is being prepared (namely, when `npm i` is run). Configures the Husky's checks.
+
+- `npm run env:prep` - builds the library and self-links it for the Demo project.
+
 - `npm run dev:lib` - starts a vite-powered development server for the library source files. Continuously rebuilds the contents of the `/dist` folder while you make changes to the `/src` folder. **Does not rebuild types!** Must be restarted in order to rebuild them.
 
-- `npm run dev:doc` - continuously rebuilds the documentation static-website while you make changes to the library source files and puts the result under the `/docs/api`. **Note** that for some reason it must be restarted in order to detect the changes you made to the `/doc` folder.
+- `npm run dev:doc` - continuously rebuilds the documentation static-website while you make changes to the library source files and puts the results under the `/docs/api`.
 
 - `npm run dev:demo` - starts a vite-powered development server for the Demo project. The Demo project targets the library from the `/dist` folder via a symlinked `@maplibre/maplibre-gl-directions` package.
 
-- `npm run build` - Combines `npm run format`, `npm run build:lib`, `npm run build:doc` and `npm run build:demo` into a single call.
+- `npm run build` - Combines `npm run lint`, `npm run build:lib`, `npm run build:doc` and `npm run build:demo` into a single call.
 
-  1. `npm run format` - lints (with `eslint --fix`) and formats (with `prettier --write`) all the necessary project source files.
+  1. `npm run build:lib` - builds the library (the `/src` folder contents) and outputs the resulting es-module and its type declarations into the `/dist` folder.
 
-  2. `npm run build:lib` - builds the library (the `/src` folder contents) and outputs the resulting es-module and its type declarations into the `/dist` folder.
+  2. `npm run build:doc` - builds the documentation (the `/doc` folder contents and the source code comments) using the TypeDoc compiler and outputs the resulting static-website into the `/docs/api` folder.
 
-  3. `npm run build:doc` - builds the documentation (the `/doc` folder contents and the source code comments) using the TypeDoc compiler and outputs the resulting static-website into the `/docs/api` folder.
+  3. `npm run build:demo` - builds the Demo project (the `/demo` folder contents) and outputs the resulting static-website into the `/docs` folder.
 
-  4. `npm run build:demo` - builds the Demo project (the `/demo` folder contents) and outputs the resulting static-website into the `/docs` folder.
+- `npm run format` - formats all the files that are not ignored by the `.prettierignore` and rewrites the files in-place.
+
+- `npm run prelint` - is run automatically each time when `npm run lint` is called.
+
+- `npm run lint` - lints and fixes the contents all the .ts, .js, .cjs and .svelte files and rewrites the files in-place.
+
+- `npm run check:lib` - checks the `/src` folder contents using the `svelte-check`.
+
+- `npm run check:demo` - checks the `/demo` folder contents using the `svelte-check`.
+
+- `npm run check` - combines `npm run lint`, `npm run check:lib` and `npm run check:demo` into a single call. Is run automatically if there were changes to the `/src` or `/demo` folders before you commit the changes and aborts the commit if there are errors that could not be automatically fixed by eslint.
 
 Since the deployment process is configured to be performed automatically, you don't have to make sure that the `/docs` folder is up-to-date (it's actually ignored by Git). You run `npm run build` manually only to make sure that the build doesn't fail.
 
@@ -58,4 +72,4 @@ Since the deployment process is configured to be performed automatically, you do
 
 That happens when the package is not self-symlinked. Perhaps you did `npm i` or installed some new dependencies (NPM removes all the symlinked deps after updating the `node_modules).
 
-**Solution**: run `npm run build:lib`, then run `npm link` and `npm link @maplibre/maplibre-gl-directions` once again.
+**Solution**: run `npm run env:prep` once again.

@@ -1,38 +1,22 @@
-<template>
-  <app-sidebar>
-    <template #title>{{ name }}</template>
-
-    <p>Another example that demonstrates the ease of extending the original styles provided by the plugin.</p>
-
-    <p>This time a "symbol" layer is added that shows the direction the selected route goes in.</p>
-
-    <small
-      ><strong>Note</strong> that you have to manually load and add the images you intend to use for the custom layers
-      you add</small
-    >
-  </app-sidebar>
-
-  <div ref="mapRef" class="shadow-xl" />
-</template>
-
-<script setup lang="ts">
-  import { onMounted, ref } from "vue";
-  import { useRoute } from "vue-router";
-  import AppSidebar from "../components/AppSidebar.vue";
+<script lang="ts">
+  import { onMount } from "svelte";
+  import { examples } from "../router";
+  import { location } from "svelte-spa-router";
+  import AppSidebar from "../components/AppSidebar.svelte";
   import maplibregl from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
   import style from "../assets/map/style/style.json?url";
   import MapLibreGlDirections, { layersFactory } from "@maplibre/maplibre-gl-directions";
-  import DirectionArrowImageSrc from "../assets/map/images/direction-arrow.png";
+  import DirectionArrowImageSrc from "../assets/map/images/direction-arrow.png?url";
 
-  const name = ref(useRoute().matched[0].name);
+  const meta = examples.find((example) => example.path === $location);
 
-  const directions = ref<MapLibreGlDirections>();
+  let mapRef: HTMLElement | undefined = undefined;
+  let directions: MapLibreGlDirections | undefined = undefined;
 
-  const mapRef = ref();
-  onMounted(() => {
+  onMount(() => {
     const map = new maplibregl.Map({
-      container: mapRef.value,
+      container: mapRef,
       style,
       center: [-74.1197632, 40.6974034],
       zoom: 11,
@@ -63,14 +47,29 @@
     });
 
     map.on("load", () => {
-      directions.value = new MapLibreGlDirections(map, {
+      directions = new MapLibreGlDirections(map, {
         requestOptions: {
           alternatives: "true",
         },
         layers,
       });
 
-      directions.value.interactive = true;
+      directions.interactive = true;
     });
   });
 </script>
+
+<AppSidebar>
+  <span slot="title">{meta.name}</span>
+
+  <p>Another example that demonstrates the ease of extending the original styles provided by the plugin.</p>
+
+  <p>This time a "symbol" layer is added that shows the direction the selected route goes in.</p>
+
+  <small
+    ><strong>Note</strong> that you have to manually load and add the images you intend to use for the custom layers you
+    add</small
+  >
+</AppSidebar>
+
+<div bind:this={mapRef} class="shadow-xl" />

@@ -15,52 +15,81 @@
     "dist"
   ],
   "module": "./dist/maplibre-gl-directions.es.js",
-  "types": "./dist/main.d.ts",
+  "types": "./dist/src/main.d.ts",
+  "type": "module",
+  "prettier": {
+    "tabWidth": 2,
+    "semi": true,
+    "singleQuote": false,
+    "quoteProps": "as-needed",
+    "trailingComma": "all",
+    "bracketSpacing": true,
+    "printWidth": 120,
+    "plugins": [
+      "prettier-plugin-svelte"
+    ],
+    "svelteSortOrder": "options-scripts-markup-styles",
+    "svelteStrictMode": false,
+    "svelteIndentScriptAndStyle": true
+  },
   "scripts": {
+    "prepare": "husky install",
     "env:prep": "npm run build:lib && npm link && npm link @maplibre/maplibre-gl-directions",
-    "dev:lib": "vue-tsc --project tsconfig.lib.json && vite build --watch --mode development --config vite.lib.config.ts",
+    "dev:lib": "npm run check:lib && tsc --project ./tsconfig.lib.json && vite build --watch --mode development --config vite.lib.config.ts",
     "dev:doc": "typedoc --tsconfig tsconfig.lib.json --watch",
-    "dev:demo": "vue-tsc && vite --config vite.demo.config.ts",
-    "build": "npm run format && npm run build:lib && npm run build:doc && npm run build:demo",
-    "format": "eslint --fix && prettier --write ./",
-    "build:lib": "vue-tsc --project tsconfig.lib.json && vite build --config vite.lib.config.ts",
+    "dev:demo": "npm run check:demo && tsc --project ./tsconfig.json && vite --config vite.demo.config.ts",
+    "build": "npm run lint && npm run build:lib && npm run build:doc && npm run build:demo",
+    "build:lib": "npm run check:lib && tsc --project ./tsconfig.lib.json && vite build --config vite.lib.config.ts",
     "build:doc": "typedoc --tsconfig tsconfig.lib.json",
-    "build:demo": "vue-tsc && vite build --config vite.demo.config.ts --base /maplibre-gl-directions/"
+    "build:demo": "npm run check:demo && tsc --project ./tsconfig.json && vite build --config vite.demo.config.ts --base /maplibre-gl-directions/",
+    "format": "prettier --write .",
+    "prelint": "npm run format",
+    "lint": "eslint --fix './{demo,src}/**/*.{ts,js,cjs,svelte}'",
+    "check:lib": "svelte-check --tsconfig ./tsconfig.lib.json --workspace src",
+    "check:demo": "svelte-check --tsconfig ./tsconfig.json --workspace demo",
+    "check": "npm run lint && npm run check:lib && npm run check:demo"
+  },
+  "lint-staged": {
+    "./{src,demo}/**/*.{ts,js,cjs,svelte}": [
+      "npm run check"
+    ]
   },
   "dependencies": {
     "@mapbox/polyline": "^1.1.1",
-    "axios": "^0.26.1",
     "nanoid": "^3.3.3",
-    "vue": "^3.2.33"
+    "svelte-spa-router": "^3.2.0"
   },
   "peerDependencies": {
     "maplibre-gl": "^2.1.0"
   },
   "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.30",
     "@tailwindcss/forms": "^0.5.0",
+    "@tsconfig/svelte": "^2.0.1",
     "@types/geojson": "^7946.0.8",
     "@types/mapbox__point-geometry": "^0.1.2",
     "@types/mapbox__polyline": "^1.0.2",
     "@types/mapbox__vector-tile": "^1.3.0",
-    "@types/node": "^17.0.25",
-    "@typescript-eslint/eslint-plugin": "^5.20.0",
-    "@typescript-eslint/parser": "^5.20.0",
-    "@vitejs/plugin-vue": "^2.3.1",
-    "@vue/eslint-config-prettier": "^7.0.0",
-    "@vue/eslint-config-typescript": "^10.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.21.0",
+    "@typescript-eslint/parser": "^5.21.0",
     "autoprefixer": "^10.4.4",
-    "eslint": "^8.13.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "eslint-plugin-vue": "^8.7.0",
+    "eslint": "^8.14.0",
+    "eslint-plugin-svelte3": "^3.4.1",
+    "husky": "^7.0.4",
+    "lint-staged": "^12.4.1",
     "maplibre-gl": "^2.1.9",
     "postcss": "^8.4.12",
+    "postcss-load-config": "^3.1.4",
     "prettier": "^2.6.2",
-    "tailwindcss": "^3.0.24",
+    "prettier-plugin-svelte": "^2.7.0",
+    "rollup-plugin-visualizer": "^5.6.0",
+    "svelte": "^3.44.0",
+    "svelte-check": "^2.2.7",
+    "svelte-preprocess": "^4.10.5",
+    "tailwindcss": "^3.0.23",
+    "tslib": "^2.3.1",
     "typedoc": "^0.22.15",
     "typescript": "^4.5.4",
-    "vite": "^2.9.5",
-    "vue-eslint-parser": "^8.3.0",
-    "vue-router": "^4.0.14",
-    "vue-tsc": "^0.29.8"
+    "vite": "^2.9.5"
   }
 }

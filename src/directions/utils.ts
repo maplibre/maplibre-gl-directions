@@ -31,7 +31,11 @@ export function buildConfiguration(
 export function buildRequest(
   configuration: MapLibreGlDirectionsConfiguration,
   waypointsCoordinates: [number, number][],
-): { method: "get" | "post"; url: string; payload: URLSearchParams } {
+): {
+  method: "get" | "post";
+  url: string;
+  payload: URLSearchParams;
+} {
   const method = configuration.makePostRequest ? "post" : "get";
 
   let url: string;
@@ -61,7 +65,11 @@ export function buildRequest(
     payload = new URLSearchParams(formData);
   }
 
-  return { method, url, payload };
+  return {
+    method,
+    url,
+    payload,
+  };
 }
 
 /**
@@ -202,7 +210,7 @@ export function buildRoutelines(
       // for each pair of leg's coordinates
       legCoordinates.forEach((lngLat, i) => {
         // find the previous segment
-        const previousSegment = features[features.length - 1] as Feature<LineString> | undefined;
+        const previousSegment = features[features.length - 1];
         // determine the current segment's congestion level
         const segmentCongestion = congestionLevelDecoder(requestOptions, route.legs[legIndex]?.annotation, i);
 

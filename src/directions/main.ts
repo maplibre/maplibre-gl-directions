@@ -1,5 +1,5 @@
-import type maplibregl from "maplibre-gl";
-import type { Directions, MapLibreGlDirectionsConfiguration, Route, Snappoint } from "./types";
+import type { Map, MapGeoJSONFeature, MapMouseEvent, MapTouchEvent } from "maplibre-gl";
+import type { Directions, MapLibreGlDirectionsConfiguration } from "./types";
 import type { Feature, FeatureCollection, LineString, Point } from "geojson";
 import {
   MapLibreGlDirectionsEvented,
@@ -7,14 +7,12 @@ import {
   MapLibreGlDirectionsWaypointEvent,
 } from "./events";
 import { buildConfiguration, buildRequest, buildPoint, buildSnaplines, buildRoutelines } from "./utils";
-import axios from "axios";
-import { MapMouseEvent, MapTouchEvent } from "maplibre-gl";
 
 /**
  * The main class responsible for all the user interaction and for the routing itself.
  */
 export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
-  constructor(map: maplibregl.Map, configuration?: Partial<MapLibreGlDirectionsConfiguration>) {
+  constructor(map: Map, configuration?: Partial<MapLibreGlDirectionsConfiguration>) {
     super(map);
 
     this.map = map;
@@ -37,7 +35,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   /*
    * Everything is `protected` to allow access from a subclass.
    */
-  protected readonly map: maplibregl.Map;
+  protected declare readonly map: Map;
   protected readonly configuration: MapLibreGlDirectionsConfiguration;
 
   protected _interactive = false;
@@ -46,11 +44,11 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   protected buildSnaplines = buildSnaplines;
   protected buildRoutelines = buildRoutelines;
 
-  protected onMoveHandler: (e: maplibregl.MapMouseEvent) => void;
-  protected onDragDownHandler: (e: maplibregl.MapMouseEvent) => void;
-  protected onDragMoveHandler: (e: maplibregl.MapMouseEvent) => void;
-  protected onDragUpHandler: (e: maplibregl.MapMouseEvent) => void;
-  protected onClickHandler: (e: maplibregl.MapMouseEvent) => void;
+  protected onMoveHandler: (e: MapMouseEvent) => void;
+  protected onDragDownHandler: (e: MapMouseEvent) => void;
+  protected onDragMoveHandler: (e: MapMouseEvent) => void;
+  protected onDragUpHandler: (e: MapMouseEvent) => void;
+  protected onClickHandler: (e: MapMouseEvent) => void;
 
   protected _waypoints: Feature<Point>[] = [];
   protected snappoints: Feature<Point>[] = [];
@@ -111,15 +109,15 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       let response: Directions;
 
       if (method === "get") {
-        response = (await axios.get<Directions>(`${url}?${payload}`)).data;
+        response = await fetch(`${url}?${payload}`).then((res) => res.json() as Promise<Directions>);
       } else {
-        response = (
-          await axios.post<Directions>(`${url}`, payload, {
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-          })
-        ).data;
+        response = await fetch(`${url}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: payload,
+        }).then((res) => res.json() as Promise<Directions>);
       }
 
       this.snappoints = response.waypoints.map((snappoint, i) =>
@@ -213,8 +211,8 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     });
   }
 
-  protected onMove(e: maplibregl.MapMouseEvent) {
-    const feature: maplibregl.MapGeoJSONFeature | undefined = this.map.queryRenderedFeatures(e.point, {
+  protected onMove(e: MapMouseEvent) {
+    const feature: MapGeoJSONFeature | undefined = this.map.queryRenderedFeatures(e.point, {
       layers: [
         ...this.configuration.sensitiveWaypointLayers,
         ...this.configuration.sensitiveSnappointLayers,
@@ -344,16 +342,22 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.draw();
   }
 
-  protected dragDownPosition: { x: number; y: number } = { x: 0, y: 0 };
+  protected dragDownPosition: {
+    x: number;
+    y: number;
+  } = {
+    x: 0,
+    y: 0,
+  };
   protected waypointBeingDragged?: Feature<Point>;
   protected waypointBeingDraggedInitialCoordinates?: [number, number];
   protected departSnappointIndex = -1;
 
-  protected onDragDown(e: maplibregl.MapMouseEvent | maplibregl.MapTouchEvent) {
+  protected onDragDown(e: MapMouseEvent | MapTouchEvent) {
     if (e.type === "touchstart" && e.originalEvent.touches.length !== 1) return;
     if (e.type === "mousedown" && e.originalEvent.which !== 1) return;
 
-    const feature: maplibregl.MapGeoJSONFeature | undefined = this.map.queryRenderedFeatures(e.point, {
+    const feature: MapGeoJSONFeature | undefined = this.map.queryRenderedFeatures(e.point, {
       layers: [
         ...this.configuration.sensitiveWaypointLayers,
         ...this.configuration.sensitiveSnappointLayers,
@@ -444,7 +448,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.draw();
   }
 
-  protected onDragMove(e: maplibregl.MapMouseEvent | maplibregl.MapTouchEvent) {
+  protected onDragMove(e: MapMouseEvent | MapTouchEvent) {
     /*
      * `preventDefault` here prevents drag down gesture in mobile Chrome from updating the page.
      */
@@ -468,7 +472,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.draw();
   }
 
-  protected async onDragUp(e: maplibregl.MapMouseEvent | maplibregl.MapTouchEvent) {
+  protected async onDragUp(e: MapMouseEvent | MapTouchEvent) {
     if (e.type === "mouseup" && e.originalEvent.which !== 1) return;
 
     if (this.hoverpoint?.properties) this.hoverpoint.properties.showSnaplines = false;
@@ -563,8 +567,8 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.draw();
   }
 
-  protected onClick(e: maplibregl.MapMouseEvent) {
-    const feature: maplibregl.MapGeoJSONFeature | undefined = this.map.queryRenderedFeatures(e.point, {
+  protected onClick(e: MapMouseEvent) {
+    const feature: MapGeoJSONFeature | undefined = this.map.queryRenderedFeatures(e.point, {
       layers: [
         ...this.configuration.sensitiveWaypointLayers,
         ...this.configuration.sensitiveSnappointLayers,
@@ -637,7 +641,9 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     this.assignWaypointsCategories();
 
-    const waypointEvent = new MapLibreGlDirectionsWaypointEvent("addwaypoint", originalEvent, { index });
+    const waypointEvent = new MapLibreGlDirectionsWaypointEvent("addwaypoint", originalEvent, {
+      index,
+    });
     this.fire(waypointEvent);
 
     this.draw();
@@ -650,7 +656,9 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     this.assignWaypointsCategories();
 
-    const waypointEvent = new MapLibreGlDirectionsWaypointEvent("removewaypoint", originalEvent, { index });
+    const waypointEvent = new MapLibreGlDirectionsWaypointEvent("removewaypoint", originalEvent, {
+      index,
+    });
     this.fire(waypointEvent);
 
     this.draw();
@@ -754,6 +762,9 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
    * de-initializing the instance.
    */
   destroy() {
+    this.interactive = false;
+    this.clear();
+
     this.configuration.layers.forEach((layer) => {
       this.map.removeLayer(layer.id);
     });
