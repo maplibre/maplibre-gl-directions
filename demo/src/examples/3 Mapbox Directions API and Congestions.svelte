@@ -29,7 +29,7 @@
     });
   });
 
-  $: if (map) {
+  $: if (map && directions) {
     if (directions) directions.destroy();
 
     directions = new MapLibreGlDirections(map, {

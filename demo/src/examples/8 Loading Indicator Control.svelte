@@ -37,7 +37,7 @@
   let control: LoadingIndicatorControl;
   let position: ControlPosition = "top-right";
 
-  $: if (map) {
+  $: if (map && directions) {
     if (control && map.hasControl(control)) map.removeControl(control);
     map.addControl((control = new LoadingIndicatorControl(directions, { class: "m-2" })), position);
   }
