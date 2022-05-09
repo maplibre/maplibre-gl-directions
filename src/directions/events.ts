@@ -152,8 +152,8 @@ export class MapLibreGlDirectionsRoutingEvent implements MapLibreGlDirectionsEve
   /**
    * The server's response.
    *
-   * Only presents when it's the {@link MapLibreGlDirectionsEventType.fetchroutesend|`fetchroutesend`} event, but is
-   * `undefined` in case the request to fetch directions failed.
+   * Only presents when it's the {@link MapLibreGlDirectionsEventType.fetchroutesend|`fetchroutesend`} event, but might
+   * be `undefined` in case the request to fetch directions failed.
    *
    * @see http://project-osrm.org/docs/v5.24.0/api/#responses
    */
