@@ -21,7 +21,8 @@
       style,
       center: [-74.1197632, 40.6974034],
       zoom: 11,
-      customAttribution: "<a href='//project-osrm.org/' target='_blank'>&copy; OSRM</a>",
+      customAttribution:
+        "<a href='//docs.mapbox.com/help/getting-started/directions/' target='_blank'>&copy; Mapbox Directions</a>",
     });
 
     _map.on("load", () => {
