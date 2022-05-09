@@ -107,13 +107,15 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
       this.abortController = new AbortController();
 
-      const { method, url, payload } = this.buildRequest(this.configuration, this.waypointsCoordinates);
+      let timer;
+      if (this.configuration.requestTimeout !== null) {
+        timer = setTimeout(() => this.abortController?.abort(), this.configuration.requestTimeout);
+      }
 
+      const { method, url, payload } = this.buildRequest(this.configuration, this.waypointsCoordinates);
       let response: Directions;
 
       try {
-        setTimeout(() => this.abortController?.abort(), this.configuration.requestTimeout);
-
         if (method === "get") {
           response = (await (
             await fetch(`${url}?${payload}`, { signal: this.abortController.signal })
@@ -136,6 +138,8 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         this.interactive = prevInteractive;
 
         this.abortController = undefined;
+
+        clearTimeout(timer);
 
         this.fire(new MapLibreGlDirectionsRoutingEvent("fetchroutesend", originalEvent, response));
       }
