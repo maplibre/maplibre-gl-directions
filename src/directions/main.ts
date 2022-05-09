@@ -112,6 +112,8 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       let response: Directions;
 
       try {
+        setTimeout(() => this.abortController?.abort(), this.configuration.requestTimeout);
+
         if (method === "get") {
           response = (await (
             await fetch(`${url}?${payload}`, { signal: this.abortController.signal })

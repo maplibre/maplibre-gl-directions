@@ -78,6 +78,19 @@ export interface MapLibreGlDirectionsConfiguration {
   requestOptions: Partial<Record<string, string>>;
 
   /**
+   * A timeout in ms after which a still-unresolved routing-request automatically gets aborted.
+   *
+   * @default `Infinity` (no timeout)
+   *
+   * @example
+   * ```
+   * // abort requests that take longer then 5s to complete
+   * requestTimeout: 5000
+   * ```
+   */
+  requestTimeout: number;
+
+  /**
    * Whether to make a {@link https://docs.mapbox.com/api/navigation/http-post/|POST request} instead of a GET one.
    *
    * __Note__ that this is only supported by the Mapbox Directions API. Don't set the value to `true` if using an
@@ -258,6 +271,7 @@ export const MapLibreGlDirectionsDefaultConfiguration: Omit<MapLibreGlDirections
   api: "https://router.project-osrm.org/route/v1",
   profile: "driving",
   requestOptions: {},
+  requestTimeout: Infinity,
   makePostRequest: false,
   sourceName: "maplibre-gl-directions",
   pointsScalingFactor: 1,
