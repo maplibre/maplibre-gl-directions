@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { location } from "svelte-spa-router";
   import { examples } from "../router";
+  import { location } from "svelte-spa-router";
   import AppSidebar from "../components/AppSidebar.svelte";
   import maplibregl, { Map, ControlPosition } from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
@@ -48,7 +48,7 @@
 
   <label class="flex flex-col gap-2">
     <span><strong>Position</strong></span>
-    <select bind:value={position}>
+    <select bind:value={position} disabled={!directions}>
       <option value="top-left">Top-Left</option>
       <option value="top-right">Top-Right</option>
       <option value="bottom-left">Bottom-Left</option>

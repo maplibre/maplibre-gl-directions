@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { location } from "svelte-spa-router";
   import { examples } from "../router";
+  import { location } from "svelte-spa-router";
   import AppSidebar from "../components/AppSidebar.svelte";
   import maplibregl from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
@@ -88,7 +88,9 @@
     {/each}
   </ol>
 
-  <button disabled={!messages.length} on:click={() => (messages = [])}>Clear</button>
+  {#if messages.length}
+    <button on:click={() => (messages = [])}>Clear</button>
+  {/if}
 </AppSidebar>
 
 <div bind:this={mapRef} class="shadow-xl" />

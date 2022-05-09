@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { location } from "svelte-spa-router";
   import { examples } from "../router";
+  import { location } from "svelte-spa-router";
   import AppSidebar from "../components/AppSidebar.svelte";
   import maplibregl, { Map } from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
@@ -30,7 +30,7 @@
     });
   });
 
-  $: if (map && directions) {
+  $: if (map) {
     if (directions) directions.destroy();
 
     directions = new MapLibreGlDirections(map, {

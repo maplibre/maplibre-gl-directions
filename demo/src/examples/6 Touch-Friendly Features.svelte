@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { location } from "svelte-spa-router";
   import { examples } from "../router";
+  import { location } from "svelte-spa-router";
   import AppSidebar from "../components/AppSidebar.svelte";
   import maplibregl, { Map } from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
@@ -13,7 +13,6 @@
   let mapRef: HTMLElement | undefined = undefined;
   let map: Map | undefined = undefined;
   let directions: MapLibreGlDirections | undefined = undefined;
-
   // `maxTouchPoints` isn't recognized by TS. Safe to ignore.
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
@@ -33,7 +32,7 @@
     });
   });
 
-  $: if (map && directions) {
+  $: if (map) {
     if (directions) directions.destroy();
 
     const layers = layersFactory(isTouchDevice ? 1.5 : 1, isTouchDevice ? 2 : 1);
@@ -53,7 +52,7 @@
   <span slot="title">{meta.name}</span>
 
   <label class="flex items-center gap-3">
-    <input bind:checked={isTouchDevice} type="checkbox" />
+    <input type="checkbox" bind:checked={isTouchDevice} disabled={!directions} />
     <strong>Simulate a Touch-Enabled Device</strong>
   </label>
 
