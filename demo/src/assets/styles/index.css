@@ -65,4 +65,8 @@
   select {
     @apply transition-all px-3 py-2 bg-accent-500 hover:bg-accent-400 active:bg-accent-600 border-none rounded-md shadow-lg hover:shadow-xl active:shadow-md focus:ring-0 focus:ring-offset-0 disabled:opacity-50 disabled:shadow-none;
   }
+
+  input[type="number"] {
+    @apply transition-all bg-slate-100 text-slate-900 border-none rounded-md shadow-lg hover:shadow-xl active:shadow-md focus:ring-0 focus:ring-offset-0 focus:outline-accent-500 focus:outline-offset-0 disabled:opacity-50 disabled:shadow-none;
+  }
 }
