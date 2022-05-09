@@ -274,7 +274,8 @@ export type PointType = "WAYPOINT" | "SNAPPOINT" | "HOVERPOINT" | string;
 // server response. Only the necessary for the plugin fields
 
 export interface Directions {
-  code: string;
+  code: "Ok" | string;
+  message?: string;
   routes: Route[];
   waypoints: Snappoint[];
 }
