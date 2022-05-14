@@ -99,10 +99,11 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
   protected async fetchDirections(originalEvent: MapLibreGlDirectionsWaypointEvent) {
     const prevInteractive = this.interactive;
-    this.interactive = false;
 
     if (this._waypoints.length >= 2) {
       this.fire(new MapLibreGlDirectionsRoutingEvent("fetchroutesstart", originalEvent));
+
+      this.interactive = false;
 
       this.abortController = new AbortController();
 
@@ -110,19 +111,31 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
       let response: Directions;
 
-      if (method === "get") {
-        response = await fetch(`${url}?${payload}`, { signal: this.abortController.signal }).then(
-          (res) => res.json() as Promise<Directions>,
-        );
-      } else {
-        response = await fetch(`${url}`, {
-          signal: this.abortController.signal,
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: payload,
-        }).then((res) => res.json() as Promise<Directions>);
+      try {
+        if (method === "get") {
+          response = (await (
+            await fetch(`${url}?${payload}`, { signal: this.abortController.signal })
+          ).json()) as Directions;
+        } else {
+          response = (await (
+            await fetch(`${url}`, {
+              signal: this.abortController.signal,
+              method: "POST",
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+              body: payload,
+            })
+          ).json()) as Directions;
+        }
+
+        if (response.code !== "Ok") throw new Error(response.message ?? "An unexpected error occurred.");
+      } finally {
+        this.interactive = prevInteractive;
+
+        this.abortController = undefined;
+
+        this.fire(new MapLibreGlDirectionsRoutingEvent("fetchroutesend", originalEvent, response));
       }
 
       this.snappoints = response.waypoints.map((snappoint, i) =>
@@ -138,10 +151,6 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         this.snappoints,
       );
       if (response.routes.length <= this.selectedRouteIndex) this.selectedRouteIndex = 0;
-
-      this.abortController = undefined;
-
-      this.fire(new MapLibreGlDirectionsRoutingEvent("fetchroutesend", originalEvent, response));
     } else {
       this.snappoints = [];
       this.routelines = [];
@@ -149,8 +158,6 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     // the selected route index might have changed
     this.draw(false);
-
-    this.interactive = prevInteractive;
   }
 
   protected draw(skipSelectedRouteRedraw = true) {
