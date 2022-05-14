@@ -104,14 +104,19 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     if (this._waypoints.length >= 2) {
       this.fire(new MapLibreGlDirectionsRoutingEvent("fetchroutesstart", originalEvent));
 
+      this.abortController = new AbortController();
+
       const { method, url, payload } = this.buildRequest(this.configuration, this.waypointsCoordinates);
 
       let response: Directions;
 
       if (method === "get") {
-        response = await fetch(`${url}?${payload}`).then((res) => res.json() as Promise<Directions>);
+        response = await fetch(`${url}?${payload}`, { signal: this.abortController.signal }).then(
+          (res) => res.json() as Promise<Directions>,
+        );
       } else {
         response = await fetch(`${url}`, {
+          signal: this.abortController.signal,
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
@@ -133,6 +138,8 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         this.snappoints,
       );
       if (response.routes.length <= this.selectedRouteIndex) this.selectedRouteIndex = 0;
+
+      this.abortController = undefined;
 
       this.fire(new MapLibreGlDirectionsRoutingEvent("fetchroutesend", originalEvent, response));
     } else {
@@ -635,6 +642,8 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     index?: number,
     originalEvent?: MapMouseEvent | MapTouchEvent,
   ) {
+    this.abortController?.abort();
+
     index = index ?? this._waypoints.length;
 
     this._waypoints.splice(index, 0, this.buildPoint(waypoint, "WAYPOINT"));
@@ -651,6 +660,8 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   }
 
   protected async _removeWaypoint(index: number, originalEvent?: MapMouseEvent | MapTouchEvent) {
+    this.abortController?.abort();
+
     this._waypoints.splice(index, 1);
     this.snappoints.splice(index, 1);
 
@@ -715,6 +726,8 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
    * @return Resolved after the routing request has finished
    */
   async setWaypoints(waypoints: [number, number][]) {
+    this.abortController?.abort();
+
     this._waypoints = waypoints.map((waypoint) => {
       return this.buildPoint(waypoint, "WAYPOINT");
     });
@@ -748,6 +761,18 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   async removeWaypoint(index: number) {
     await this._removeWaypoint(index);
   }
+
+  /**
+   * A publicly-available abort-controller that allows to manually abort an ongoing routing-request.
+   *
+   * Only exists (`!== undefined`) when there's an ongoing routing-request.
+   *
+   * @example
+   * ```
+   * direсtions.abortController.abort();
+   * ```
+   */
+  abortController: AbortController | undefined;
 
   /**
    * Clears the map from all the instance's traces: waypoints, snappoints, routes, etc.
