@@ -20,7 +20,7 @@
       style,
       center: [-74.1197632, 40.6974034],
       zoom: 11,
-      customAttribution: "<a href='//project-osrm.org/' target='_blank'>&copy; OSRM</a>",
+      customAttribution: "<a href='http://project-osrm.org/' target='_blank'>&copy; OSRM</a>",
     });
 
     map.on("load", () => {
