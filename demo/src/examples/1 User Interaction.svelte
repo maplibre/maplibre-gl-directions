@@ -22,6 +22,7 @@
       zoom: 11,
       customAttribution: "<a href='//project-osrm.org/' target='_blank'>&copy; OSRM</a>",
     });
+
     map.on("load", () => {
       directions = new MapLibreGlDirections(map, {
         requestOptions: {
@@ -40,7 +41,7 @@
   <span slot="title">{meta.name}</span>
 
   <label class="flex items-center gap-3">
-    <input bind:checked={interactive} type="checkbox" disabled={!directions} />
+    <input type="checkbox" bind:checked={interactive} disabled={!directions} />
     <strong>Interactivity enabled</strong>
   </label>
 
