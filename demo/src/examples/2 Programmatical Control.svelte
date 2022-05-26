@@ -95,4 +95,4 @@
   </div>
 </AppSidebar>
 
-<div bind:this={mapRef} class="shadow-xl" />
+<div bind:this={mapRef} class="basis-full lg:basis-2/3 shadow-xl" />
