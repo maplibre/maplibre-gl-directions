@@ -29,7 +29,7 @@ export default function layersFactory(
         "line-opacity": 0.65,
         "line-width": 3,
       },
-      filter: ["all", ["in", "$type", "LineString"], ["in", "type", "SNAPLINE"]],
+      filter: ["==", ["get", "type"], "SNAPLINE"],
     },
 
     {
@@ -59,7 +59,7 @@ export default function layersFactory(
           ["case", ["boolean", ["get", "highlight"], false], 32 * linesScalingFactor, 23 * linesScalingFactor],
         ],
       },
-      filter: ["all", ["in", "$type", "LineString"], ["in", "route", "ALT"]],
+      filter: ["==", ["get", "route"], "ALT"],
     },
     {
       id: `${sourceName}-alt-routeline`,
@@ -89,7 +89,7 @@ export default function layersFactory(
           10 * linesScalingFactor,
         ],
       },
-      filter: ["all", ["in", "$type", "LineString"], ["in", "route", "ALT"]],
+      filter: ["==", ["get", "route"], "ALT"],
     },
 
     {
@@ -126,7 +126,7 @@ export default function layersFactory(
           ["case", ["boolean", ["get", "highlight"], false], 32 * linesScalingFactor, 23 * linesScalingFactor],
         ],
       },
-      filter: ["all", ["in", "$type", "LineString"], ["in", "route", "SELECTED"]],
+      filter: ["==", ["get", "route"], "SELECTED"],
     },
     {
       id: `${sourceName}-routeline`,
@@ -162,7 +162,7 @@ export default function layersFactory(
           10 * linesScalingFactor,
         ],
       },
-      filter: ["all", ["in", "$type", "LineString"], ["in", "route", "SELECTED"]],
+      filter: ["==", ["get", "route"], "SELECTED"],
     },
 
     {
@@ -185,7 +185,7 @@ export default function layersFactory(
         "circle-color": "#30a856",
         "circle-opacity": 0.65,
       },
-      filter: ["all", ["in", "$type", "Point"], ["in", "type", "HOVERPOINT"]],
+      filter: ["==", ["get", "type"], "HOVERPOINT"],
     },
     {
       id: `${sourceName}-hoverpoint`,
@@ -206,7 +206,7 @@ export default function layersFactory(
         ],
         "circle-color": "#30a856",
       },
-      filter: ["all", ["in", "$type", "Point"], ["in", "type", "HOVERPOINT"]],
+      filter: ["==", ["get", "type"], "HOVERPOINT"],
     },
 
     {
@@ -235,7 +235,7 @@ export default function layersFactory(
         "circle-color": ["case", ["boolean", ["get", "highlight"], false], "#e50d3f", "#cb3373"],
         "circle-opacity": 0.65,
       },
-      filter: ["all", ["in", "$type", "Point"], ["in", "type", "SNAPPOINT"]],
+      filter: ["==", ["get", "type"], "SNAPPOINT"],
     },
     {
       id: `${sourceName}-snappoint`,
@@ -261,7 +261,7 @@ export default function layersFactory(
         ],
         "circle-color": ["case", ["boolean", ["get", "highlight"], false], "#e50d3f", "#cb3373"],
       },
-      filter: ["all", ["in", "$type", "Point"], ["in", "type", "SNAPPOINT"]],
+      filter: ["==", ["get", "type"], "SNAPPOINT"],
     },
 
     {
@@ -284,7 +284,7 @@ export default function layersFactory(
         "circle-color": ["case", ["boolean", ["get", "highlight"], false], "#6d26d7", "#7b33e7"],
         "circle-opacity": 0.65,
       },
-      filter: ["all", ["in", "$type", "Point"], ["in", "type", "WAYPOINT"]],
+      filter: ["==", ["get", "type"], "WAYPOINT"],
     },
 
     {
@@ -306,7 +306,7 @@ export default function layersFactory(
         ],
         "circle-color": ["case", ["boolean", ["get", "highlight"], false], "#6d26d7", "#7b33e7"],
       },
-      filter: ["all", ["in", "$type", "Point"], ["in", "type", "WAYPOINT"]],
+      filter: ["==", ["get", "type"], "WAYPOINT"],
     },
   ];
 }
