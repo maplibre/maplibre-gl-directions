@@ -8,11 +8,11 @@ import type {
   Snappoint,
 } from "./directions/types";
 import {
-  MapLibreGlDirectionsEventType,
+  type MapLibreGlDirectionsEventType,
   MapLibreGlDirectionsWaypointEvent,
-  MapLibreGlDirectionsWaypointEventData,
+  type MapLibreGlDirectionsWaypointEventData,
   MapLibreGlDirectionsRoutingEvent,
-  MapLibreGlDirectionsRoutingEventData,
+  type MapLibreGlDirectionsRoutingEventData,
 } from "./directions/events";
 import layersFactory from "./directions/layers";
 import type { LayerSpecification, MapMouseEvent, MapTouchEvent } from "maplibre-gl";
