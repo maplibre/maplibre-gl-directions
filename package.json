@@ -65,7 +65,7 @@
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^1.0.0-next.30",
     "@tailwindcss/forms": "^0.5.2",
-    "@tsconfig/svelte": "^2.0.1",
+    "@tsconfig/svelte": "^3.0.0",
     "@types/geojson": "^7946.0.8",
     "@types/mapbox__point-geometry": "^0.1.2",
     "@types/mapbox__polyline": "^1.0.2",
