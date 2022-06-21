@@ -8,7 +8,7 @@
   <span slot="title">Examples</span>
 
   <ul>
-    {#each examples as example}
+    {#each examples.sort((a, b) => a.index - b.index) as example}
       <li>
         <a href={example.path} use:link>{example.name}</a>
       </li>
