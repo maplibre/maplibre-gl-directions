@@ -153,5 +153,58 @@ Another example of your interest might be the "Show Routes' Directions" one. It 
 
 ## Behavioral customization
 
-WIP on subclasses (and events?)
-Consider 2 scenarios: load-save and distance-measurement.
+Behavioral customization allows you (jokes aside) to customize the plugin's behavior. It might be some minor customization (like saving some additional information for each waypoint in order to be able to somehow manipulate that saved data later) or some more complex cases like allowing for different types of waypoints - routed and straight-lined waypoints, though we won't cover the last case in this guide at least because it requires some severe updates on the back-end-side.
+
+Behavioral customization in its main comes down to 2 different strategies. In order to pick the most appropriate one, ask yourself a question: does the plugin's public interface provide enough data to satisfy my case?
+
+If the answer is "yes", then in most cases all you'd need is to listen to events and react to them appropriately. But if you need some additional data that comes from the server, or some intrinsic plugin's properties, you'd need to extend the `MapLibreGlDirections` superclass with a subclass.
+
+In that subclass you're free to augment the default implementation the way you need, to remove methods and properties, to create your own custom ones, to modify and extend the built-in standard ones and more.
+
+There are 2 examples available at the moment that cover the subclass-extensibility case. The fist one called "Distance Measurement". It shows how to extend the `MapLibreGlDirections` superclass with a subclass in a way so that the instance produced by the last would allow you to display each route leg's distance along the respective routeline. It also uses the {@link removewaypoint|`removewaypoint`} and {@link fetchroutesend|`fetchroutesend`} events to read the response's total distance field to be able to display it in the UI.
+
+The second example is called "Load and Save". It considers the case when you need to be able to load and save the (pre)built route as a collection of GeoJSON Features.
+
+The only thing that you should be aware of when trying to extend the plugin's default functionality with a subclass is that there exist two different approaches of extending the default methods.
+
+The thing here is that some methods of the main class are defined on it as usual normal methods, and some other being not exactly methods in common sense, but rather properties which hold functions in them.
+
+There's (almost) no difference from the architectual-design perspective, but the language still implies some restrictions over semantics for extensibility.
+
+Namely, normally you're allowed to re-define some existing method of a superclass like this:
+
+```typescript
+existingSuperMethod() {
+  const originalResult = super.existingSuperMethod();
+  // ... do other stuff with the result
+}
+```
+
+But in cases with, e.g. utility-methods of the plugin, that becomes impossible, and what you need to do instead is to first save the original implementation somewhere (let's say as a class field) and then to manually call it where appropriate as if it was a super-call:
+
+```typescript
+// where the `utils` comes from the `import { utils } from "@maplibre/maplibre-gl-directions"`
+originalBuildRoutelines = utils.buildRoutelines;
+
+protected buildRoutelines = (
+  requestOptions: MapLibreGlDirectionsConfiguration["requestOptions"],
+  routes: Route[],
+  selectedRouteIndex: number,
+  snappoints: Feature<Point>[],
+): Feature<LineString>[][] => {
+  // first we call the original method. It returns the built routelines
+  const routelines = this.originalBuildRoutelines(requestOptions, routes, selectedRouteIndex, snappoints);
+
+  // modify these routelines the way you need
+  // ...
+
+  // and don't forget to return the resulting modified routelines
+  return routelines;
+}
+```
+
+See the examples' source codes to dive deeper into the implementation details. There are a lot of possibilities, and it's a really tricky business to describe each possible detail here in the docs. Feel free to experiment and ask a question either in the MapLibre's official channel in Slack or even open an issue in the plugin's GitHub repo.
+
+Here's an image of what can potentially be done after investing some time into customization: straight-lined routing, distance measurement and multiple Directions' instances running in parallel on the same map with a possibility to toggle between them:
+
+![A Complex Customization Example](https://raw.githubusercontent.com/maplibre/maplibre-gl-directions/main/doc/images/complex-customization.png)
