@@ -47,7 +47,8 @@
     "lint": "eslint --fix './{demo,src}/**/*.{ts,js,cjs,svelte}'",
     "check:lib": "svelte-check --tsconfig ./tsconfig.lib.json --workspace src",
     "check:demo": "svelte-check --tsconfig ./tsconfig.json --workspace demo",
-    "check": "npm run lint && npm run check:lib && npm run check:demo"
+    "check": "npm run lint && npm run check:lib && npm run check:demo",
+    "test": "vitest run --config vite.test.config.ts"
   },
   "lint-staged": {
     "./{src,demo}/**/*.{ts,js,cjs,svelte}": [
@@ -75,7 +76,9 @@
     "autoprefixer": "^10.4.7",
     "eslint": "^8.17.0",
     "eslint-plugin-svelte3": "^4.0.0",
+    "happy-dom": "^5.3.2",
     "husky": "^8.0.1",
+    "jsdom": "^20.0.0",
     "lint-staged": "^13.0.1",
     "maplibre-gl": "^2.1.9",
     "postcss": "^8.4.12",
@@ -90,6 +93,7 @@
     "tslib": "^2.3.1",
     "typedoc": "^0.22.17",
     "typescript": "^4.7.3",
-    "vite": "^2.9.10"
+    "vite": "^2.9.10",
+    "vitest": "^0.16.0"
   }
 }
