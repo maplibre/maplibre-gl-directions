@@ -29,7 +29,7 @@ export const layers = [
     },
     paint: {
       "line-pattern": "routeline",
-      "line-width": 8,
+      "line-width": 12,
       "line-opacity": 0.5,
     },
     filter: ["==", ["get", "route"], "ALT"],
@@ -45,7 +45,7 @@ export const layers = [
     },
     paint: {
       "line-pattern": "routeline",
-      "line-width": 8,
+      "line-width": 12,
     },
     filter: ["==", ["get", "route"], "SELECTED"],
   },

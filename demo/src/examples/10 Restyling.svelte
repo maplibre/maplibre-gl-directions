@@ -56,7 +56,7 @@
         requestOptions: {
           alternatives: "true",
         },
-        layers,
+        layers, // see the imports
         // if you decide not to use some layers of the default set (casings namely), make sure to update the sensitive
         // layers respectfully
         sensitiveWaypointLayers: ["maplibre-gl-directions-waypoint"],
@@ -64,12 +64,10 @@
         sensitiveRoutelineLayers: ["maplibre-gl-directions-routeline"],
         sensitiveAltRoutelineLayers: ["maplibre-gl-directions-alt-routeline"],
       });
+
+      directions.interactive = interactive;
     });
   });
-
-  $: if (directions) {
-    directions.interactive = interactive;
-  }
 </script>
 
 <AppSidebar>
@@ -78,7 +76,7 @@
   <p>
     It's completely up to you how to style the Directions' features shown on the map. You can either use the default
     styles provided by the plugin (see other examples), easily modify the default features' dimensions (see the
-    <a href="/examples/touch-friendly-features" use:link>Touch-Friendly Features examples</a>) or
+    <a href="/examples/touch-friendly-features" use:link>Touch-Friendly Features example</a>) or
     <strong>define your custom features' styles from scratch</strong>.
   </p>
 
