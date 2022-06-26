@@ -6,7 +6,8 @@
   import maplibregl from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
   import style from "../assets/map/style/style.json?url";
-  import CustomMapLibreGlDirections, { routingLayers } from "../assets/map/custom-directions";
+  import CustomMapLibreGlDirections from "../assets/map/custom-directions";
+
   const meta = examples.find((example) => example.path === $location);
 
   let mapRef: HTMLElement | undefined = undefined;
@@ -23,15 +24,10 @@
     });
 
     map.on("load", () => {
-      directions = new CustomMapLibreGlDirections(map, {
-        layers: routingLayers,
-      });
+      directions = new CustomMapLibreGlDirections(map);
+      directions.interactive = interactive;
     });
   });
-
-  $: if (directions) {
-    directions.interactive = interactive;
-  }
 
   function loadRoute() {
     directions.setWaypointsFeatures(JSON.parse(localStorage.getItem("saved-waypoints-features")));
@@ -55,7 +51,7 @@
 
   <small
     >This example uses the <code>localStorage</code> to save routes, but you are obviously not restricted to it. There might
-    instead be a file or a serverside-database or whatever else.</small
+    instead be a file or a serverside-database or whatever else</small
   >
 
   <p>

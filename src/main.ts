@@ -36,14 +36,11 @@ export type {
   Route,
   Leg,
   Snappoint,
+  MapLibreGlDirectionsWaypointEvent,
+  MapLibreGlDirectionsWaypointEventData,
   MapLibreGlDirectionsRoutingEvent,
   MapLibreGlDirectionsRoutingEventData,
 };
-
-/**
- * @protected
- */
-export { MapLibreGlDirectionsWaypointEvent, MapLibreGlDirectionsWaypointEventData };
 
 /**
  * @protected
