@@ -7,7 +7,7 @@
   import "maplibre-gl/dist/maplibre-gl.css";
   import style from "../assets/map/style/style.json?url";
   import MapLibreGlDirections, { layersFactory } from "@maplibre/maplibre-gl-directions";
-  import DirectionArrowImageSrc from "../assets/map/images/direction-arrow.png?url";
+  import DirectionArrowImageUrl from "../assets/map/images/direction-arrow.png?url";
 
   const meta = examples.find((example) => example.path === $location);
 
@@ -23,14 +23,15 @@
       customAttribution: "<a href='http://project-osrm.org/' target='_blank'>&copy; OSRM</a>",
     });
 
-    map.loadImage(DirectionArrowImageSrc, (error, image) => {
+    // load the arrow image and add it to the map
+    map.loadImage(DirectionArrowImageUrl, (error, image) => {
       if (!error && image) {
         map.addImage("direction-arrow", image);
       }
     });
 
     const layers = layersFactory();
-    // add direction arrow
+    // add a direction arrow layer
     layers.push({
       id: "maplibre-gl-directions-routeline-direction-arrow",
       type: "symbol",
@@ -43,7 +44,7 @@
       paint: {
         "icon-opacity": 0.5,
       },
-      filter: ["all", ["in", "$type", "LineString"], ["in", "route", "SELECTED"]],
+      filter: ["==", ["get", "route"], "SELECTED"],
     });
 
     map.on("load", () => {
