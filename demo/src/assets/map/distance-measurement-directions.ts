@@ -40,6 +40,8 @@ export default class DistanceMeasurementMapLibreGlDirections extends MapLibreGlD
   };
 }
 
+// using a different source name. That might become useful if you'd like to use the Distance Measurement Directions
+// instance along with a normal Directions instance on the same map
 const sourceName = "distance-measurement-maplibre-gl-directions";
 
 const config: Partial<MapLibreGlDirectionsConfiguration> = {
@@ -58,7 +60,7 @@ const config: Partial<MapLibreGlDirectionsConfiguration> = {
         "line-color": "#34343f",
         "line-width": 2,
       },
-      filter: ["all", ["in", "$type", "LineString"], ["in", "type", "SNAPLINE"]],
+      filter: ["==", ["get", "type"], "SNAPLINE"],
     },
     {
       id: `${sourceName}-routeline`,
@@ -73,7 +75,7 @@ const config: Partial<MapLibreGlDirectionsConfiguration> = {
         "line-opacity": 0.85,
         "line-width": 3,
       },
-      filter: ["all", ["in", "$type", "LineString"], ["in", "route", "SELECTED"]],
+      filter: ["==", ["get", "route"], "SELECTED"],
     },
     {
       id: `${sourceName}-routeline-distance`,
@@ -92,7 +94,7 @@ const config: Partial<MapLibreGlDirectionsConfiguration> = {
         "text-halo-color": "#ffffff",
         "text-halo-width": 1,
       },
-      filter: ["all", ["in", "$type", "LineString"], ["in", "route", "SELECTED"]],
+      filter: ["==", ["get", "route"], "SELECTED"],
     },
     {
       id: `${sourceName}-hoverpoint`,
@@ -102,7 +104,7 @@ const config: Partial<MapLibreGlDirectionsConfiguration> = {
         "circle-radius": 9,
         "circle-color": "#212121",
       },
-      filter: ["all", ["in", "$type", "Point"], ["in", "type", "HOVERPOINT"]],
+      filter: ["==", ["get", "type"], "HOVERPOINT"],
     },
     {
       id: `${sourceName}-snappoint`,
@@ -112,7 +114,7 @@ const config: Partial<MapLibreGlDirectionsConfiguration> = {
         "circle-radius": ["case", ["boolean", ["get", "highlight"], false], 9, 7],
         "circle-color": ["case", ["boolean", ["get", "highlight"], false], "#313131", "#494949"],
       },
-      filter: ["all", ["in", "$type", "Point"], ["in", "type", "SNAPPOINT"]],
+      filter: ["==", ["get", "type"], "SNAPPOINT"],
     },
     {
       id: `${sourceName}-waypoint`,
@@ -122,9 +124,10 @@ const config: Partial<MapLibreGlDirectionsConfiguration> = {
         "circle-radius": ["case", ["boolean", ["get", "highlight"], false], 9, 7],
         "circle-color": ["case", ["boolean", ["get", "highlight"], false], "#212121", "#2c2c2c"],
       },
-      filter: ["all", ["in", "$type", "Point"], ["in", "type", "WAYPOINT"]],
+      filter: ["==", ["get", "type"], "WAYPOINT"],
     },
   ] as maplibregl.LayerSpecification[],
+  // don't forget to update the sensitive layers
   sensitiveSnappointLayers: [`${sourceName}-snappoint`],
   sensitiveWaypointLayers: [`${sourceName}-waypoint`],
   sensitiveRoutelineLayers: [`${sourceName}-routeline`],

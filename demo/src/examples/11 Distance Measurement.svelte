@@ -36,12 +36,10 @@
           totalDistance = 0;
         }
       });
+
+      directions.interactive = interactive;
     });
   });
-
-  $: if (directions) {
-    directions.interactive = interactive;
-  }
 </script>
 
 <AppSidebar>
