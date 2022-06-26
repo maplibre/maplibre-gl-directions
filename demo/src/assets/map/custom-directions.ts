@@ -1,6 +1,6 @@
 import type maplibregl from "maplibre-gl";
 import type { MapLibreGlDirectionsConfiguration, Feature, LineString, Point } from "@maplibre/maplibre-gl-directions";
-import MapLibreGlDirections, { layersFactory } from "@maplibre/maplibre-gl-directions";
+import MapLibreGlDirections from "@maplibre/maplibre-gl-directions";
 import { MapLibreGlDirectionsWaypointEvent } from "@maplibre/maplibre-gl-directions";
 
 export default class CustomMapLibreGlDirections extends MapLibreGlDirections {
