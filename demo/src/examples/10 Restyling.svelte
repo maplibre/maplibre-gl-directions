@@ -27,6 +27,7 @@
       zoom: 11,
       customAttribution:
         '<a href=\'http://project-osrm.org/\' target=\'_blank\'>&copy; OSRM</a> | Icons made by <a href="https://www.flaticon.com/authors/vectors-market" title="Vectors Market">Vectors Market</a> and by <a href="https://www.flaticon.com/authors/dinosoftlabs" title="DinosoftLabs">DinosoftLabs</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>',
+      fadeDuration: 0,
     });
 
     map.on("load", () => {
