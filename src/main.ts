@@ -65,9 +65,5 @@ export { utils };
  */
 export type { Feature, Point, PointType, LineString };
 
-/**
- * @deprecated in favor of {@link LoadingIndicatorControl}
- */
-export { LoadingIndicatorControl as LoadingControl };
 export { LoadingIndicatorControl };
 export type { LoadingIndicatorControlConfiguration };
