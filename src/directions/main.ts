@@ -40,7 +40,6 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   protected readonly configuration: MapLibreGlDirectionsConfiguration;
 
   protected _interactive = false;
-  protected _isCurrentlyUpdating = false;
   protected _updateWhileDrag = false;
   protected _mouseMovementDetector: ReturnType<typeof setTimeout>;
   protected buildRequest = buildRequest;
@@ -60,7 +59,20 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   protected routelines: Feature<LineString>[][] = [];
   protected selectedRouteIndex = 0;
   protected hoverpoint: Feature<Point> | undefined = undefined;
-
+  protected currentMousePosition: {
+    x: number;
+    y: number;
+  } = {
+    x: 0,
+    y: 0,
+  };
+  protected lastRequestMousePosition: {
+    x: number;
+    y: number;
+  } = {
+    x: 0,
+    y: 0,
+  };
   /**
    * @alias {@link waypoints}
    *
@@ -458,6 +470,18 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     }
 
     /*
+     * if the user selected a waypoint or routeLine and routes should update while dragging,
+     * we initiate the live updating process.
+     */
+    if (
+      this.configuration.sensitiveWaypointLayers.includes(feature?.layer.id ?? "") ||
+      this.configuration.sensitiveRoutelineLayers.includes(feature?.layer.id ?? "")
+    ) {
+      if (this.updateWhileDrag) {
+        this.updateWhileDraggingHandler(e);
+      }
+    }
+    /*
      * Disable the global `onMove` handlers for them not to interfere with the new ones which are added further down.
      */
     this.map.off("touchstart", this.onMoveHandler);
@@ -483,12 +507,6 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
      */
     if (e.type === "touchmove" && e.originalEvent.touches.length !== 1) return e.originalEvent.preventDefault();
     if (e.type === "mousemove" && e.originalEvent.which !== 1) return;
-    /*
-     * if routes should update while dragging, and the handler for that isn't already running, we call it
-     */
-    if (this.updateWhileDrag && !this._isCurrentlyUpdating) {
-      this.updateWhileDraggingHandler(e);
-    }
 
     if (this.waypointBeingDragged) {
       /*
@@ -503,7 +521,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
       this.hoverpoint.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
     }
-
+    this.currentMousePosition = e.point;
     this.draw();
   }
 
@@ -512,7 +530,6 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
      * if routes should update while dragging, there's some cleanup to do when releasing the mouse
      */
     if (this.updateWhileDrag) {
-      this._isCurrentlyUpdating = false;
       clearTimeout(this._mouseMovementDetector);
     }
 
@@ -611,42 +628,46 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   }
 
   protected async updateWhileDragging(e: MapMouseEvent | MapTouchEvent) {
-    /*
-     * letting other handlers know that updateWhileDragging is running
-     */
-    this._isCurrentlyUpdating = true;
+    if (
+      Math.abs(this.lastRequestMousePosition?.x - this.currentMousePosition?.x) >
+        (this.configuration.dragThreshold >= 0 ? this.configuration.dragThreshold : 0) ||
+      Math.abs(this.lastRequestMousePosition?.y - this.currentMousePosition?.y) >
+        (this.configuration.dragThreshold >= 0 ? this.configuration.dragThreshold : 0)
+    ) {
+      this.lastRequestMousePosition = this.currentMousePosition;
 
-    if (this.waypointBeingDragged) {
-      /*
-       * If a waypoint has been dragged, we fire a "movewaypoint" just like "onDragUp" does.
-       */
-      const waypointEvent = new MapLibreGlDirectionsWaypointEvent("movewaypoint", e, {
-        index: this._waypoints.indexOf(this.waypointBeingDragged),
-        initialCoordinates: this.waypointBeingDraggedInitialCoordinates,
-      });
-      this.fire(waypointEvent);
-      /*
-       * If the routing request has failed for some reason, restore the waypoint's original position.
-       */
-      try {
-        await this.fetchDirections(waypointEvent);
-      } catch (err) {
-        if (this.waypointBeingDraggedInitialCoordinates) {
-          this.waypointBeingDragged.geometry.coordinates = this.waypointBeingDraggedInitialCoordinates;
+      if (this.waypointBeingDragged) {
+        /*
+         * If a waypoint has been dragged, we fire a "movewaypoint" just like "onDragUp" does.
+         */
+        const waypointEvent = new MapLibreGlDirectionsWaypointEvent("movewaypoint", e, {
+          index: this._waypoints.indexOf(this.waypointBeingDragged),
+          initialCoordinates: this.waypointBeingDraggedInitialCoordinates,
+        });
+        this.fire(waypointEvent);
+        /*
+         * If the routing request has failed for some reason, restore the waypoint's original position.
+         */
+        try {
+          await this.fetchDirections(waypointEvent);
+        } catch (err) {
+          if (this.waypointBeingDraggedInitialCoordinates) {
+            this.waypointBeingDragged.geometry.coordinates = this.waypointBeingDraggedInitialCoordinates;
+          }
         }
+      } else if (this.hoverpoint) {
+        /*
+         * If the selected route line has been dragged then add a waypoint at the previously saved index.
+         */
+        const departedSnapPointIndex =
+          this.departSnappointIndex !== undefined ? this.departSnappointIndex + 1 : undefined;
+        await this._addWaypoint([e.lngLat.lng, e.lngLat.lat], departedSnapPointIndex, e);
+        /*
+         * This new waypoint is set as the one now being dragged, in order to not interrupt the user's dragging action
+         */
+        this.waypointBeingDragged = this._waypoints[departedSnapPointIndex];
+        this.onDragDown(e);
       }
-    } else if (this.hoverpoint) {
-      /*
-       * If the selected route line has been dragged then add a waypoint at the previously saved index.
-       */
-      const departedSnapPointIndex =
-        this.departSnappointIndex !== undefined ? this.departSnappointIndex + 1 : undefined;
-      await this._addWaypoint([e.lngLat.lng, e.lngLat.lat], departedSnapPointIndex, e);
-      /*
-       * This new waypoint is set as the one now being dragged, in order to not interrupt the user's dragging action
-       */
-      this.waypointBeingDragged = this._waypoints[departedSnapPointIndex];
-      this.onDragDown(e);
     }
 
     /*
