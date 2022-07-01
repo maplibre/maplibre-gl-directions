@@ -787,7 +787,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   }
 
   /**
-   * The interactivity state of the instance. When `true`, routes are updated live while dragging
+   * The behaviour of update while dragging of the instance. When `true`, routes are updated live while dragging
    * Automatically set to the value present in the config
    */
   get updateWhileDrag() {
