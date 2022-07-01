@@ -13,6 +13,7 @@
   let mapRef: HTMLElement | undefined = undefined;
   let directions: MapLibreGlDirections | undefined = undefined;
   let interactive = true;
+  let updateWhileDrag = false;
 
   onMount(() => {
     const map = new maplibregl.Map({
@@ -34,6 +35,7 @@
 
   $: if (directions) {
     directions.interactive = interactive;
+    directions.updateWhileDrag = updateWhileDrag;
   }
 </script>
 
@@ -43,6 +45,11 @@
   <label class="flex items-center gap-3">
     <input type="checkbox" bind:checked={interactive} disabled={!directions} />
     <strong>Interactivity enabled</strong>
+  </label>
+
+  <label class="flex items-center gap-3">
+    <input type="checkbox" bind:checked={updateWhileDrag} disabled={!directions} />
+    <strong>Update route while dragging</strong>
   </label>
 
   <ul>

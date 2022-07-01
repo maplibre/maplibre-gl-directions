@@ -28,6 +28,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.onDragMoveHandler = this.onDragMove.bind(this);
     this.onDragUpHandler = this.onDragUp.bind(this);
     this.onClickHandler = this.onClick.bind(this);
+    this.updateWhileDraggingHandler = this.updateWhileDragging.bind(this);
 
     this.init();
   }
@@ -39,6 +40,9 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   protected readonly configuration: MapLibreGlDirectionsConfiguration;
 
   protected _interactive = false;
+  protected _isCurrentlyUpdating = false;
+  protected _updateWhileDrag = false;
+  protected _mouseMovementDetector: ReturnType<typeof setTimeout>;
   protected buildRequest = buildRequest;
   protected buildPoint = buildPoint;
   protected buildSnaplines = buildSnaplines;
@@ -49,6 +53,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   protected onDragMoveHandler: (e: MapMouseEvent) => void;
   protected onDragUpHandler: (e: MapMouseEvent) => void;
   protected onClickHandler: (e: MapMouseEvent) => void;
+  protected updateWhileDraggingHandler: (e: MapMouseEvent | MapTouchEvent) => void;
 
   protected _waypoints: Feature<Point>[] = [];
   protected snappoints: Feature<Point>[] = [];
@@ -95,6 +100,10 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.configuration.layers.forEach((layer) => {
       this.map.addLayer(layer);
     });
+    /*
+     * using the config value as a starting setting.
+     */
+    this.updateWhileDrag = this.configuration.updateWhileDrag;
   }
 
   protected async fetchDirections(originalEvent: MapLibreGlDirectionsWaypointEvent) {
@@ -474,6 +483,12 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
      */
     if (e.type === "touchmove" && e.originalEvent.touches.length !== 1) return e.originalEvent.preventDefault();
     if (e.type === "mousemove" && e.originalEvent.which !== 1) return;
+    /*
+     * if routes should update while dragging, and the handler for that isn't already running, we call it
+     */
+    if (this.updateWhileDrag && !this._isCurrentlyUpdating) {
+      this.updateWhileDraggingHandler(e);
+    }
 
     if (this.waypointBeingDragged) {
       /*
@@ -493,6 +508,14 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   }
 
   protected async onDragUp(e: MapMouseEvent | MapTouchEvent) {
+    /*
+     * if routes should update while dragging, there's some cleanup to do when releasing the mouse
+     */
+    if (this.updateWhileDrag) {
+      this._isCurrentlyUpdating = false;
+      clearTimeout(this._mouseMovementDetector);
+    }
+
     if (e.type === "mouseup" && e.originalEvent.which !== 1) return;
 
     if (this.hoverpoint?.properties) this.hoverpoint.properties.showSnaplines = false;
@@ -585,6 +608,51 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.map.on("mousemove", this.onMoveHandler);
 
     this.draw();
+  }
+
+  protected async updateWhileDragging(e: MapMouseEvent | MapTouchEvent) {
+    /*
+     * letting other handlers know that updateWhileDragging is running
+     */
+    this._isCurrentlyUpdating = true;
+
+    if (this.waypointBeingDragged) {
+      /*
+       * If a waypoint has been dragged, we fire a "movewaypoint" just like "onDragUp" does.
+       */
+      const waypointEvent = new MapLibreGlDirectionsWaypointEvent("movewaypoint", e, {
+        index: this._waypoints.indexOf(this.waypointBeingDragged),
+        initialCoordinates: this.waypointBeingDraggedInitialCoordinates,
+      });
+      this.fire(waypointEvent);
+      /*
+       * If the routing request has failed for some reason, restore the waypoint's original position.
+       */
+      try {
+        await this.fetchDirections(waypointEvent);
+      } catch (err) {
+        if (this.waypointBeingDraggedInitialCoordinates) {
+          this.waypointBeingDragged.geometry.coordinates = this.waypointBeingDraggedInitialCoordinates;
+        }
+      }
+    } else if (this.hoverpoint) {
+      /*
+       * If the selected route line has been dragged then add a waypoint at the previously saved index.
+       */
+      const departedSnapPointIndex =
+        this.departSnappointIndex !== undefined ? this.departSnappointIndex + 1 : undefined;
+      await this._addWaypoint([e.lngLat.lng, e.lngLat.lat], departedSnapPointIndex, e);
+      /*
+       * This new waypoint is set as the one now being dragged, in order to not interrupt the user's dragging action
+       */
+      this.waypointBeingDragged = this._waypoints[departedSnapPointIndex];
+      this.onDragDown(e);
+    }
+
+    /*
+     * after everything is done, we wait a bit before triggering a new update, in order to not flood the backend
+     */
+    this._mouseMovementDetector = setTimeout(this.updateWhileDraggingHandler, 300, e);
   }
 
   protected onClick(e: MapMouseEvent) {
@@ -716,6 +784,18 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       this.map.off("mousedown", this.onDragDownHandler);
       this.map.off("click", this.onClickHandler);
     }
+  }
+
+  /**
+   * The interactivity state of the instance. When `true`, routes are updated live while dragging
+   * Automatically set to the value present in the config
+   */
+  get updateWhileDrag() {
+    return this._updateWhileDrag;
+  }
+
+  set updateWhileDrag(update) {
+    this._updateWhileDrag = update;
   }
 
   /**

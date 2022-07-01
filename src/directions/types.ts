@@ -265,6 +265,19 @@ export interface MapLibreGlDirectionsConfiguration {
    * ```
    */
   dragThreshold: number;
+
+  /**
+   * Whether to update a route while dragging a waypoint/hoverpoint instead of only when dropping it
+   *
+   * @default `false`
+   *
+   * @example
+   * ```
+   * // make the route update while dragging
+   * updateWhileDrag: true
+   * ```
+   */
+  updateWhileDrag: boolean;
 }
 
 export const MapLibreGlDirectionsDefaultConfiguration: Omit<MapLibreGlDirectionsConfiguration, "layers"> = {
@@ -281,6 +294,7 @@ export const MapLibreGlDirectionsDefaultConfiguration: Omit<MapLibreGlDirections
   sensitiveRoutelineLayers: ["maplibre-gl-directions-routeline", "maplibre-gl-directions-routeline-casing"],
   sensitiveAltRoutelineLayers: ["maplibre-gl-directions-alt-routeline", "maplibre-gl-directions-alt-routeline-casing"],
   dragThreshold: 10,
+  updateWhileDrag: false,
 };
 
 export type PointType = "WAYPOINT" | "SNAPPOINT" | "HOVERPOINT" | string;
