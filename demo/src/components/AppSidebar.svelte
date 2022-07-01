@@ -16,7 +16,7 @@
       </header>
     {/if}
 
-    <article class="p-5 lg:p-10 flex flex-col gap-1.5 lg:gap-3" class:pt-0={!noHeader}>
+    <article class="p-5 lg:p-10 flex flex-col gap-1.5 lg:gap-3" class:!pt-0={!noHeader}>
       <h1 class="break-all">
         <slot name="title" />
       </h1>
