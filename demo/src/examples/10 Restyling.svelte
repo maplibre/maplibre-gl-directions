@@ -17,7 +17,6 @@
 
   let mapRef: HTMLElement | undefined = undefined;
   let directions: MapLibreGlDirections | undefined = undefined;
-  let interactive = true;
 
   onMount(() => {
     const map = new maplibregl.Map({
@@ -65,7 +64,7 @@
         sensitiveAltRoutelineLayers: ["maplibre-gl-directions-alt-routeline"],
       });
 
-      directions.interactive = interactive;
+      directions.interactive = true;
     });
   });
 </script>

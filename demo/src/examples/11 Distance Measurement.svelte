@@ -11,7 +11,6 @@
 
   let mapRef: HTMLElement | undefined = undefined;
   let directions: DistanceMeasurementMapLibreGlDirections | undefined = undefined;
-  let interactive = true;
 
   let totalDistance = 0;
 
@@ -37,7 +36,7 @@
         }
       });
 
-      directions.interactive = interactive;
+      directions.interactive = true;
     });
   });
 </script>

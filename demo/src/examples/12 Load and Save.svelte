@@ -12,7 +12,6 @@
 
   let mapRef: HTMLElement | undefined = undefined;
   let directions: CustomMapLibreGlDirections | undefined = undefined;
-  let interactive = true;
 
   onMount(() => {
     const map = new maplibregl.Map({
@@ -25,7 +24,7 @@
 
     map.on("load", () => {
       directions = new CustomMapLibreGlDirections(map);
-      directions.interactive = interactive;
+      directions.interactive = true;
     });
   });
 
