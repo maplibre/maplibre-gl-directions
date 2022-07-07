@@ -28,6 +28,11 @@
     });
   });
 
+  const noDataToLoad =
+    !localStorage.getItem("saved-waypoints-features") ||
+    !localStorage.getItem("saved-snappoints-features") ||
+    !localStorage.getItem("saved-routelines-features");
+
   function loadRoute() {
     directions.setWaypointsFeatures(JSON.parse(localStorage.getItem("saved-waypoints-features")));
     directions.setSnappointsFeatures(JSON.parse(localStorage.getItem("saved-snappoints-features")));
@@ -44,7 +49,7 @@
 <AppSidebar>
   <span slot="title">{meta.name}</span>
 
-  <button disabled={!directions} on:click={loadRoute}>Load the saved Route</button>
+  <button disabled={!directions || noDataToLoad} on:click={loadRoute}>Load the saved Route</button>
   <button disabled={!directions} on:click={saveRoute}>Save the Route</button>
   <button disabled={!directions} on:click={() => directions.clear()}>Clear</button>
 
