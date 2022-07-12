@@ -254,7 +254,8 @@ export interface MapLibreGlDirectionsConfiguration {
 
   /**
    * A minimal amount of pixels a waypoint or the hoverpoint must be dragged in order for the drag-event to be
-   * respected. Should be a number >= `0`. Any negative value is treated as `0`.
+   * respected, and for network requests to be made when using refreshOnMove = true. Should be a number >= `0`.
+   * Any negative value is treated as `0`.
    *
    * @default `10`
    *
@@ -277,7 +278,7 @@ export interface MapLibreGlDirectionsConfiguration {
    * updateWhileDrag: true
    * ```
    */
-  updateWhileDrag: boolean;
+  refreshOnMove: boolean;
 }
 
 export const MapLibreGlDirectionsDefaultConfiguration: Omit<MapLibreGlDirectionsConfiguration, "layers"> = {
@@ -294,7 +295,7 @@ export const MapLibreGlDirectionsDefaultConfiguration: Omit<MapLibreGlDirections
   sensitiveRoutelineLayers: ["maplibre-gl-directions-routeline", "maplibre-gl-directions-routeline-casing"],
   sensitiveAltRoutelineLayers: ["maplibre-gl-directions-alt-routeline", "maplibre-gl-directions-alt-routeline-casing"],
   dragThreshold: 10,
-  updateWhileDrag: false,
+  refreshOnMove: false,
 };
 
 export type PointType = "WAYPOINT" | "SNAPPOINT" | "HOVERPOINT" | string;
