@@ -482,7 +482,17 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   }
 
   protected refreshOnMoveIsRefreshing = false;
+
   protected onDragMove(e: MapMouseEvent | MapTouchEvent) {
+    /*
+     * when updateOnMove is active, if this timeout ever triggers it means we are dragging,
+     * but not moving the mouse.
+     */
+    if (this.refreshOnMove) {
+      clearTimeout(this.mouseMovementDetector);
+      this.mouseMovementDetector = setTimeout(this.liveRefreshHandler, 300, e);
+    }
+
     /*
      * `preventDefault` here prevents drag down gesture in mobile Chrome from updating the page.
      */
@@ -671,11 +681,6 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       }
       this.refreshOnMoveIsRefreshing = false;
     }
-
-    /*
-     * after everything is done, we wait a bit before triggering a new update, in order to not flood the backend
-     */
-    //this.mouseMovementDetector = setTimeout(this.liveRefreshHandler, 300, e);
   }
 
   protected onClick(e: MapMouseEvent) {
