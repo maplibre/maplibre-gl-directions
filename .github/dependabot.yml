@@ -12,4 +12,4 @@ updates:
     open-pull-requests-limit: 20
     labels:
       - "dependencies"
-      - "release:ignore"
+      - "semver:patch"

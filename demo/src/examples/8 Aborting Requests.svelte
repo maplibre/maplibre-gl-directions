@@ -2,7 +2,6 @@
   import { onMount } from "svelte";
   import { examples } from "../router";
   import { location } from "svelte-spa-router";
-
   import AppSidebar from "../components/AppSidebar.svelte";
   import maplibregl, { Map } from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
