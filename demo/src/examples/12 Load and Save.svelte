@@ -28,10 +28,15 @@
     });
   });
 
-  const noDataToLoad =
-    !localStorage.getItem("saved-waypoints-features") ||
-    !localStorage.getItem("saved-snappoints-features") ||
-    !localStorage.getItem("saved-routelines-features");
+  function checkDataToLoad() {
+    return (
+      localStorage.getItem("saved-waypoints-features") &&
+      localStorage.getItem("saved-snappoints-features") &&
+      localStorage.getItem("saved-routelines-features")
+    );
+  }
+
+  let noDataToLoad = !checkDataToLoad();
 
   function loadRoute() {
     directions.setWaypointsFeatures(JSON.parse(localStorage.getItem("saved-waypoints-features")));
@@ -43,6 +48,8 @@
     localStorage.setItem("saved-waypoints-features", JSON.stringify(directions.waypointsFeatures));
     localStorage.setItem("saved-snappoints-features", JSON.stringify(directions.snappointsFeatures));
     localStorage.setItem("saved-routelines-features", JSON.stringify(directions.routelinesFeatures));
+
+    noDataToLoad = !checkDataToLoad();
   }
 </script>
 
