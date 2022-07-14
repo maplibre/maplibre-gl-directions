@@ -462,18 +462,6 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     }
 
     /*
-     * if the user selected a waypoint or routeLine and routes should update while dragging,
-     * we initiate the live updating process.
-     */
-    if (
-      this.configuration.sensitiveWaypointLayers.includes(feature?.layer.id ?? "") ||
-      this.configuration.sensitiveRoutelineLayers.includes(feature?.layer.id ?? "")
-    ) {
-      if (this.refreshOnMove) {
-        this.liveRefreshHandler(e);
-      }
-    }
-    /*
      * Disable the global `onMove` handlers for them not to interfere with the new ones which are added further down.
      */
     this.map.off("touchstart", this.onMoveHandler);
@@ -493,6 +481,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.draw();
   }
 
+  protected refreshOnMoveIsRefreshing = false;
   protected onDragMove(e: MapMouseEvent | MapTouchEvent) {
     /*
      * `preventDefault` here prevents drag down gesture in mobile Chrome from updating the page.
@@ -515,6 +504,14 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     }
     this.currentMousePosition = e.point;
     this.draw();
+
+    /*
+     * if the user selected a waypoint or routeLine and routes should update while dragging,
+     * we initiate the live updating process.
+     */
+    if (this.refreshOnMove && !this.refreshOnMoveIsRefreshing) {
+      this.liveRefreshHandler(e);
+    }
   }
 
   protected mouseMovementDetector: ReturnType<typeof setTimeout>;
@@ -635,6 +632,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       Math.abs(this.lastRequestMousePosition?.y - this.currentMousePosition?.y) >
         (this.configuration.dragThreshold >= 0 ? this.configuration.dragThreshold : 0)
     ) {
+      this.refreshOnMoveIsRefreshing = true;
       this.lastRequestMousePosition = this.currentMousePosition;
 
       if (this.waypointBeingDragged) {
@@ -671,12 +669,13 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         this.waypointBeingDragged = this._waypoints[departedSnapPointIndex];
         this.onDragDown(e);
       }
+      this.refreshOnMoveIsRefreshing = false;
     }
 
     /*
      * after everything is done, we wait a bit before triggering a new update, in order to not flood the backend
      */
-    this.mouseMovementDetector = setTimeout(this.liveRefreshHandler, 300, e);
+    //this.mouseMovementDetector = setTimeout(this.liveRefreshHandler, 300, e);
   }
 
   protected onClick(e: MapMouseEvent) {
