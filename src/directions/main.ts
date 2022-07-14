@@ -417,13 +417,35 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         | undefined;
     } else if (this.configuration.sensitiveRoutelineLayers.includes(feature?.layer.id ?? "")) {
       /*
+       * When a routeline (a leg in particular) is being dragged, find its respective depart snappoint's index and save
+       * it outside. Since a route is divided into legs by the snappoints, the leg's index is always equal to the
+       * depart snappoint's index.
+       */
+      this.departSnappointIndex = JSON.parse(feature?.properties?.legIndex);
+
+      /*
        * the "touchstart" event ("mousemove" equivalent) is not always fired before this `onDragDown` (which is also the
        * "touchstart"), therefore the hoverpoint might not exist yet. If it indeed does not, then create it and then
        * enable showing its snaplines.
        */
 
       if (this.hoverpoint) {
-        this.hoverpoint.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
+        if (this.refreshOnMove) {
+          /*
+           * If dragging a hoverpoint and refreshOnMove is active, we must convert it to a waypoint instead
+           */
+          const departedSnapPointIndex =
+            this.departSnappointIndex !== undefined ? this.departSnappointIndex + 1 : undefined;
+          this._addWaypoint([e.lngLat.lng, e.lngLat.lat], departedSnapPointIndex, e).then(() => {
+            /*
+             * This new waypoint is set as the one now being dragged, in order to not interrupt the user's dragging action
+             */
+            this.waypointBeingDragged = this._waypoints[departedSnapPointIndex];
+            this.hoverpoint = undefined;
+          });
+        } else {
+          this.hoverpoint.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
+        }
       } else {
         this.hoverpoint = this.buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT", {
           departSnappointProperties: {
@@ -438,13 +460,6 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       if (this.hoverpoint.properties) {
         this.hoverpoint.properties.showSnaplines = true;
       }
-
-      /*
-       * When a routeline (a leg in particular) is being dragged, find its respective depart snappoint's index and save
-       * it outside. Since a route is divided into legs by the snappoints, the leg's index is always equal to the
-       * depart snappoint's index.
-       */
-      this.departSnappointIndex = JSON.parse(feature?.properties?.legIndex);
 
       /*
        * Highlight the respective leg's depart and arrive snappoints.
@@ -567,11 +582,8 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         try {
           await this.fetchDirections(waypointEvent);
         } catch (err) {
-          if (!(err instanceof DOMException && err.name == "AbortError")) {
-            if (this.waypointBeingDraggedInitialCoordinates) {
-              this.waypointBeingDragged.geometry.coordinates = this.waypointBeingDraggedInitialCoordinates;
-            }
-          }
+          // If the request fails we need to catch the exception for it not to bubble up
+          // even though we don't intend on doing anything with it
         }
 
         this.waypointBeingDragged = undefined;
@@ -645,6 +657,10 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       this.refreshOnMoveIsRefreshing = true;
       this.lastRequestMousePosition = this.currentMousePosition;
 
+      /*
+       * During liveRefresh, we only care about waypoints, because if dragging a hoverpoint
+       * then it has already been converted to a waypoint on dragDown
+       */
       if (this.waypointBeingDragged) {
         /*
          * If a waypoint has been dragged, we fire a "movewaypoint" just like "onDragUp" does.
@@ -666,18 +682,6 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
             }
           }
         }
-      } else if (this.hoverpoint) {
-        /*
-         * If the selected route line has been dragged then add a waypoint at the previously saved index.
-         */
-        const departedSnapPointIndex =
-          this.departSnappointIndex !== undefined ? this.departSnappointIndex + 1 : undefined;
-        await this._addWaypoint([e.lngLat.lng, e.lngLat.lat], departedSnapPointIndex, e);
-        /*
-         * This new waypoint is set as the one now being dragged, in order to not interrupt the user's dragging action
-         */
-        this.waypointBeingDragged = this._waypoints[departedSnapPointIndex];
-        this.onDragDown(e);
       }
       this.refreshOnMoveIsRefreshing = false;
     }
