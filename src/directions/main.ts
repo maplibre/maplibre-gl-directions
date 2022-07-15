@@ -582,8 +582,11 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         try {
           await this.fetchDirections(waypointEvent);
         } catch (err) {
-          // If the request fails we need to catch the exception for it not to bubble up
-          // even though we don't intend on doing anything with it
+          if (!(err instanceof DOMException && err.name == "AbortError")) {
+            if (this.waypointBeingDraggedInitialCoordinates) {
+              this.waypointBeingDragged.geometry.coordinates = this.waypointBeingDraggedInitialCoordinates;
+            }
+          }
         }
 
         this.waypointBeingDragged = undefined;
@@ -676,11 +679,8 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         try {
           await this.fetchDirections(waypointEvent);
         } catch (err) {
-          if (!(err instanceof DOMException && err.name == "AbortError")) {
-            if (this.waypointBeingDraggedInitialCoordinates) {
-              this.waypointBeingDragged.geometry.coordinates = this.waypointBeingDraggedInitialCoordinates;
-            }
-          }
+          // If the request fails we need to catch the exception for it not to bubble up
+          // even though we don't intend on doing anything with it
         }
       }
       this.refreshOnMoveIsRefreshing = false;
