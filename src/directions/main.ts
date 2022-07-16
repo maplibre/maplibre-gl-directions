@@ -436,13 +436,12 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
            */
           const departedSnapPointIndex =
             this.departSnappointIndex !== undefined ? this.departSnappointIndex + 1 : undefined;
-          this._addWaypoint([e.lngLat.lng, e.lngLat.lat], departedSnapPointIndex, e).then(() => {
-            /*
-             * This new waypoint is set as the one now being dragged, in order to not interrupt the user's dragging action
-             */
-            this.waypointBeingDragged = this._waypoints[departedSnapPointIndex];
-            this.hoverpoint = undefined;
-          });
+          this._addWaypoint([e.lngLat.lng, e.lngLat.lat], departedSnapPointIndex, e);
+          /*
+           * This new waypoint is set as the one now being dragged, in order to not interrupt the user's dragging action
+           */
+          this.waypointBeingDragged = this._waypoints[departedSnapPointIndex];
+          this.hoverpoint = undefined;
         } else {
           this.hoverpoint.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
         }
@@ -457,7 +456,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         });
       }
 
-      if (this.hoverpoint.properties) {
+      if (this.hoverpoint?.properties) {
         this.hoverpoint.properties.showSnaplines = true;
       }
 
