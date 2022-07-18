@@ -3,7 +3,7 @@
   import { examples } from "../router";
   import { location } from "svelte-spa-router";
   import AppSidebar from "../components/AppSidebar.svelte";
-  import maplibregl from "maplibre-gl";
+  import maplibregl, { Map } from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
   import style from "../assets/map/style/style.json?url";
   import MapLibreGlDirections from "@maplibre/maplibre-gl-directions";
@@ -11,12 +11,24 @@
   const meta = examples.find((example) => example.path === $location);
 
   let mapRef: HTMLElement | undefined = undefined;
+  let map: Map | undefined = undefined;
   let directions: MapLibreGlDirections | undefined = undefined;
   let interactive = true;
   let refreshOnMove = false;
 
+  function changeRefreshOnMove() {
+    if (directions) directions.destroy();
+
+    directions = new MapLibreGlDirections(map, {
+      requestOptions: {
+        alternatives: "true",
+      },
+      refreshOnMove: !refreshOnMove,
+    });
+  }
+
   onMount(() => {
-    const map = new maplibregl.Map({
+    map = new maplibregl.Map({
       container: mapRef,
       style,
       center: [-74.1197632, 40.6974034],
@@ -35,7 +47,6 @@
 
   $: if (directions) {
     directions.interactive = interactive;
-    directions.refreshOnMove = refreshOnMove;
   }
 </script>
 
@@ -48,7 +59,7 @@
   </label>
 
   <label class="flex items-center gap-3">
-    <input type="checkbox" bind:checked={refreshOnMove} disabled={!directions} />
+    <input type="checkbox" bind:checked={refreshOnMove} on:click={changeRefreshOnMove} disabled={!directions} />
     <strong>Update route while dragging</strong>
   </label>
 

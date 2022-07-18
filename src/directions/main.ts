@@ -40,7 +40,6 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   protected readonly configuration: MapLibreGlDirectionsConfiguration;
 
   protected _interactive = false;
-  protected _refreshOnMove = false;
   protected buildRequest = buildRequest;
   protected buildPoint = buildPoint;
   protected buildSnaplines = buildSnaplines;
@@ -97,10 +96,6 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.configuration.layers.forEach((layer) => {
       this.map.addLayer(layer);
     });
-    /*
-     * using the config value as a starting setting.
-     */
-    this.refreshOnMove = this.configuration.refreshOnMove;
   }
 
   protected async fetchDirections(originalEvent: MapLibreGlDirectionsWaypointEvent) {
@@ -430,7 +425,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
        */
 
       if (this.hoverpoint) {
-        if (this.refreshOnMove) {
+        if (this.configuration.refreshOnMove) {
           /*
            * If dragging a hoverpoint and refreshOnMove is active, we must convert it to a waypoint instead
            */
@@ -502,7 +497,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
      * when updateOnMove is active, if this timeout ever triggers it means we are dragging,
      * but not moving the mouse.
      */
-    if (this.refreshOnMove) {
+    if (this.configuration.refreshOnMove) {
       clearTimeout(this.mouseMovementDetector);
       this.mouseMovementDetector = setTimeout(this.liveRefreshHandler, 300, e);
     }
@@ -533,7 +528,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
      * if the user selected a waypoint or routeLine and routes should update while dragging,
      * we initiate the live updating process.
      */
-    if (this.refreshOnMove && !this.refreshOnMoveIsRefreshing) {
+    if (this.configuration.refreshOnMove && !this.refreshOnMoveIsRefreshing) {
       this.liveRefreshHandler(e);
     }
   }
@@ -544,7 +539,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     /*
      * if routes should update while dragging, there's some cleanup to do when releasing the mouse
      */
-    if (this.refreshOnMove) {
+    if (this.configuration.refreshOnMove) {
       clearTimeout(this.mouseMovementDetector);
     }
 
@@ -815,18 +810,6 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       this.map.off("mousedown", this.onDragDownHandler);
       this.map.off("click", this.onClickHandler);
     }
-  }
-
-  /**
-   * The behaviour of update while dragging of the instance. When `true`, routes are updated live while dragging
-   * Automatically set to the value present in the config
-   */
-  get refreshOnMove() {
-    return this._refreshOnMove;
-  }
-
-  set refreshOnMove(update) {
-    this._refreshOnMove = update;
   }
 
   /**
