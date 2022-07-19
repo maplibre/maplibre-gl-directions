@@ -12,7 +12,6 @@
 
   let mapRef: HTMLElement | undefined = undefined;
   let directions: CustomMapLibreGlDirections | undefined = undefined;
-  let interactive = true;
 
   onMount(() => {
     const map = new maplibregl.Map({
@@ -25,9 +24,19 @@
 
     map.on("load", () => {
       directions = new CustomMapLibreGlDirections(map);
-      directions.interactive = interactive;
+      directions.interactive = true;
     });
   });
+
+  function checkDataToLoad() {
+    return (
+      localStorage.getItem("saved-waypoints-features") &&
+      localStorage.getItem("saved-snappoints-features") &&
+      localStorage.getItem("saved-routelines-features")
+    );
+  }
+
+  let noDataToLoad = !checkDataToLoad();
 
   function loadRoute() {
     directions.setWaypointsFeatures(JSON.parse(localStorage.getItem("saved-waypoints-features")));
@@ -39,13 +48,15 @@
     localStorage.setItem("saved-waypoints-features", JSON.stringify(directions.waypointsFeatures));
     localStorage.setItem("saved-snappoints-features", JSON.stringify(directions.snappointsFeatures));
     localStorage.setItem("saved-routelines-features", JSON.stringify(directions.routelinesFeatures));
+
+    noDataToLoad = !checkDataToLoad();
   }
 </script>
 
 <AppSidebar>
   <span slot="title">{meta.name}</span>
 
-  <button disabled={!directions} on:click={loadRoute}>Load the saved Route</button>
+  <button disabled={!directions || noDataToLoad} on:click={loadRoute}>Load the saved Route</button>
   <button disabled={!directions} on:click={saveRoute}>Save the Route</button>
   <button disabled={!directions} on:click={() => directions.clear()}>Clear</button>
 

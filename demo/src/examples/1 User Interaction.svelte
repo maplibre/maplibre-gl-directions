@@ -11,11 +11,24 @@
   const meta = examples.find((example) => example.path === $location);
 
   let mapRef: HTMLElement | undefined = undefined;
+  let map: maplibregl.Map | undefined = undefined;
   let directions: MapLibreGlDirections | undefined = undefined;
   let interactive = true;
+  let refreshOnMove = false;
+
+  function changeRefreshOnMove() {
+    if (directions) directions.destroy();
+
+    directions = new MapLibreGlDirections(map, {
+      requestOptions: {
+        alternatives: "true",
+      },
+      refreshOnMove: !refreshOnMove,
+    });
+  }
 
   onMount(() => {
-    const map = new maplibregl.Map({
+    map = new maplibregl.Map({
       container: mapRef,
       style,
       center: [-74.1197632, 40.6974034],
@@ -43,6 +56,11 @@
   <label class="flex items-center gap-3">
     <input type="checkbox" bind:checked={interactive} disabled={!directions} />
     <strong>Interactivity enabled</strong>
+  </label>
+
+  <label class="flex items-center gap-3">
+    <input type="checkbox" bind:checked={refreshOnMove} on:click={changeRefreshOnMove} disabled={!directions} />
+    <strong>Update route while dragging</strong>
   </label>
 
   <ul>
