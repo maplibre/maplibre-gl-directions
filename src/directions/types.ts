@@ -254,7 +254,7 @@ export interface MapLibreGlDirectionsConfiguration {
 
   /**
    * A minimal amount of pixels a waypoint or the hoverpoint must be dragged in order for the drag-event to be
-   * respected, and for network requests to be made when using refreshOnMove = true. Should be a number >= `0`.
+   * respected, and for network requests to be made when using {@link refreshOnMove|`refreshOnMove: true`}. Should be a number >= `0`.
    * Any negative value is treated as `0`.
    *
    * @default `10`
@@ -275,7 +275,7 @@ export interface MapLibreGlDirectionsConfiguration {
    * @example
    * ```
    * // make the route update while dragging
-   * updateWhileDrag: true
+   * refreshOnMove: true
    * ```
    */
   refreshOnMove: boolean;

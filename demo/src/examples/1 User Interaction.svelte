@@ -3,7 +3,7 @@
   import { examples } from "../router";
   import { location } from "svelte-spa-router";
   import AppSidebar from "../components/AppSidebar.svelte";
-  import maplibregl, { Map } from "maplibre-gl";
+  import maplibregl from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
   import style from "../assets/map/style/style.json?url";
   import MapLibreGlDirections from "@maplibre/maplibre-gl-directions";
@@ -11,7 +11,7 @@
   const meta = examples.find((example) => example.path === $location);
 
   let mapRef: HTMLElement | undefined = undefined;
-  let map: Map | undefined = undefined;
+  let map: maplibregl.Map | undefined = undefined;
   let directions: MapLibreGlDirections | undefined = undefined;
   let interactive = true;
   let refreshOnMove = false;

@@ -45,11 +45,11 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   protected buildSnaplines = buildSnaplines;
   protected buildRoutelines = buildRoutelines;
 
-  protected onMoveHandler: (e: MapMouseEvent) => void;
-  protected onDragDownHandler: (e: MapMouseEvent) => void;
-  protected onDragMoveHandler: (e: MapMouseEvent) => void;
-  protected onDragUpHandler: (e: MapMouseEvent) => void;
-  protected onClickHandler: (e: MapMouseEvent) => void;
+  protected onMoveHandler: (e: MapMouseEvent | MapTouchEvent) => void;
+  protected onDragDownHandler: (e: MapMouseEvent | MapTouchEvent) => void;
+  protected onDragMoveHandler: (e: MapMouseEvent | MapTouchEvent) => void;
+  protected onDragUpHandler: (e: MapMouseEvent | MapTouchEvent) => void;
+  protected onClickHandler: (e: MapMouseEvent | MapTouchEvent) => void;
   protected liveRefreshHandler: (e: MapMouseEvent | MapTouchEvent) => void;
 
   protected _waypoints: Feature<Point>[] = [];
@@ -57,6 +57,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   protected routelines: Feature<LineString>[][] = [];
   protected selectedRouteIndex = 0;
   protected hoverpoint: Feature<Point> | undefined = undefined;
+
   /**
    * @alias {@link waypoints}
    *
@@ -99,6 +100,10 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   }
 
   protected async fetchDirections(originalEvent: MapLibreGlDirectionsWaypointEvent) {
+    /*
+     * If a request from a previous fetchDirections is already running,
+     * we abort it as we don't need the previous value anymore
+     */
     this.abortController?.abort();
     const prevInteractive = this.interactive;
 
@@ -498,8 +503,8 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
      * but not moving the mouse.
      */
     if (this.configuration.refreshOnMove) {
-      clearTimeout(this.mouseMovementDetector);
-      this.mouseMovementDetector = setTimeout(this.liveRefreshHandler, 300, e);
+      clearTimeout(this.noMouseMovementTimer);
+      this.noMouseMovementTimer = setTimeout(this.liveRefreshHandler, 300, e);
     }
 
     /*
@@ -525,7 +530,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.draw();
 
     /*
-     * if the user selected a waypoint or routeLine and routes should update while dragging,
+     * If the user selected a waypoint or a routeline and routes should update while dragging,
      * we initiate the live updating process.
      */
     if (this.configuration.refreshOnMove && !this.refreshOnMoveIsRefreshing) {
@@ -533,14 +538,14 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     }
   }
 
-  protected mouseMovementDetector: ReturnType<typeof setTimeout>;
+  protected noMouseMovementTimer: ReturnType<typeof setTimeout>;
 
   protected async onDragUp(e: MapMouseEvent | MapTouchEvent) {
     /*
      * if routes should update while dragging, there's some cleanup to do when releasing the mouse
      */
     if (this.configuration.refreshOnMove) {
-      clearTimeout(this.mouseMovementDetector);
+      clearTimeout(this.noMouseMovementTimer);
     }
 
     if (e.type === "mouseup" && e.originalEvent.which !== 1) return;
