@@ -1,8 +1,8 @@
 # MapLibreGlDirections
 
-For the sakes of your convenience, make sure you haven't enabled any of the following filters:
+For the sakes of your convenience, make sure you've enabled the "Public" filter:
 
-![Enabling the "Public" filter](https://raw.githubusercontent.com/maplibre/maplibre-gl-directions/main/doc/images/no-filters.png)
+![Enabling the "Public" filter](https://raw.githubusercontent.com/maplibre/maplibre-gl-directions/main/doc/images/public-filter.png)
 
 ---
 
