@@ -14,7 +14,7 @@
   "files": [
     "dist"
   ],
-  "module": "./dist/maplibre-gl-directions.es.js",
+  "module": "./dist/maplibre-gl-directions.js",
   "types": "./dist/src/main.d.ts",
   "type": "module",
   "prettier": {
