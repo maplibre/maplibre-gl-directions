@@ -12,6 +12,8 @@
 8. Commit and push the changes
 9. Create a PR
 
+_In case of any troubles, refer to the troubleshooting instructions at the bottom of this page._
+
 The step 5 is a shorthand for `npm run build:lib && npm link && npm link @maplibre/maplibre-gl-directions` where the last two commands must be performed in order to have the `@maplibre/maplibre-gl-directions` as a local symlinked dependency, because the Demo project uses not the library sources, but the locally-built `/dist` folder to make sure that the instance being tested is the same instance which is deployed to the end user.
 
 ## Project Structure
@@ -73,3 +75,9 @@ Since the deployment process is configured to be performed automatically, you do
 That happens when the package is not self-symlinked. Perhaps you did `npm i` or installed some new dependencies (NPM removes all the symlinked deps after updating the `node_modules).
 
 **Solution**: run `npm run env:prep` once again.
+
+### `npm run build` fails without a meaningful reason
+
+This may happen if you have already had the project on your machine and recently pulled the upstream changes. Due to some package version updates the build may start to fail without any reasonable explanation of why is it so.
+
+**Solution**: run `npm ci` instead of `npm i` and try again. Another solution might be to completely delete the `node_modules` folder and reinstall the dependencies from scratch.
