@@ -13,7 +13,7 @@ export default defineConfig({
 
     lib: {
       entry: "src/main.ts",
-      formats: ["es"],
+      formats: ["es", "cjs"],
     },
   },
 });
