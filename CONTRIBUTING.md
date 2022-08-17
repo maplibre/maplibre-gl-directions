@@ -68,6 +68,39 @@ You may keep any examples you add when creating a PR if you think the changes yo
 
 Since the deployment process is configured to be performed automatically, you don't have to make sure that the `/docs` folder is up-to-date (it's actually ignored by Git). You run `npm run build` manually only to make sure that the build doesn't fail.
 
+## CI/CD Setup
+
+We use GitHub Actions for deployment. There are several tasks that get performed independently:
+
+- Build and Deploy the Demo project
+- Build and Publish the Library
+- Pull Request Checks
+
+### Build and Deploy the Demo project
+
+Deploys the `/docs` folder to GitHub Pages each time the main branch is pushed (building the folder from sources beforehand). The GitHub Pages is configured in such a way so that the deployed site is actually available under the maplibre.org domain. Does not require any special access tokens.
+
+### Build and Publish the Library
+
+Triggered manually whenever the team decides it's the time to release a new version of the library. Builds the sources from the target branch, runs all the checks, prepares the build-artifacts, updates the version in `package.json` (and automatically commits the changes), prepares the release notes and releases the new version to NPM all in one action.
+
+At the time of writing this ignores all the changes to the files made by `eslint --fix` and `prettier --write`, but there's a plan to fix that (#108).
+
+Requires a special access token (a secret) with slightly bumped permissions in order for github actions bot to be able to commit and push the updated `package.json` version of the library. The token is called "GH_TOKEN" and is a personal access token with the following permissions granted: admin:org, admin:org_hook, admin:public_key, admin:repo_hook, repo, workflow, write:packages.
+
+Also requires the "NPM_ORG_TOKEN" token which is an organization secret to be able to release the package under the "@maplibre" namespace.
+
+### Pull Request Checks
+
+Whenever there's a new PR, ensures that:
+
+- The build passes
+- The PR has at least one of the following labels: either `release:ignore`, or `semver:patch`, or `semver:minor`, or `semver:major`.
+
+`semver-*` labels are used to indicate the backwards-compatibility of the proposed changes in order for GitHub to be able to automatically build the release notes. The `release:ignore` label should be used in cases when there's no need to mention the PR in release notes.
+
+Please, note that there's no protection from releasing a minor or a patch version when there was a `semver:major` PR merged. The maintainers should track the changes themselves. In general, it's a good idea to release new versions as soon as there are some changes available.
+
 ## Troubleshooting
 
 ### "Failed to resolve import "@maplibre/maplibre-gl-directions" from "demo/<...>". Does the file exist?
