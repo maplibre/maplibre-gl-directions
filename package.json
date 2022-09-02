@@ -57,7 +57,7 @@
   "dependencies": {
     "@mapbox/polyline": "^1.1.1",
     "nanoid": "^4.0.0",
-    "svelte-spa-router": "^3.2.0"
+    "svelte-spa-router": "^3.3.0"
   },
   "peerDependencies": {
     "maplibre-gl": "^2.1.0"
