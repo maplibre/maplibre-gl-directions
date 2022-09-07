@@ -389,110 +389,115 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     if (e.type === "touchstart" && e.originalEvent.touches.length !== 1) return;
     if (e.type === "mousedown" && e.originalEvent.which !== 1) return;
 
-    const feature: MapGeoJSONFeature | undefined = this.map.queryRenderedFeatures(e.point, {
-      layers: [
-        ...this.configuration.sensitiveWaypointLayers,
-        ...this.configuration.sensitiveSnappointLayers,
-        ...this.configuration.sensitiveRoutelineLayers,
-      ],
-    })[0];
+    const features: MapGeoJSONFeature[] | undefined = this.map.queryRenderedFeatures(e.point);
+    // check if the user is trying to drag a layer from our source
+    if (features[0].source === this.configuration.sourceName) {
+      // he is. let's find the top most feature that might interest us
 
-    /*
-     * Save the cursor's position to be able to check later whether the dragged feature moved at all.
-     */
-    this.dragDownPosition = e.point;
-    this.currentMousePosition = e.point;
-
-    if (this.configuration.sensitiveWaypointLayers.includes(feature?.layer.id ?? "")) {
+      const feature: MapGeoJSONFeature | undefined = features.filter((feature) => {
+        return (
+          this.configuration.sensitiveWaypointLayers.includes(feature?.layer.id ?? "") ||
+          this.configuration.sensitiveSnappointLayers.includes(feature?.layer.id ?? "") ||
+          this.configuration.sensitiveRoutelineLayers.includes(feature?.layer.id ?? "")
+        );
+      })[0];
       /*
-       * When a waypoint is being dragged, save it and its current coordinates outside.
+       * Save the cursor's position to be able to check later whether the dragged feature moved at all.
        */
+      this.dragDownPosition = e.point;
+      this.currentMousePosition = e.point;
 
-      this.waypointBeingDragged = this._waypoints.find((waypoint) => {
-        return waypoint.properties?.id === feature?.properties?.id;
-      });
+      if (this.configuration.sensitiveWaypointLayers.includes(feature?.layer.id ?? "")) {
+        /*
+         * When a waypoint is being dragged, save it and its current coordinates outside.
+         */
 
-      this.waypointBeingDraggedInitialCoordinates = this.waypointBeingDragged?.geometry.coordinates as
-        | [number, number]
-        | undefined;
-    } else if (this.configuration.sensitiveRoutelineLayers.includes(feature?.layer.id ?? "")) {
-      /*
-       * When a routeline (a leg in particular) is being dragged, find its respective depart snappoint's index and save
-       * it outside. Since a route is divided into legs by the snappoints, the leg's index is always equal to the
-       * depart snappoint's index.
-       */
-      this.departSnappointIndex = JSON.parse(feature?.properties?.legIndex);
-
-      /*
-       * the "touchstart" event ("mousemove" equivalent) is not always fired before this `onDragDown` (which is also the
-       * "touchstart"), therefore the hoverpoint might not exist yet. If it indeed does not, then create it and then
-       * enable showing its snaplines.
-       */
-
-      if (this.hoverpoint) {
-        if (this.configuration.refreshOnMove) {
-          /*
-           * If dragging a hoverpoint and refreshOnMove is active, we must convert it to a waypoint instead
-           */
-          const departedSnapPointIndex =
-            this.departSnappointIndex !== undefined ? this.departSnappointIndex + 1 : undefined;
-          this._addWaypoint([e.lngLat.lng, e.lngLat.lat], departedSnapPointIndex, e);
-          /*
-           * This new waypoint is set as the one now being dragged, in order to not interrupt the user's dragging action
-           */
-          this.waypointBeingDragged = this._waypoints[departedSnapPointIndex];
-          this.hoverpoint = undefined;
-        } else {
-          this.hoverpoint.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
-        }
-      } else {
-        this.hoverpoint = this.buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT", {
-          departSnappointProperties: {
-            ...JSON.parse(feature?.properties?.departSnappointProperties ?? "{}"),
-          },
-          arriveSnappointProperties: {
-            ...JSON.parse(feature?.properties?.arriveSnappointProperties ?? "{}"),
-          },
+        this.waypointBeingDragged = this._waypoints.find((waypoint) => {
+          return waypoint.properties?.id === feature?.properties?.id;
         });
-      }
 
-      if (this.hoverpoint?.properties) {
-        this.hoverpoint.properties.showSnaplines = true;
+        this.waypointBeingDraggedInitialCoordinates = this.waypointBeingDragged?.geometry.coordinates as
+          | [number, number]
+          | undefined;
+      } else if (this.configuration.sensitiveRoutelineLayers.includes(feature?.layer.id ?? "")) {
+        /*
+         * When a routeline (a leg in particular) is being dragged, find its respective depart snappoint's index and save
+         * it outside. Since a route is divided into legs by the snappoints, the leg's index is always equal to the
+         * depart snappoint's index.
+         */
+        this.departSnappointIndex = JSON.parse(feature?.properties?.legIndex);
+
+        /*
+         * the "touchstart" event ("mousemove" equivalent) is not always fired before this `onDragDown` (which is also the
+         * "touchstart"), therefore the hoverpoint might not exist yet. If it indeed does not, then create it and then
+         * enable showing its snaplines.
+         */
+
+        if (this.hoverpoint) {
+          if (this.configuration.refreshOnMove) {
+            /*
+             * If dragging a hoverpoint and refreshOnMove is active, we must convert it to a waypoint instead
+             */
+            const departedSnapPointIndex =
+              this.departSnappointIndex !== undefined ? this.departSnappointIndex + 1 : undefined;
+            this._addWaypoint([e.lngLat.lng, e.lngLat.lat], departedSnapPointIndex, e);
+            /*
+             * This new waypoint is set as the one now being dragged, in order to not interrupt the user's dragging action
+             */
+            this.waypointBeingDragged = this._waypoints[departedSnapPointIndex];
+            this.hoverpoint = undefined;
+          } else {
+            this.hoverpoint.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
+          }
+        } else {
+          this.hoverpoint = this.buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT", {
+            departSnappointProperties: {
+              ...JSON.parse(feature?.properties?.departSnappointProperties ?? "{}"),
+            },
+            arriveSnappointProperties: {
+              ...JSON.parse(feature?.properties?.arriveSnappointProperties ?? "{}"),
+            },
+          });
+        }
+
+        if (this.hoverpoint?.properties) {
+          this.hoverpoint.properties.showSnaplines = true;
+        }
+
+        /*
+         * Highlight the respective leg's depart and arrive snappoints.
+         */
+        if (~this.departSnappointIndex && this.snappoints[this.departSnappointIndex]?.properties) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          this.snappoints[this.departSnappointIndex].properties.highlight = true;
+          this.highlightedSnappoints.push(this.snappoints[this.departSnappointIndex]);
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          this.snappoints[this.departSnappointIndex + 1].properties.highlight = true;
+          this.highlightedSnappoints.push(this.snappoints[this.departSnappointIndex + 1]);
+        }
       }
 
       /*
-       * Highlight the respective leg's depart and arrive snappoints.
+       * Disable the global `onMove` handlers for them not to interfere with the new ones which are added further down.
        */
-      if (~this.departSnappointIndex && this.snappoints[this.departSnappointIndex]?.properties) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        this.snappoints[this.departSnappointIndex].properties.highlight = true;
-        this.highlightedSnappoints.push(this.snappoints[this.departSnappointIndex]);
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        this.snappoints[this.departSnappointIndex + 1].properties.highlight = true;
-        this.highlightedSnappoints.push(this.snappoints[this.departSnappointIndex + 1]);
+      this.map.off("touchstart", this.onMoveHandler);
+      this.map.off("mousemove", this.onMoveHandler);
+
+      /*
+       * Add specific drag-only listeners.
+       */
+      if (e.type === "touchstart") {
+        this.map.on("touchmove", this.onDragMoveHandler);
+        this.map.on("touchend", this.onDragUpHandler);
+      } else if (e.type === "mousedown") {
+        this.map.on("mousemove", this.onDragMoveHandler);
+        this.map.on("mouseup", this.onDragUpHandler);
       }
+
+      this.draw();
     }
-
-    /*
-     * Disable the global `onMove` handlers for them not to interfere with the new ones which are added further down.
-     */
-    this.map.off("touchstart", this.onMoveHandler);
-    this.map.off("mousemove", this.onMoveHandler);
-
-    /*
-     * Add specific drag-only listeners.
-     */
-    if (e.type === "touchstart") {
-      this.map.on("touchmove", this.onDragMoveHandler);
-      this.map.on("touchend", this.onDragUpHandler);
-    } else if (e.type === "mousedown") {
-      this.map.on("mousemove", this.onDragMoveHandler);
-      this.map.on("mouseup", this.onDragUpHandler);
-    }
-
-    this.draw();
   }
 
   protected refreshOnMoveIsRefreshing = false;
