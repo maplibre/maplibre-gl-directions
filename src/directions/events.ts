@@ -35,7 +35,7 @@ export class MapLibreGlDirectionsEvented {
    */
   off<T extends keyof MapLibreGlDirectionsEventType>(type: T, listener: (e: MapLibreGlDirectionsEventType[T]) => void) {
     const index = this.listeners[type]?.indexOf(listener);
-    if (index && ~index) this.listeners[type]?.splice(index, 1);
+    if (~index) this.listeners[type]?.splice(index, 1);
   }
 
   /**
