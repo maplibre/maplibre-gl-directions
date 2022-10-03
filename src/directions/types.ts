@@ -58,7 +58,7 @@ export interface MapLibreGlDirectionsConfiguration {
    *
    * @example
    * ```
-   * request: {
+   * requestOptions: {
    *   overview: "full",
    *   steps: "true"
    * }
@@ -68,7 +68,7 @@ export interface MapLibreGlDirectionsConfiguration {
    * ```
    * api: "https://api.mapbox.com/directions/v5",
    * profile: "mapbox/driving-traffic",
-   * request: {
+   * requestOptions: {
    *   access_token: "<mapbox-access-token>",
    *   annotations: "congestion",
    *   geometries: "polyline6"

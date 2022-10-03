@@ -391,7 +391,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     const features: MapGeoJSONFeature[] | undefined = this.map.queryRenderedFeatures(e.point);
     // check if the user is trying to drag a layer from our source
-    if (features[0].source === this.configuration.sourceName) {
+    if (features.length && features[0].source === this.configuration.sourceName) {
       // he is. let's find the top most feature that might interest us
 
       const feature: MapGeoJSONFeature | undefined = features.filter((feature) => {
