@@ -646,6 +646,10 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.map.on("touchstart", this.onMoveHandler);
     this.map.on("mousemove", this.onMoveHandler);
 
+    // Re-enable original dragPan functionality. Might have already been re-enabled, but there are cases when it's
+    // not the case. See https://github.com/maplibre/maplibre-gl-directions/issues/186
+    this.map.dragPan.enable();
+
     this.draw();
   }
 
