@@ -75,7 +75,7 @@
     "autoprefixer": "^10.4.13",
     "eslint": "^8.23.0",
     "eslint-plugin-svelte3": "^4.0.0",
-    "husky": "^8.0.1",
+    "husky": "^8.0.2",
     "lint-staged": "^13.0.4",
     "maplibre-gl": "^2.1.9",
     "postcss": "^8.4.19",
