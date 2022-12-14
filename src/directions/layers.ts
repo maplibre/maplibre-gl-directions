@@ -308,6 +308,5 @@ export default function layersFactory(
       },
       filter: ["==", ["get", "type"], "WAYPOINT"],
     },
-    // TODO try to remove when MapLibre's updated
   ] as unknown as LayerSpecification[];
 }
