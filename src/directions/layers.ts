@@ -308,5 +308,5 @@ export default function layersFactory(
       },
       filter: ["==", ["get", "type"], "WAYPOINT"],
     },
-  ];
+  ] as unknown as LayerSpecification[];
 }

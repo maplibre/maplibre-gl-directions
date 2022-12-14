@@ -21,7 +21,7 @@
       style,
       center: [-74.1197632, 40.6974034],
       zoom: 11,
-      customAttribution: "<a href='http://project-osrm.org/' target='_blank'>&copy; OSRM</a>",
+      customAttribution: "<a href='http://project-osrm.org/' target='_blank' rel='noreferrer'>&copy; OSRM</a>",
     });
 
     _map.on("load", () => {
@@ -64,8 +64,10 @@
 
   <small
     ><strong>Note</strong> that you may need to manually
-    <a href="https://www.browserstack.com/guide/how-to-perform-network-throttling-in-chrome" target="_blank"
-      >enable network throttling</a
+    <a
+      href="https://www.browserstack.com/guide/how-to-perform-network-throttling-in-chrome"
+      target="_blank"
+      rel="noreferrer">enable network throttling</a
     > for the setting above to take effect</small
   >
 </AppSidebar>
