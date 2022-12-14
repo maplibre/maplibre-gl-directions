@@ -146,7 +146,8 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
         if (response.code !== "Ok") throw new Error(response.message ?? "An unexpected error occurred.");
       } finally {
-        this.interactive = prevInteractive;
+        // see #189 (https://github.com/maplibre/maplibre-gl-directions/issues/189)
+        if (this.abortController.signal.reason !== "DESTROY") this.interactive = prevInteractive;
 
         this.abortController = undefined;
 
@@ -908,8 +909,11 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
    * de-initializing the instance.
    */
   destroy() {
-    this.interactive = false;
+    // see #189 (https://github.com/maplibre/maplibre-gl-directions/issues/189)
+    this.abortController?.abort("DESTROY");
+
     this.clear();
+    this.interactive = false;
 
     this.configuration.layers.forEach((layer) => {
       this.map.removeLayer(layer.id);
