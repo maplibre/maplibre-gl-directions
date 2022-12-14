@@ -25,8 +25,8 @@
     <span class="text-slate-500">or navigate to</span>
 
     <div class="flex flex-col gap-2.5 lg:gap-5 justify-center items-center">
-      <a href="https://github.com/maplibre/maplibre-gl-directions" target="_blank">GitHub</a>
-      <a href={`${import.meta.env.BASE_URL}/api`} target="_blank">API</a>
+      <a href="https://github.com/maplibre/maplibre-gl-directions" target="_blank" rel="noreferrer">GitHub</a>
+      <a href={`${import.meta.env.BASE_URL}/api`} target="_blank" rel="noreferrer">API</a>
     </div>
   </div>
 </div>

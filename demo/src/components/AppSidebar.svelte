@@ -12,7 +12,7 @@
     {#if !noHeader}
       <header class="p-5 lg:p-10 pb-2.5 lg:pb-5 flex justify-between gap-2.5 lg:gap-5 sticky top-0 bg-inherit">
         <a href="/" use:link>Back to Menu</a>
-        <a href={meta.sourceUrl} target="_blank">Source</a>
+        <a href={meta.sourceUrl} target="_blank" rel="noreferrer">Source</a>
       </header>
     {/if}
 
