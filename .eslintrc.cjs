@@ -26,6 +26,6 @@ module.exports = {
   },
   plugins: ["svelte3", "@typescript-eslint"],
   // ignore the node_modules folder and all the root-level .ts, .js and .cjs files because the custom eslint parser
-  // doesn't know how to work with them for some reason
-  ignorePatterns: ["node_modules", "/*.ts", "/*.js", "/*.cjs"],
+  // doesn't know how to work with them for some reason and the stats.html file
+  ignorePatterns: ["node_modules", "/*.ts", "/*.js", "/*.cjs", "/stats.html"],
 };

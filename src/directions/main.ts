@@ -391,7 +391,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     const features: MapGeoJSONFeature[] | undefined = this.map.queryRenderedFeatures(e.point);
     // check if the user is trying to drag a layer from our source
-    if (features[0].source === this.configuration.sourceName) {
+    if (features.length && features[0].source === this.configuration.sourceName) {
       // he is. let's find the top most feature that might interest us
 
       const feature: MapGeoJSONFeature | undefined = features.filter((feature) => {
@@ -645,6 +645,10 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
      */
     this.map.on("touchstart", this.onMoveHandler);
     this.map.on("mousemove", this.onMoveHandler);
+
+    // Re-enable original dragPan functionality. Might have already been re-enabled, but there are cases when it's
+    // not the case. See https://github.com/maplibre/maplibre-gl-directions/issues/186
+    this.map.dragPan.enable();
 
     this.draw();
   }
