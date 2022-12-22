@@ -158,7 +158,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
       this.snappoints = response.waypoints.map((snappoint, i) =>
         this.buildPoint(snappoint.location, "SNAPPOINT", {
-          waypointProperties: this._waypoints[i].properties ?? {},
+          waypointProperties: this._waypoints[i]?.properties ?? {},
         }),
       );
 
