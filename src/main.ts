@@ -21,6 +21,8 @@ import type { Feature, Point, LineString } from "geojson";
 
 import LoadingIndicatorControl from "./controls/loading-indicator/main";
 import type { LoadingIndicatorControlConfiguration } from "./controls/loading-indicator/types";
+import BearingsControl from "./controls/bearings/main";
+import type { BearingsControlConfiguration } from "./controls/bearings/types";
 import "./controls/common.css";
 
 export default MapLibreGlDirections;
@@ -67,3 +69,6 @@ export type { Feature, Point, PointType, LineString };
 
 export { LoadingIndicatorControl };
 export type { LoadingIndicatorControlConfiguration };
+
+export { BearingsControl };
+export type { BearingsControlConfiguration };
