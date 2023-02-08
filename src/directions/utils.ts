@@ -31,6 +31,7 @@ export function buildConfiguration(
 export function buildRequest(
   configuration: MapLibreGlDirectionsConfiguration,
   waypointsCoordinates: [number, number][],
+  waypointsBearings?: ([number, number] | undefined)[],
 ): {
   method: "get" | "post";
   url: string;
@@ -63,6 +64,21 @@ export function buildRequest(
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     payload = new URLSearchParams(formData);
+  }
+
+  if (configuration.bearings) {
+    payload.set(
+      "bearings",
+      waypointsBearings
+        .map((waypointBearing) => {
+          if (waypointBearing) {
+            return `${waypointBearing[0]},${waypointBearing[1]}`;
+          } else {
+            return "";
+          }
+        })
+        .join(";"),
+    );
   }
 
   return {

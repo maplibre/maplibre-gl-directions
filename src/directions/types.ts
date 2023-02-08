@@ -279,6 +279,21 @@ export interface MapLibreGlDirectionsConfiguration {
    * ```
    */
   refreshOnMove: boolean;
+
+  /**
+   * Whether to support waypoints' {@link https://docs.mapbox.com/api/navigation/directions/#optional-parameters|bearings}.
+   *
+   * @see {@link http://project-osrm.org/docs/v5.24.0/api/#requests|OSRM #Requests}
+   * @see {@link https://docs.mapbox.com/api/navigation/directions/#optional-parameters|Mapbox Direction API #Optional parameters}
+   *
+   * @default `false`
+   *
+   * @example
+   * ```
+   * bearings: true
+   * ```
+   */
+  bearings: boolean;
 }
 
 export const MapLibreGlDirectionsDefaultConfiguration: Omit<MapLibreGlDirectionsConfiguration, "layers"> = {
@@ -296,6 +311,7 @@ export const MapLibreGlDirectionsDefaultConfiguration: Omit<MapLibreGlDirections
   sensitiveAltRoutelineLayers: ["maplibre-gl-directions-alt-routeline", "maplibre-gl-directions-alt-routeline-casing"],
   dragThreshold: 10,
   refreshOnMove: false,
+  bearings: false,
 };
 
 export type PointType = "WAYPOINT" | "SNAPPOINT" | "HOVERPOINT" | string;

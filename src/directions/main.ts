@@ -123,7 +123,11 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         timer = setTimeout(() => this.abortController?.abort(), this.configuration.requestTimeout);
       }
 
-      const { method, url, payload } = this.buildRequest(this.configuration, this.waypointsCoordinates);
+      const { method, url, payload } = this.buildRequest(
+        this.configuration,
+        this.waypointsCoordinates,
+        this.configuration.bearings ? this.waypointsBearings : undefined,
+      );
       let response: Directions;
 
       try {
@@ -147,7 +151,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         if (response.code !== "Ok") throw new Error(response.message ?? "An unexpected error occurred.");
       } finally {
         // see #189 (https://github.com/maplibre/maplibre-gl-directions/issues/189)
-        if (this.abortController.signal.reason !== "DESTROY") this.interactive = prevInteractive;
+        if (this.abortController?.signal.reason !== "DESTROY") this.interactive = prevInteractive;
 
         this.abortController = undefined;
 
@@ -768,7 +772,19 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     index = index ?? this._waypoints.length;
 
-    this._waypoints.splice(index, 0, this.buildPoint(waypoint, "WAYPOINT"));
+    this._waypoints.splice(
+      index,
+      0,
+      this.buildPoint(
+        waypoint,
+        "WAYPOINT",
+        this.configuration.bearings
+          ? {
+              bearing: undefined,
+            }
+          : undefined,
+      ),
+    );
 
     this.assignWaypointsCategories();
 
@@ -842,6 +858,34 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   }
 
   /**
+   * Returns all the waypoints' bearings values or an empty array if the `bearings` configuration property is not
+   * enabled.
+   */
+  get waypointsBearings(): ([number, number] | undefined)[] {
+    if (!this.configuration.bearings) return [];
+
+    return this._waypoints.map((waypoint) => {
+      return Array.isArray(waypoint.properties.bearing)
+        ? [waypoint.properties.bearing[0], waypoint.properties.bearing[1]]
+        : undefined;
+    });
+  }
+
+  /**
+   * Sets the waypoints' bearings values. Does not produce any effect in case the `bearings` configuration property is
+   * disabled.
+   */
+  set waypointsBearings(bearings: [number, number | undefined][]) {
+    if (!this.configuration.bearings) return;
+
+    this._waypoints.forEach((waypoint, i) => {
+      waypoint.properties.bearing = bearings[i];
+    });
+
+    this.setWaypoints(this.waypoints);
+  }
+
+  /**
    * Replaces all the waypoints with the specified ones and re-fetches the routes.
    *
    * @param waypoints The coordinates at which the waypoints should be added
@@ -850,8 +894,16 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   async setWaypoints(waypoints: [number, number][]) {
     this.abortController?.abort();
 
-    this._waypoints = waypoints.map((waypoint) => {
-      return this.buildPoint(waypoint, "WAYPOINT");
+    this._waypoints = waypoints.map((waypoint, index) => {
+      return this.buildPoint(
+        waypoint,
+        "WAYPOINT",
+        this.configuration.bearings
+          ? {
+              bearing: this.waypointsBearings[index],
+            }
+          : undefined,
+      );
     });
 
     this.assignWaypointsCategories();
