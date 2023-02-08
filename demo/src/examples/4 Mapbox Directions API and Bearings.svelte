@@ -32,6 +32,7 @@
           access_token:
             "pk.eyJ1Ijoic21lbGx5c2hvdmVsIiwiYSI6ImNsMW80eXQ4aTEwN3czcG8zMXM2NzJ2ODIifQ.oWHUIUiEj2SS4_hue3qv2g",
         },
+        bearings: true,
       });
 
       directions.interactive = true;
