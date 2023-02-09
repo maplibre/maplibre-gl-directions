@@ -51,16 +51,6 @@
 <AppSidebar>
   <span slot="title">{meta.name}</span>
 
-  <!--  <label class="flex flex-col gap-2">-->
-  <!--    <span><strong>Position</strong></span>-->
-  <!--    <select bind:value={position} disabled={!directions}>-->
-  <!--      <option value="top-left">Top-Left</option>-->
-  <!--      <option value="top-right">Top-Right</option>-->
-  <!--      <option value="bottom-left">Bottom-Left</option>-->
-  <!--      <option value="bottom-right">Bottom-Right</option>-->
-  <!--    </select>-->
-  <!--  </label>-->
-
   <p>
     The <code>BearingsControl</code> adds a control to modify the waypoints' bearings values.
   </p>
