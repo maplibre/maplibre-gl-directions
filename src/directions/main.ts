@@ -858,11 +858,16 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   }
 
   /**
-   * Returns all the waypoints' bearings values or an empty array if the `bearings` configuration property is not
+   * Returns all the waypoints' bearings values or an empty array if the `bearings` configuration option is not
    * enabled.
    */
   get waypointsBearings(): ([number, number] | undefined)[] {
-    if (!this.configuration.bearings) return [];
+    if (!this.configuration.bearings) {
+      console.warn(
+        "The `waypointsBearings` getter was referred to, but the `bearings` configuration option is not enabled!",
+      );
+      return [];
+    }
 
     return this._waypoints.map((waypoint) => {
       return Array.isArray(waypoint.properties.bearing)
@@ -872,11 +877,16 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   }
 
   /**
-   * Sets the waypoints' bearings values. Does not produce any effect in case the `bearings` configuration property is
+   * Sets the waypoints' bearings values. Does not produce any effect in case the `bearings` configuration option is
    * disabled.
    */
   set waypointsBearings(bearings: [number, number | undefined][]) {
-    if (!this.configuration.bearings) return;
+    if (!this.configuration.bearings) {
+      console.warn(
+        "The `waypointsBearings` setter was referred to, but the `bearings` configuration option is not enabled!",
+      );
+      return;
+    }
 
     this._waypoints.forEach((waypoint, i) => {
       waypoint.properties.bearing = bearings[i];

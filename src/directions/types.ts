@@ -290,6 +290,7 @@ export interface MapLibreGlDirectionsConfiguration {
    *
    * @example
    * ```
+   * // enable the bearings support
    * bearings: true
    * ```
    */

@@ -10,7 +10,7 @@
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   if (!directions.configuration.bearings) {
-    console.warn("The Bearings Control is used, but the `bearings` option is not enabled on the Directions instance.");
+    console.warn("The Bearings Control is used, but the `bearings` configuration option is not enabled!");
   }
 
   directions.on("addwaypoint", onWaypointsChanged);

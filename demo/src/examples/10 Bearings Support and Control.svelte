@@ -52,8 +52,8 @@
   <span slot="title">{meta.name}</span>
 
   <p>
-    The <a href="" target="_blank" rel="noreferrer">bearings</a> support allows to control in which direction the route would
-    be continued from a given waypoint.
+    The <a href="http://project-osrm.org/docs/v5.24.0/api/#requests" target="_blank" rel="noreferrer">bearings</a> support
+    allows to control in which direction the route would be continued from a given waypoint.
   </p>
 
   <p>
