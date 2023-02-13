@@ -52,8 +52,28 @@
   <span slot="title">{meta.name}</span>
 
   <p>
-    The <code>BearingsControl</code> adds a control to modify the waypoints' bearings values.
+    The <a href="" target="_blank" rel="noreferrer">bearings</a> support allows to control in which direction the route would
+    be continued from a given waypoint.
   </p>
+
+  <p>
+    In order to enable support for this API option on the plugin level, pass the <code>bearings: true</code> option to
+    the plugin's configuration object. When this is done, each request would contain the <code>bearings</code> field. The
+    problem with that is that the values for the waypoints' bearings are not populated correctly since we need some way to
+    assign these bearings values to our waypoints.
+  </p>
+
+  <p>Luckily, that's possible to achieve using the built-in <strong>Bearings Control</strong>.</p>
+
+  <label class="flex flex-col gap-2">
+    <span><strong>Position</strong></span>
+    <select bind:value={position} disabled={!directions}>
+      <option value="top-left">Top-Left</option>
+      <option value="top-right">Top-Right</option>
+      <option value="bottom-left">Bottom-Left</option>
+      <option value="bottom-right">Bottom-Right</option>
+    </select>
+  </label>
 </AppSidebar>
 
 <div bind:this={mapRef} class="basis-full lg:basis-2/3 shadow-xl" />
