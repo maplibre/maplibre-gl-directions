@@ -759,7 +759,11 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   protected assignWaypointsCategories() {
     this._waypoints.forEach((waypoint, index) => {
       const category = index === 0 ? "ORIGIN" : index === this._waypoints.length - 1 ? "DESTINATION" : undefined;
-      if (waypoint.properties) waypoint.properties.category = category;
+
+      if (waypoint.properties) {
+        waypoint.properties.index = index;
+        waypoint.properties.category = category;
+      }
     });
   }
 
