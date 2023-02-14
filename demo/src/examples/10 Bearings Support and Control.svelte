@@ -3,7 +3,7 @@
   import { examples } from "../router";
   import { location } from "svelte-spa-router";
   import AppSidebar from "../components/AppSidebar.svelte";
-  import maplibregl, { Map } from "maplibre-gl";
+  import maplibregl, { Map, NavigationControl } from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
   import style from "../assets/map/style/style.json?url";
   import MapLibreGlDirections, {
@@ -32,16 +32,20 @@
       });
 
       directions.interactive = true;
+
+      map.addControl(new NavigationControl({}));
     });
   });
 
   let control: BearingsControl;
   let controlConfiguration: BearingsControlConfiguration = {
     defaultEnabled: false,
+    angleDefault: 0,
     angleMin: 0,
     angleMax: 359,
     angleStep: 1,
     fixedDegrees: 0,
+    degreesDefault: 45,
     degreesMin: 15,
     degreesMax: 360,
     degreesStep: 15,
@@ -72,9 +76,75 @@
 
   <p>Luckily, that's possible to achieve using the built-in <strong>Bearings Control</strong>.</p>
 
+  <label class="flex flex-col gap-2">
+    <span><strong>Default angle</strong></span>
+    <input type="number" disabled={!directions} bind:value={controlConfiguration.angleDefault} />
+  </label>
+
+  <label class="flex flex-col gap-2">
+    <span><strong>Minimal allowed angle</strong></span>
+    <input type="number" disabled={!directions} bind:value={controlConfiguration.angleMin} />
+  </label>
+
+  <label class="flex flex-col gap-2">
+    <span><strong>Maximal allowed angle</strong></span>
+    <input type="number" disabled={!directions} bind:value={controlConfiguration.angleMax} />
+  </label>
+
+  <label class="flex flex-col gap-2">
+    <span><strong>Angle step</strong></span>
+    <input type="number" disabled={!directions} bind:value={controlConfiguration.angleStep} />
+  </label>
+
+  <label class="flex flex-col gap-2">
+    <span><strong>Fixed degrees</strong></span>
+    <input type="number" disabled={!directions} bind:value={controlConfiguration.fixedDegrees} />
+  </label>
+
+  <label class="flex flex-col gap-2">
+    <span><strong>Degrees default</strong></span>
+    <input
+      type="number"
+      disabled={!directions || !!controlConfiguration.fixedDegrees}
+      bind:value={controlConfiguration.degreesDefault}
+    />
+  </label>
+
+  <label class="flex flex-col gap-2">
+    <span><strong>Minimal allowed degrees</strong></span>
+    <input
+      type="number"
+      disabled={!directions || !!controlConfiguration.fixedDegrees}
+      bind:value={controlConfiguration.degreesMin}
+    />
+  </label>
+
+  <label class="flex flex-col gap-2">
+    <span><strong>Maximal allowed degrees</strong></span>
+    <input
+      type="number"
+      disabled={!directions || !!controlConfiguration.fixedDegrees}
+      bind:value={controlConfiguration.degreesMax}
+    />
+  </label>
+
+  <label class="flex flex-col gap-2">
+    <span><strong>Degrees step</strong></span>
+    <input
+      type="number"
+      disabled={!directions || !!controlConfiguration.fixedDegrees}
+      bind:value={controlConfiguration.degreesStep}
+    />
+  </label>
+
   <label class="flex items-center gap-3">
-    <input type="checkbox" bind:checked={controlConfiguration.respectMapBearing} disabled={!directions} />
+    <input type="checkbox" disabled={!directions} bind:checked={controlConfiguration.respectMapBearing} />
     <strong>Respect Map's Bearing</strong>
+  </label>
+
+  <label class="flex flex-col gap-2">
+    <span><strong>Image size</strong></span>
+    <input type="number" disabled={!directions} bind:value={controlConfiguration.imageSize} />
   </label>
 </AppSidebar>
 

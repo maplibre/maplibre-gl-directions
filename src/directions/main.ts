@@ -892,7 +892,11 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       waypoint.properties.bearing = bearings[i];
     });
 
-    this.setWaypoints(this.waypoints);
+    const waypointEvent = new MapLibreGlDirectionsWaypointEvent("rotatewaypoints", undefined);
+    this.fire(waypointEvent);
+
+    this.draw();
+    this.fetchDirections(waypointEvent);
   }
 
   /**

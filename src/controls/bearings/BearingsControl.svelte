@@ -13,16 +13,16 @@
     console.warn("The Bearings Control is used, but the `bearings` configuration option is not enabled!");
   }
 
-  directions.on("addwaypoint", onWaypointsChanged);
-  directions.on("removewaypoint", onWaypointsChanged);
-  directions.on("movewaypoint", onWaypointsChanged);
-  directions.on("setwaypoints", onWaypointsChanged);
-
   let waypointsBearings: {
     enabled: boolean;
     angle: number;
     degrees: number;
   }[] = [];
+
+  directions.on("addwaypoint", onWaypointsChanged);
+  directions.on("removewaypoint", onWaypointsChanged);
+  directions.on("movewaypoint", onWaypointsChanged);
+  directions.on("setwaypoints", onWaypointsChanged);
 
   function onWaypointsChanged() {
     waypointsBearings = directions.waypointsBearings.map((waypointBearing, index) => {
@@ -30,11 +30,17 @@
 
       return {
         enabled: configuration.defaultEnabled || !!waypointBearing,
-        angle: waypointBearing ? waypointBearing[0] : 0,
-        degrees: waypointBearing ? waypointBearing[1] : 45,
+        angle: waypointBearing ? waypointBearing[0] : configuration.angleDefault,
+        degrees: waypointBearing
+          ? waypointBearing[1]
+          : configuration.fixedDegrees
+          ? configuration.fixedDegrees
+          : configuration.degreesDefault,
       };
     });
   }
+
+  onWaypointsChanged();
 
   $: directions.waypointsBearings = waypointsBearings.map((waypointBearing) => {
     return waypointBearing.enabled ? [waypointBearing.angle, waypointBearing.degrees] : undefined;
