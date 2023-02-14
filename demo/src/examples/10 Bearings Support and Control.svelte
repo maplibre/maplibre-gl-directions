@@ -40,6 +40,7 @@
   let control: BearingsControl;
   let controlConfiguration: BearingsControlConfiguration = {
     defaultEnabled: false,
+    debounceTimeout: 150,
     angleDefault: 0,
     angleMin: 0,
     angleMax: 359,
@@ -75,6 +76,16 @@
   </p>
 
   <p>Luckily, that's possible to achieve using the built-in <strong>Bearings Control</strong>.</p>
+
+  <label class="flex items-center gap-3">
+    <input type="checkbox" disabled={!directions} bind:checked={controlConfiguration.defaultEnabled} />
+    <strong>Default Enabled</strong>
+  </label>
+
+  <label class="flex flex-col gap-2">
+    <span><strong>Debounce timeout</strong></span>
+    <input type="number" disabled={!directions} bind:value={controlConfiguration.debounceTimeout} />
+  </label>
 
   <label class="flex flex-col gap-2">
     <span><strong>Default angle</strong></span>

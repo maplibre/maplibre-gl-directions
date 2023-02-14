@@ -7,6 +7,13 @@ export interface BearingsControlConfiguration {
   defaultEnabled: boolean;
 
   /**
+   * Debounce requests by the specified amount of milliseconds.
+   *
+   * @default `150`
+   */
+  debounceTimeout: number;
+
+  /**
    * The default angle for a waypoint when it's added.
    *
    * @default `0`
@@ -89,6 +96,7 @@ export interface BearingsControlConfiguration {
 
 export const BearingsControlDefaultConfiguration: BearingsControlConfiguration = {
   defaultEnabled: false,
+  debounceTimeout: 150,
   angleDefault: 0,
   angleMin: 0,
   angleMax: 359,

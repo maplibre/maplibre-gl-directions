@@ -42,9 +42,18 @@
 
   onWaypointsChanged();
 
-  $: directions.waypointsBearings = waypointsBearings.map((waypointBearing) => {
-    return waypointBearing.enabled ? [waypointBearing.angle, waypointBearing.degrees] : undefined;
-  });
+  let timeout;
+
+  $: {
+    // update the directions' value with simple debouncing to avoid `fetchDirections` spamming
+    if (timeout) clearTimeout(timeout);
+
+    timeout = setTimeout(() => {
+      directions.waypointsBearings = waypointsBearings.map((waypointBearing) => {
+        return waypointBearing.enabled ? [waypointBearing.angle, waypointBearing.degrees] : undefined;
+      });
+    }, configuration.debounceTimeout);
+  }
 
   const images = [] as (HTMLDivElement | null)[];
   let imageBeingRotatedIndex = -1;
