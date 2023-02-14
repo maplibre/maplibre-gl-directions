@@ -1,8 +1,8 @@
 <script lang="ts">
+  import { onDestroy } from "svelte";
+  import type { Map } from "maplibre-gl";
   import type MapLibreGlDirections from "../../directions/main";
   import type { BearingsControlConfiguration } from "./types";
-  import { onDestroy } from "svelte";
-  import { Map } from "maplibre-gl";
 
   export let directions: MapLibreGlDirections;
   export let configuration: BearingsControlConfiguration;

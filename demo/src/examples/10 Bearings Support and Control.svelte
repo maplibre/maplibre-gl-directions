@@ -50,11 +50,8 @@
   };
 
   $: if (map && directions) {
-    (async () => {
-      if (control && map.hasControl(control)) map.removeControl(control);
-      await new Promise((res) => setTimeout(res, 1000));
-      map.addControl((control = new BearingsControl(directions, controlConfiguration)), "top-left");
-    })();
+    if (control && map.hasControl(control)) map.removeControl(control);
+    map.addControl((control = new BearingsControl(directions, controlConfiguration)), "top-left");
   }
 </script>
 
