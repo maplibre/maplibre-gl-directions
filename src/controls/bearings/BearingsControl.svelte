@@ -107,20 +107,32 @@
 </script>
 
 <div
-  class="maplibregl-ctrl maplibregl-ctrl-group maplibre-gl-directions-bearings-control p-4 {waypointsBearings.length
+  class="maplibre-gl-directions-bearings-control maplibregl-ctrl maplibregl-ctrl-group p-4 {waypointsBearings.length
     ? 'block'
     : 'hidden'} bg-white text-base  rounded"
 >
-  <div class="flex flex-col max-h-96 overflow-y-auto">
+  <div class="maplibre-gl-directions-bearings-control__list flex flex-col max-h-96 overflow-y-auto">
     {#each waypointsBearings as waypointBearing, i}
-      <div class="flex items-center gap-2 text-slate-800{waypointBearing.enabled ? '' : '/50'}">
-        <span class="text-slate-800">{i + 1}. </span>
-        <input type="checkbox" bind:checked={waypointBearing.enabled} />
+      <div
+        class="
+        maplibre-gl-directions-bearings-control__list-item
+        {waypointBearing.enabled
+          ? 'maplibre-gl-directions-bearings-control__list-item--enabled'
+          : 'maplibre-gl-directions-bearings-control__list-item--disabled'}
+        flex items-center gap-2 text-slate-800{waypointBearing.enabled ? '' : '/50'}"
+      >
+        <span class="maplibre-gl-directions-bearings-control__number text-slate-800">{i + 1}. </span>
+        <input
+          type="checkbox"
+          bind:checked={waypointBearing.enabled}
+          class="maplibre-gl-directions-bearings-control__checkbox"
+        />
         <div bind:this={images[i]} on:mousedown={(e) => onImageMousedown(e, i)}>
           <svg
             height="20"
             width="20"
             viewBox="0 0 20 20"
+            class="maplibre-gl-directions-bearings-control__waypoint-image"
             style="width: {configuration.imageSize}px; height: {configuration.imageSize}px; opacity: {waypointBearing.enabled
               ? 1
               : 0.25};"
@@ -146,11 +158,12 @@
           min={configuration.angleMin}
           max={configuration.angleMax}
           step={configuration.angleStep}
+          class="maplibre-gl-directions-bearings-control__input"
         />
-        <span>°</span>
-        <span>±</span>
+        <span class="maplibre-gl-directions-bearings-control__text">°</span>
+        <span class="maplibre-gl-directions-bearings-control__text">±</span>
         {#if configuration.fixedDegrees}
-          <span>{configuration.fixedDegrees}°</span>
+          <span class="maplibre-gl-directions-bearings-control__text">{configuration.fixedDegrees}°</span>
         {:else}
           <input
             type="number"
@@ -159,8 +172,9 @@
             min={configuration.degreesMin}
             max={configuration.degreesMax}
             step={configuration.degreesStep}
+            class="maplibre-gl-directions-bearings-control__input"
           />
-          <span>°</span>
+          <span class="maplibre-gl-directions-bearings-control__text">°</span>
         {/if}
       </div>
     {/each}
