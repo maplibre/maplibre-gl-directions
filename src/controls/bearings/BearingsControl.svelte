@@ -119,20 +119,22 @@
           height="20"
           width="20"
           viewBox="0 0 20 20"
-          style="width: {configuration.imageSize}px; height: {configuration.imageSize}px;"
+          style="width: {configuration.imageSize}px; height: {configuration.imageSize}px; opacity: {waypointBearing.enabled
+            ? 1
+            : 0.25};"
         >
           <circle
             r="5"
             cx="10"
             cy="10"
             fill="transparent"
-            stroke="rgba(109, {waypointBearing.enabled ? '38, 215' : '109, 109'}, 0.65)"
+            stroke="rgba(109, 38, 215, 0.65)"
             stroke-width="10"
             stroke-dasharray="calc({waypointBearing.degrees / 3.6} * 31.42 / 100) 31.42"
             transform="rotate({-90 - waypointBearing.degrees / 2 + waypointBearing.angle - angleAdjustment})"
             style="transform-origin: 10px 10px"
           />
-          <circle r="6" cx="10" cy="10" fill="rgb(109, {waypointBearing.enabled ? '38, 215' : '109, 109'})" />
+          <circle r="6" cx="10" cy="10" fill="rgb(109, 38, 215)" />
         </svg>
       </div>
       <input
