@@ -108,58 +108,61 @@
 
 <div
   class="maplibregl-ctrl maplibregl-ctrl-group maplibre-gl-directions-bearings-control p-4 {waypointsBearings.length
-    ? 'flex'
-    : 'hidden'} flex-col gap-4 max-h-96 overflow-y-auto bg-white rounded"
+    ? 'block'
+    : 'hidden'} bg-white text-base  rounded"
 >
-  {#each waypointsBearings as waypointBearing, i}
-    <div class="flex items-center gap-2">
-      <input type="checkbox" bind:checked={waypointBearing.enabled} />
-      <div bind:this={images[i]} on:mousedown={(e) => onImageMousedown(e, i)}>
-        <svg
-          height="20"
-          width="20"
-          viewBox="0 0 20 20"
-          style="width: {configuration.imageSize}px; height: {configuration.imageSize}px; opacity: {waypointBearing.enabled
-            ? 1
-            : 0.25};"
-        >
-          <circle
-            r="5"
-            cx="10"
-            cy="10"
-            fill="transparent"
-            stroke="rgba(109, 38, 215, 0.65)"
-            stroke-width="10"
-            stroke-dasharray="calc({waypointBearing.degrees / 3.6} * 31.42 / 100) 31.42"
-            transform="rotate({-90 - waypointBearing.degrees / 2 + waypointBearing.angle - angleAdjustment})"
-            style="transform-origin: 10px 10px"
-          />
-          <circle r="6" cx="10" cy="10" fill="rgb(109, 38, 215)" />
-        </svg>
-      </div>
-      <input
-        type="number"
-        disabled={!waypointBearing.enabled}
-        bind:value={waypointBearing.angle}
-        min={configuration.angleMin}
-        max={configuration.angleMax}
-        step={configuration.angleStep}
-      />
-      <span>°</span>
-      <span>±</span>
-      {#if configuration.fixedDegrees}
-        <span>{configuration.fixedDegrees}°</span>
-      {:else}
+  <div class="flex flex-col max-h-96 overflow-y-auto">
+    {#each waypointsBearings as waypointBearing, i}
+      <div class="flex items-center gap-2 text-slate-800{waypointBearing.enabled ? '' : '/50'}">
+        <span class="text-slate-800">{i + 1}. </span>
+        <input type="checkbox" bind:checked={waypointBearing.enabled} />
+        <div bind:this={images[i]} on:mousedown={(e) => onImageMousedown(e, i)}>
+          <svg
+            height="20"
+            width="20"
+            viewBox="0 0 20 20"
+            style="width: {configuration.imageSize}px; height: {configuration.imageSize}px; opacity: {waypointBearing.enabled
+              ? 1
+              : 0.25};"
+          >
+            <circle
+              r="5"
+              cx="10"
+              cy="10"
+              fill="transparent"
+              stroke="rgba(109, 38, 215, 0.65)"
+              stroke-width="10"
+              stroke-dasharray="calc({waypointBearing.degrees / 3.6} * 31.42 / 100) 31.42"
+              transform="rotate({-90 - waypointBearing.degrees / 2 + waypointBearing.angle - angleAdjustment})"
+              style="transform-origin: 10px 10px"
+            />
+            <circle r="6" cx="10" cy="10" fill="rgb(109, 38, 215)" />
+          </svg>
+        </div>
         <input
           type="number"
           disabled={!waypointBearing.enabled}
-          bind:value={waypointBearing.degrees}
-          min={configuration.degreesMin}
-          max={configuration.degreesMax}
-          step={configuration.degreesStep}
+          bind:value={waypointBearing.angle}
+          min={configuration.angleMin}
+          max={configuration.angleMax}
+          step={configuration.angleStep}
         />
         <span>°</span>
-      {/if}
-    </div>
-  {/each}
+        <span>±</span>
+        {#if configuration.fixedDegrees}
+          <span>{configuration.fixedDegrees}°</span>
+        {:else}
+          <input
+            type="number"
+            disabled={!waypointBearing.enabled}
+            bind:value={waypointBearing.degrees}
+            min={configuration.degreesMin}
+            max={configuration.degreesMax}
+            step={configuration.degreesStep}
+          />
+          <span>°</span>
+        {/if}
+      </div>
+    {/each}
+  </div>
 </div>
