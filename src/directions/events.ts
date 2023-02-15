@@ -59,6 +59,12 @@ export interface MapLibreGlDirectionsEventType {
   setwaypoints: MapLibreGlDirectionsWaypointEvent;
 
   /**
+   * Emitted after the waypoints' bearings values are changed using the
+   * {@link default.waypointsBearings|`waypointsBearings`} setter.
+   */
+  rotatewaypoints: MapLibreGlDirectionsWaypointEvent;
+
+  /**
    * Emitted when a waypoint is added.
    */
   addwaypoint: MapLibreGlDirectionsWaypointEvent;
@@ -96,7 +102,8 @@ export interface MapLibreGlDirectionsWaypointEventData {
   /**
    * Index of the added/removed/moved waypoint.
    *
-   * Never presents for the {@link MapLibreGlDirectionsEventType.setwaypoints|`setwaypoints`} event.
+   * Never presents for {@link MapLibreGlDirectionsEventType.setwaypoints|`setwaypoints`} and
+   * {@link MapLibreGlDirectionsEventType.rotatewaypoints|`rotatewaypoints`} events.
    */
   index: number;
 
@@ -115,7 +122,7 @@ export class MapLibreGlDirectionsWaypointEvent
    * @private
    */
   constructor(
-    type: "setwaypoints" | "addwaypoint" | "removewaypoint" | "movewaypoint",
+    type: "setwaypoints" | "rotatewaypoints" | "addwaypoint" | "removewaypoint" | "movewaypoint",
     originalEvent: MapMouseEvent | MapTouchEvent | undefined,
     data?: Partial<MapLibreGlDirectionsWaypointEventData>,
   ) {
