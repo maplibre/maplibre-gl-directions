@@ -686,14 +686,11 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
           initialCoordinates: this.waypointBeingDraggedInitialCoordinates,
         });
         this.fire(waypointEvent);
-        /*
-         * If the routing request has failed for some reason, restore the waypoint's original position.
-         */
+
         try {
           await this.fetchDirections(waypointEvent);
         } catch (err) {
-          // If the request fails we need to catch the exception for it not to bubble up
-          // even though we don't intend on doing anything with it
+          // noop
         }
       }
       this.refreshOnMoveIsRefreshing = false;
@@ -798,7 +795,12 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.fire(waypointEvent);
 
     this.draw();
-    await this.fetchDirections(waypointEvent);
+
+    try {
+      await this.fetchDirections(waypointEvent);
+    } catch (err) {
+      // noop
+    }
   }
 
   protected async _removeWaypoint(index: number, originalEvent?: MapMouseEvent | MapTouchEvent) {
@@ -815,7 +817,12 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.fire(waypointEvent);
 
     this.draw();
-    await this.fetchDirections(waypointEvent);
+
+    try {
+      await this.fetchDirections(waypointEvent);
+    } catch (err) {
+      // noop
+    }
   }
 
   // the public interface begins here
@@ -900,7 +907,12 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.fire(waypointEvent);
 
     this.draw();
-    this.fetchDirections(waypointEvent);
+
+    try {
+      this.fetchDirections(waypointEvent);
+    } catch (err) {
+      // noop
+    }
   }
 
   /**
@@ -930,7 +942,12 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.fire(waypointEvent);
 
     this.draw();
-    await this.fetchDirections(waypointEvent);
+
+    try {
+      await this.fetchDirections(waypointEvent);
+    } catch (err) {
+      // noop
+    }
   }
 
   /**

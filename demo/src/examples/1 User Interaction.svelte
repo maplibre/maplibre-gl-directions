@@ -45,13 +45,27 @@
     });
   });
 
+  let message;
+
   $: if (directions) {
     directions.interactive = interactive;
+
+    directions.on("fetchroutesend", (event) => {
+      if (event.data.code !== "Ok") {
+        message = `${event.data.code}: ${event.data.message ?? "no details available."}`;
+      } else {
+        message = "";
+      }
+    });
   }
 </script>
 
 <AppSidebar>
   <span slot="title">{meta.name}</span>
+
+  {#if message}
+    <p class="text-red-500">{message}</p>
+  {/if}
 
   <label class="flex items-center gap-3">
     <input type="checkbox" bind:checked={interactive} disabled={!directions} />
