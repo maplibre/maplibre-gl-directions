@@ -144,7 +144,7 @@
               fill="transparent"
               stroke="rgba(109, 38, 215, 0.65)"
               stroke-width="10"
-              stroke-dasharray="calc({waypointBearing.degrees / 3.6} * 31.42 / 100) 31.42"
+              stroke-dasharray="{((waypointBearing.degrees / 3.6) * 31.42) / 100} 31.42"
               transform="rotate({-90 - waypointBearing.degrees / 2 + waypointBearing.angle - angleAdjustment})"
               style="transform-origin: 10px 10px"
             />
