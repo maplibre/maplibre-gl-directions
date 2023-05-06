@@ -28,6 +28,10 @@ Add waypoints by clicking the map, click a waypoint to remove it, drag waypoints
 
 Supports the Mapbox Directions API congestions (both plain and numeric!)
 
+### Bearings
+
+Supports the waypoints' bearings settings with the help of a custom Control.
+
 ### Customization
 
 The powerful customization interface allows to customize everything starting from visual aspects all the way up to request logic.
