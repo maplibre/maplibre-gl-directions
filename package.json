@@ -55,7 +55,7 @@
     ]
   },
   "dependencies": {
-    "@mapbox/polyline": "^1.1.1",
+    "@mapbox/polyline": "^1.2.0",
     "nanoid": "^4.0.2",
     "svelte-spa-router": "^3.3.0"
   },
