@@ -3,7 +3,7 @@
   import { examples } from "../router";
   import { location } from "svelte-spa-router";
   import AppSidebar from "../components/AppSidebar.svelte";
-  import maplibregl, { Map, ControlPosition } from "maplibre-gl";
+  import maplibregl, { Map, type ControlPosition } from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
   import style from "../assets/map/style/style.json?url";
   import MapLibreGlDirections, { LoadingIndicatorControl } from "@maplibre/maplibre-gl-directions";
