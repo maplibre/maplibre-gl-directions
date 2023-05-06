@@ -1,6 +1,6 @@
-For the sakes of your convenience, make sure you've enabled the "Public/Protected" filter:
+For the sakes of your convenience, make sure you've enabled the "Inherited/Protected/External" filter:
 
-![Enabling the "Public/Protected" filter](https://raw.githubusercontent.com/maplibre/maplibre-gl-directions/main/doc/images/public-protected-filter.png)
+![Enabling the "Inherited/Protected/External" filter](https://raw.githubusercontent.com/maplibre/maplibre-gl-directions/main/doc/images/public-protected-filter.png)
 
 Here's an example of what can potentially be done after investing some time into customization: straight-lined routing, distance measurement, multiple Directions' instances running in parallel on the same map with a possibility to toggle between them, different types of Waypoints and Snappoints and so on:
 
