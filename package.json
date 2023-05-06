@@ -81,7 +81,7 @@
     "postcss": "^8.4.20",
     "postcss-load-config": "^4.0.1",
     "prettier": "^2.8.1",
-    "prettier-plugin-svelte": "^2.9.0",
+    "prettier-plugin-svelte": "^2.10.0",
     "rollup-plugin-visualizer": "^5.8.3",
     "svelte": "^3.58.0",
     "svelte-check": "^3.0.3",
