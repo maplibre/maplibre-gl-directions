@@ -60,7 +60,7 @@
     "svelte-spa-router": "^3.3.0"
   },
   "peerDependencies": {
-    "maplibre-gl": "^2.1.0"
+    "maplibre-gl": "^3.0.0"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.2.0",
@@ -77,7 +77,7 @@
     "eslint-plugin-svelte3": "^4.0.0",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.2",
-    "maplibre-gl": "^2.4.0",
+    "maplibre-gl": "^3.0.0",
     "postcss": "^8.4.23",
     "postcss-load-config": "^4.0.1",
     "prettier": "^2.8.8",
