@@ -109,7 +109,7 @@
 <div
   class="maplibre-gl-directions-bearings-control maplibregl-ctrl maplibregl-ctrl-group p-4 {waypointsBearings.length
     ? 'block'
-    : 'hidden'} bg-white text-base  rounded"
+    : 'hidden'} bg-white text-base rounded"
 >
   <div class="maplibre-gl-directions-bearings-control__list flex flex-col max-h-96 overflow-y-auto">
     {#each waypointsBearings as waypointBearing, i}
