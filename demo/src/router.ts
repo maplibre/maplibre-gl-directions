@@ -1,7 +1,6 @@
-import type { ModuleNamespace } from "vite/types/hot";
 import Menu from "./Menu.svelte";
 
-export const examples = Object.entries(import.meta.glob<ModuleNamespace>("./examples/**.svelte", { eager: true })).map(
+export const examples = Object.entries(import.meta.glob("./examples/**.svelte", { eager: true })).map(
   ([path, component]) => {
     const parsedFileName = path.match(/\/(\d+)\s([^/]+)\./);
     const index = parseInt(parsedFileName[1]);
@@ -20,6 +19,8 @@ export const examples = Object.entries(import.meta.glob<ModuleNamespace>("./exam
 const routes = {};
 
 examples.forEach((example) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   routes[example.path] = example.component.default;
 });
 
