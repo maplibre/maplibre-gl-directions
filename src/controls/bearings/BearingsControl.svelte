@@ -127,7 +127,7 @@
           bind:checked={waypointBearing.enabled}
           class="maplibre-gl-directions-bearings-control__checkbox"
         />
-        <div bind:this={images[i]} on:mousedown={(e) => onImageMousedown(e, i)}>
+        <div bind:this={images[i]} on:mousedown={(e) => onImageMousedown(e, i)} role="spinbutton" tabindex="0">
           <svg
             height="20"
             width="20"
