@@ -123,7 +123,11 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         timer = setTimeout(() => this.abortController?.abort(), this.configuration.requestTimeout);
       }
 
-      const { method, url, payload } = this.buildRequest(this.configuration, this.waypointsCoordinates);
+      const { method, url, payload } = this.buildRequest(
+        this.configuration,
+        this.waypointsCoordinates,
+        this.configuration.bearings ? this.waypointsBearings : undefined,
+      );
       let response: Directions;
 
       try {
@@ -146,7 +150,8 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
         if (response.code !== "Ok") throw new Error(response.message ?? "An unexpected error occurred.");
       } finally {
-        this.interactive = prevInteractive;
+        // see #189 (https://github.com/maplibre/maplibre-gl-directions/issues/189)
+        if (this.abortController?.signal.reason !== "DESTROY") this.interactive = prevInteractive;
 
         this.abortController = undefined;
 
@@ -157,7 +162,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
       this.snappoints = response.waypoints.map((snappoint, i) =>
         this.buildPoint(snappoint.location, "SNAPPOINT", {
-          waypointProperties: this._waypoints[i].properties ?? {},
+          waypointProperties: this._waypoints[i]?.properties ?? {},
         }),
       );
 
@@ -391,7 +396,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     const features: MapGeoJSONFeature[] | undefined = this.map.queryRenderedFeatures(e.point);
     // check if the user is trying to drag a layer from our source
-    if (features[0].source === this.configuration.sourceName) {
+    if (features.length && features[0].source === this.configuration.sourceName) {
       // he is. let's find the top most feature that might interest us
 
       const feature: MapGeoJSONFeature | undefined = features.filter((feature) => {
@@ -646,6 +651,10 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.map.on("touchstart", this.onMoveHandler);
     this.map.on("mousemove", this.onMoveHandler);
 
+    // Re-enable original dragPan functionality. Might have already been re-enabled, but there are cases when it's
+    // not the case. See https://github.com/maplibre/maplibre-gl-directions/issues/186
+    this.map.dragPan.enable();
+
     this.draw();
   }
 
@@ -677,14 +686,11 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
           initialCoordinates: this.waypointBeingDraggedInitialCoordinates,
         });
         this.fire(waypointEvent);
-        /*
-         * If the routing request has failed for some reason, restore the waypoint's original position.
-         */
+
         try {
           await this.fetchDirections(waypointEvent);
         } catch (err) {
-          // If the request fails we need to catch the exception for it not to bubble up
-          // even though we don't intend on doing anything with it
+          // noop
         }
       }
       this.refreshOnMoveIsRefreshing = false;
@@ -750,7 +756,11 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   protected assignWaypointsCategories() {
     this._waypoints.forEach((waypoint, index) => {
       const category = index === 0 ? "ORIGIN" : index === this._waypoints.length - 1 ? "DESTINATION" : undefined;
-      if (waypoint.properties) waypoint.properties.category = category;
+
+      if (waypoint.properties) {
+        waypoint.properties.index = index;
+        waypoint.properties.category = category;
+      }
     });
   }
 
@@ -763,7 +773,19 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     index = index ?? this._waypoints.length;
 
-    this._waypoints.splice(index, 0, this.buildPoint(waypoint, "WAYPOINT"));
+    this._waypoints.splice(
+      index,
+      0,
+      this.buildPoint(
+        waypoint,
+        "WAYPOINT",
+        this.configuration.bearings
+          ? {
+              bearing: undefined,
+            }
+          : undefined,
+      ),
+    );
 
     this.assignWaypointsCategories();
 
@@ -773,7 +795,12 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.fire(waypointEvent);
 
     this.draw();
-    await this.fetchDirections(waypointEvent);
+
+    try {
+      await this.fetchDirections(waypointEvent);
+    } catch (err) {
+      // noop
+    }
   }
 
   protected async _removeWaypoint(index: number, originalEvent?: MapMouseEvent | MapTouchEvent) {
@@ -790,7 +817,12 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.fire(waypointEvent);
 
     this.draw();
-    await this.fetchDirections(waypointEvent);
+
+    try {
+      await this.fetchDirections(waypointEvent);
+    } catch (err) {
+      // noop
+    }
   }
 
   // the public interface begins here
@@ -837,6 +869,53 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   }
 
   /**
+   * Returns all the waypoints' bearings values or an empty array if the `bearings` configuration option is not
+   * enabled.
+   */
+  get waypointsBearings(): ([number, number] | undefined)[] {
+    if (!this.configuration.bearings) {
+      console.warn(
+        "The `waypointsBearings` getter was referred to, but the `bearings` configuration option is not enabled!",
+      );
+      return [];
+    }
+
+    return this._waypoints.map((waypoint) => {
+      return Array.isArray(waypoint.properties.bearing)
+        ? [waypoint.properties.bearing[0], waypoint.properties.bearing[1]]
+        : undefined;
+    });
+  }
+
+  /**
+   * Sets the waypoints' bearings values. Does not produce any effect in case the `bearings` configuration option is
+   * disabled.
+   */
+  set waypointsBearings(bearings: [number, number | undefined][]) {
+    if (!this.configuration.bearings) {
+      console.warn(
+        "The `waypointsBearings` setter was referred to, but the `bearings` configuration option is not enabled!",
+      );
+      return;
+    }
+
+    this._waypoints.forEach((waypoint, i) => {
+      waypoint.properties.bearing = bearings[i];
+    });
+
+    const waypointEvent = new MapLibreGlDirectionsWaypointEvent("rotatewaypoints", undefined);
+    this.fire(waypointEvent);
+
+    this.draw();
+
+    try {
+      this.fetchDirections(waypointEvent);
+    } catch (err) {
+      // noop
+    }
+  }
+
+  /**
    * Replaces all the waypoints with the specified ones and re-fetches the routes.
    *
    * @param waypoints The coordinates at which the waypoints should be added
@@ -845,8 +924,16 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   async setWaypoints(waypoints: [number, number][]) {
     this.abortController?.abort();
 
-    this._waypoints = waypoints.map((waypoint) => {
-      return this.buildPoint(waypoint, "WAYPOINT");
+    this._waypoints = waypoints.map((waypoint, index) => {
+      return this.buildPoint(
+        waypoint,
+        "WAYPOINT",
+        this.configuration.bearings
+          ? {
+              bearing: this.waypointsBearings[index],
+            }
+          : undefined,
+      );
     });
 
     this.assignWaypointsCategories();
@@ -855,7 +942,12 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.fire(waypointEvent);
 
     this.draw();
-    await this.fetchDirections(waypointEvent);
+
+    try {
+      await this.fetchDirections(waypointEvent);
+    } catch (err) {
+      // noop
+    }
   }
 
   /**
@@ -904,8 +996,11 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
    * de-initializing the instance.
    */
   destroy() {
-    this.interactive = false;
+    // see #189 (https://github.com/maplibre/maplibre-gl-directions/issues/189)
+    this.abortController?.abort("DESTROY");
+
     this.clear();
+    this.interactive = false;
 
     this.configuration.layers.forEach((layer) => {
       this.map.removeLayer(layer.id);
