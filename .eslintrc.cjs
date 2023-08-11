@@ -1,6 +1,6 @@
 module.exports = {
+  extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended", "plugin:svelte/recommended"],
   parser: "@typescript-eslint/parser",
-  extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
   parserOptions: {
     ecmaVersion: 2021,
     sourceType: "module",
@@ -15,16 +15,17 @@ module.exports = {
   overrides: [
     {
       files: ["*.svelte"],
-      processor: "svelte3/svelte3",
+      parser: "svelte-eslint-parser",
+      // Parse the `<script>` in `.svelte` as TypeScript by adding the following configuration.
+      parserOptions: {
+        parser: "@typescript-eslint/parser",
+      },
     },
   ],
-  settings: {
-    "svelte3/typescript": () => require("typescript"),
-    // ignore style tags in Svelte because of Tailwind CSS
-    // see https://github.com/sveltejs/eslint-plugin-svelte3/issues/70
-    "svelte3/ignore-styles": () => true,
+  plugins: ["@typescript-eslint"],
+  rules: {
+    "svelte/no-at-html-tags": "off",
   },
-  plugins: ["svelte3", "@typescript-eslint"],
   // ignore the node_modules folder and all the root-level .ts, .js and .cjs files because the custom eslint parser
   // doesn't know how to work with them for some reason and the stats.html file
   ignorePatterns: ["node_modules", "/*.ts", "/*.js", "/*.cjs", "/stats.html"],
