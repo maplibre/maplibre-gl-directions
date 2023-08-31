@@ -200,16 +200,27 @@ export function buildRoutelines(
     // get coordinates from the snappoint-features
     const snappointsCoordinates = snappoints.map((snappoint) => snappoint.geometry.coordinates);
 
+    // add a variable to watch the current index to start the search from
+    let currentIndex = 0;
+
     // indices of coordinate pairs that match existing snappoints (except for the first one)
     const snappointsCoordinatesIndices = snappointsCoordinates
       .map((snappointLngLat) => {
-        return coordinates.findIndex((lngLat) => {
+        // use the currentIndex to start the search from the place where the last snappoint's coordinate was found
+        const waypointCoordinatesIndex = coordinates.slice(currentIndex).findIndex((lngLat) => {
           // there might be an error in 0.00001 degree between snappoint and decoded coordinate when using the
           // "polyline" geometries. The comparator neglects that
           return coordinatesComparator(requestOptions, lngLat, snappointLngLat as [number, number]);
         });
+
+        // update the current index if something's found
+        if (waypointCoordinatesIndex !== -1) {
+          currentIndex += waypointCoordinatesIndex;
+        }
+
+        return currentIndex;
       })
-      .slice(1); // because the first one is always 0
+      .slice(1); // because the first one is always 0 (first leg always starts with the first snappoint)
 
     // split the coordinates array by legs. Each leg consists of coordinates between snappoints
     let initialIndex = 0;
