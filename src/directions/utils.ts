@@ -208,6 +208,8 @@ export function buildRoutelines(
       .map((snappointLngLat) => {
         // use the currentIndex to start the search from the place where the last snappoint's coordinate was found
         const waypointCoordinatesIndex = coordinates.slice(currentIndex).findIndex((lngLat) => {
+          // there might be an error in 0.00001 degree between snappoint and decoded coordinate when using the
+          // "polyline" geometries. The comparator neglects that
           return coordinatesComparator(requestOptions, lngLat, snappointLngLat as [number, number]);
         });
 
