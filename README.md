@@ -47,7 +47,7 @@ The plugin is written 100% in TypeScript and therefore ships with built-in types
 ## Installation
 
 ```shell
-$ npm i @maplibre/maplibre-gl-directions
+npm i @maplibre/maplibre-gl-directions
 ```
 
 ## Usage
