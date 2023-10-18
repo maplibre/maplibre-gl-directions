@@ -1,5 +1,5 @@
 import type { GeoJSONGeometry, Geometry, Leg, MapLibreGlDirectionsConfiguration, PolylineGeometry } from "./types";
-import { decode } from "@mapbox/polyline";
+import { decode } from "@placemarkio/polyline";
 
 /**
  * Decodes the geometry of a route to the form of a coordinates array.
@@ -11,9 +11,9 @@ export function geometryDecoder(
   if (requestOptions.geometries === "geojson") {
     return (geometry as GeoJSONGeometry).coordinates;
   } else if (requestOptions.geometries === "polyline6") {
-    return decode(geometry as PolylineGeometry, 6).map((coordinate) => coordinate.reverse() as [number, number]);
+    return decode(geometry as PolylineGeometry, 6);
   } else {
-    return decode(geometry as PolylineGeometry, 5).map((coordinate) => coordinate.reverse() as [number, number]);
+    return decode(geometry as PolylineGeometry, 5);
   }
 }
 
