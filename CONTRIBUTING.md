@@ -18,7 +18,7 @@ The step 5 is a shorthand for `npm run build:lib && npm link && npm link @maplib
 
 ## Project Structure
 
-The source files of the library itself are located under the `/src` folder. The `/src/main.ts` is the main entry point. The `/src/directions` folder contains everything related to the plugin's main purpose. The `/src/control` folder contains all the UI-Control-related source code (is currently WIP).
+The source files of the library itself are located under the `/src` folder. The `/src/main.ts` is the main entry point. The `/src/directions` folder contains everything related to the plugin's main purpose. The `/src/control` folder contains all the UI-Control-related source code.
 
 TypeDoc is responsible for building all the API documentation. The API documentation is built from the library sources and from the files located under the `/doc` folder.
 
