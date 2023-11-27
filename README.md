@@ -38,7 +38,7 @@ The powerful customization interface allows to customize everything starting fro
 
 ### Standard Controls
 
-Provides standard map-controls. Currently, there's only 1 (loading-indicator), but there are more to come.
+Provides standard map-controls. Currently, there're only 2 of them (loading-indicator and bearings), but there are more to come.
 
 ### TypeScript support
 
