@@ -105,7 +105,7 @@ Please, note that there's no protection from releasing a minor or a patch versio
 
 ### "Failed to resolve import "@maplibre/maplibre-gl-directions" from "demo/<...>". Does the file exist?
 
-That happens when the package is not self-symlinked. Perhaps you did `npm i` or installed some new dependencies (NPM removes all the symlinked deps after updating the `node_modules).
+That happens when the package is not self-symlinked. Perhaps you did `npm i` or installed some new dependencies (NPM removes all the symlinked deps after updating the `node_modules`).
 
 **Solution**: run `npm run env:prep` once again.
 
