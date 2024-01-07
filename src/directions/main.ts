@@ -40,6 +40,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   protected readonly configuration: MapLibreGlDirectionsConfiguration;
 
   protected _interactive = false;
+  protected _hoverable = false;
   protected buildRequest = buildRequest;
   protected buildPoint = buildPoint;
   protected buildSnaplines = buildSnaplines;
@@ -272,14 +273,20 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
        */
 
       this.map.getCanvas().style.cursor = "pointer";
-      this.map.dragPan.disable();
 
-      const highlightedWaypointIndex = this._waypoints.findIndex((waypoint) => {
+      if (this.interactive) {
+        this.map.dragPan.disable();
+      }
+
+      const highlightedWaypoint = this._waypoints.find((waypoint) => {
         return waypoint.properties?.id === feature?.properties?.id;
       });
+      const highlightedSnappoint = this.snappoints.find(
+        (snappoint) => snappoint.properties.waypointProperties?.id === highlightedWaypoint.properties.id,
+      );
 
-      this.highlightedWaypoints = [this._waypoints[highlightedWaypointIndex]];
-      this.highlightedSnappoints = [this.snappoints[highlightedWaypointIndex]];
+      this.highlightedWaypoints = [highlightedWaypoint];
+      this.highlightedSnappoints = [highlightedSnappoint];
 
       if (this.highlightedWaypoints[0]?.properties) {
         this.highlightedWaypoints[0].properties.highlight = true;
@@ -324,19 +331,22 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
        */
 
       this.map.getCanvas().style.cursor = "pointer";
-      this.map.dragPan.disable();
 
-      if (this.hoverpoint) {
-        this.hoverpoint.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
-      } else {
-        this.hoverpoint = this.buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT", {
-          departSnappointProperties: {
-            ...JSON.parse(feature?.properties?.departSnappointProperties ?? "{}"),
-          },
-          arriveSnappointProperties: {
-            ...JSON.parse(feature?.properties?.arriveSnappointProperties ?? "{}"),
-          },
-        });
+      if (this.interactive) {
+        this.map.dragPan.disable();
+
+        if (this.hoverpoint) {
+          this.hoverpoint.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
+        } else {
+          this.hoverpoint = this.buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT", {
+            departSnappointProperties: {
+              ...JSON.parse(feature?.properties?.departSnappointProperties ?? "{}"),
+            },
+            arriveSnappointProperties: {
+              ...JSON.parse(feature?.properties?.arriveSnappointProperties ?? "{}"),
+            },
+          });
+        }
       }
 
       this.routelines.forEach((routeline) => {
@@ -707,7 +717,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       ],
     })[0];
 
-    if (this.configuration.sensitiveWaypointLayers.includes(feature?.layer.id ?? "")) {
+    if (this._interactive && this.configuration.sensitiveWaypointLayers.includes(feature?.layer.id ?? "")) {
       /*
        * If a waypoint is clicked, remove it.
        */
@@ -719,7 +729,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       if (~respectiveWaypointIndex) {
         this._removeWaypoint(respectiveWaypointIndex, e);
       }
-    } else if (this.configuration.sensitiveSnappointLayers.includes(feature?.layer.id ?? "")) {
+    } else if (this._interactive && this.configuration.sensitiveSnappointLayers.includes(feature?.layer.id ?? "")) {
       /*
        * If a snappoint is clicked, find its respective waypoint and remove it.
        */
@@ -731,7 +741,10 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       if (~respectiveWaypointIndex) {
         this._removeWaypoint(respectiveWaypointIndex, e);
       }
-    } else if (this.configuration.sensitiveAltRoutelineLayers.includes(feature?.layer.id ?? "")) {
+    } else if (
+      (this.interactive || this.allowRouteSwitch) &&
+      this.configuration.sensitiveAltRoutelineLayers.includes(feature?.layer.id ?? "")
+    ) {
       /*
        * If an alternative route line is clicked, set its index as the selected route's one.
        */
@@ -741,7 +754,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
           return segment.properties?.id === feature?.properties?.id;
         });
       });
-    } else if (!this.configuration.sensitiveRoutelineLayers.includes(feature?.layer.id ?? "")) {
+    } else if (this._interactive && !this.configuration.sensitiveRoutelineLayers.includes(feature?.layer.id ?? "")) {
       /*
        * If the selected route line is clicked, don't add a new waypoint. Else do.
        */
@@ -842,17 +855,50 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     if (interactive) {
       this.map.on("touchstart", this.onMoveHandler);
       this.map.on("touchstart", this.onDragDownHandler);
-      this.map.on("mousemove", this.onMoveHandler);
       this.map.on("mousedown", this.onDragDownHandler);
       this.map.on("click", this.onClickHandler);
+
+      if (!this.hoverable) {
+        this.map.on("mousemove", this.onMoveHandler);
+        this.map.on("click", this.onClickHandler);
+      }
     } else {
       this.map.off("touchstart", this.onMoveHandler);
       this.map.off("touchstart", this.onDragDownHandler);
-      this.map.off("mousemove", this.onMoveHandler);
       this.map.off("mousedown", this.onDragDownHandler);
+
+      if (!this.hoverable) {
+        this.map.off("mousemove", this.onMoveHandler);
+        this.map.off("click", this.onClickHandler);
+      }
+    }
+  }
+
+  /**
+   * Allows hover effects in non-interactive mode. Can be set to `true` while `interactive` is `false` for the features
+   * to be highlighted when hovered over by the user. Does nothing when `interactive` is `true`.
+   */
+  get hoverable() {
+    return this._hoverable;
+  }
+
+  set hoverable(hoverable) {
+    this._hoverable = hoverable;
+
+    if (hoverable && !this.interactive) {
+      this.map.on("mousemove", this.onMoveHandler);
+      this.map.on("click", this.onClickHandler);
+    } else if (!this.interactive) {
+      this.map.off("mousemove", this.onMoveHandler);
       this.map.off("click", this.onClickHandler);
     }
   }
+
+  /**
+   * Allows user to switch to alternative routes while in non-interactive mode. Only takes effect when `hoverable` is
+   * `true`.
+   */
+  public allowRouteSwitch = false;
 
   /**
    * Returns all the waypoints' coordinates in the order they appear.
@@ -1000,6 +1046,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.abortController?.abort("DESTROY");
 
     this.clear();
+    this.hoverable = false;
     this.interactive = false;
 
     this.configuration.layers.forEach((layer) => {

@@ -14,6 +14,8 @@
   let map: maplibregl.Map | undefined = undefined;
   let directions: MapLibreGlDirections | undefined = undefined;
   let interactive = true;
+  let hoverable = false;
+  let routeSwitch = false;
   let refreshOnMove = false;
 
   function changeRefreshOnMove() {
@@ -48,7 +50,15 @@
   let message;
 
   $: if (directions) {
-    directions.interactive = interactive;
+    if (directions.hoverable !== hoverable) {
+      directions.hoverable = hoverable;
+    }
+    if (directions.interactive !== interactive) {
+      directions.interactive = interactive;
+    }
+    if (directions.allowRouteSwitch !== routeSwitch) {
+      directions.allowRouteSwitch = routeSwitch;
+    }
 
     directions.on("fetchroutesend", (event) => {
       if (event.data.code !== "Ok") {
@@ -70,6 +80,16 @@
   <label class="flex items-center gap-3">
     <input type="checkbox" bind:checked={interactive} disabled={!directions} />
     <strong>Interactivity enabled</strong>
+  </label>
+
+  <label class="flex items-center gap-3">
+    <input type="checkbox" bind:checked={hoverable} disabled={!directions} />
+    <strong>Hover enabled</strong>
+  </label>
+
+  <label class="flex items-center gap-3 ml-5">
+    <input type="checkbox" bind:checked={routeSwitch} disabled={!directions || !hoverable} />
+    <strong>Route switch</strong>
   </label>
 
   <label class="flex items-center gap-3">
