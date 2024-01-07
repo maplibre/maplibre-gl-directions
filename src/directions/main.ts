@@ -6,7 +6,14 @@ import {
   MapLibreGlDirectionsRoutingEvent,
   MapLibreGlDirectionsWaypointEvent,
 } from "./events";
-import { buildConfiguration, buildRequest, buildPoint, buildSnaplines, buildRoutelines } from "./utils";
+import {
+  buildConfiguration,
+  buildRequest,
+  buildPoint,
+  buildSnaplines,
+  buildRoutelines,
+  type RequestData,
+} from "./utils";
 
 /**
  * The main class responsible for all the user interaction and for the routing itself.
@@ -40,6 +47,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   protected readonly configuration: MapLibreGlDirectionsConfiguration;
 
   protected _interactive = false;
+  protected _hoverable = false;
   protected buildRequest = buildRequest;
   protected buildPoint = buildPoint;
   protected buildSnaplines = buildSnaplines;
@@ -52,6 +60,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   protected onClickHandler: (e: MapMouseEvent | MapTouchEvent) => void;
   protected liveRefreshHandler: (e: MapMouseEvent | MapTouchEvent) => void;
 
+  protected profiles: string[] = [];
   protected _waypoints: Feature<Point>[] = [];
   protected snappoints: Feature<Point>[] = [];
   protected routelines: Feature<LineString>[][] = [];
@@ -99,6 +108,26 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     });
   }
 
+  protected async fetch(data: RequestData) {
+    const { method, url, payload } = data;
+
+    const response = (await (method === "get"
+      ? await fetch(`${url}?${payload}`, { signal: this.abortController.signal })
+      : await fetch(`${url}`, {
+          signal: this.abortController.signal,
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: payload,
+        })
+    ).json()) as Directions;
+
+    if (response.code !== "Ok") throw new Error(response.message ?? "An unexpected error occurred.");
+
+    return response;
+  }
+
   protected async fetchDirections(originalEvent: MapLibreGlDirectionsWaypointEvent) {
     /*
      * If a request from a previous fetchDirections is already running,
@@ -123,32 +152,36 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         timer = setTimeout(() => this.abortController?.abort(), this.configuration.requestTimeout);
       }
 
-      const { method, url, payload } = this.buildRequest(
-        this.configuration,
-        this.waypointsCoordinates,
-        this.configuration.bearings ? this.waypointsBearings : undefined,
-      );
-      let response: Directions;
+      if (!this.profiles.length) {
+        this.profiles = [this.configuration.profile];
+      }
+
+      const requests = this.profiles.map((profile, index) => {
+        const isLast = index === this.profiles.length - 1;
+        const waypointsStart = index * 2;
+        const waypointsEnd = isLast ? this._waypoints.length : waypointsStart + 2;
+
+        return this.buildRequest(
+          { ...this.configuration, profile },
+          this.waypointsCoordinates.slice(waypointsStart, waypointsEnd),
+          this.configuration.bearings ? this.waypointsBearings.slice(waypointsStart, waypointsEnd) : undefined,
+        );
+      });
+
+      let responses: Directions[];
 
       try {
-        if (method === "get") {
-          response = (await (
-            await fetch(`${url}?${payload}`, { signal: this.abortController.signal })
-          ).json()) as Directions;
-        } else {
-          response = (await (
-            await fetch(`${url}`, {
-              signal: this.abortController.signal,
-              method: "POST",
-              headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-              },
-              body: payload,
-            })
-          ).json()) as Directions;
-        }
-
-        if (response.code !== "Ok") throw new Error(response.message ?? "An unexpected error occurred.");
+        responses = await Promise.all(
+          requests.map(async (request) => {
+            let response: Directions;
+            try {
+              response = await this.fetch(request);
+            } finally {
+              this.fire(new MapLibreGlDirectionsRoutingEvent("fetchroutesend", originalEvent, response));
+            }
+            return response;
+          }),
+        );
       } finally {
         // see #189 (https://github.com/maplibre/maplibre-gl-directions/issues/189)
         if (this.abortController?.signal.reason !== "DESTROY") this.interactive = prevInteractive;
@@ -156,23 +189,32 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         this.abortController = undefined;
 
         clearTimeout(timer);
-
-        this.fire(new MapLibreGlDirectionsRoutingEvent("fetchroutesend", originalEvent, response));
       }
 
-      this.snappoints = response.waypoints.map((snappoint, i) =>
-        this.buildPoint(snappoint.location, "SNAPPOINT", {
-          waypointProperties: this._waypoints[i]?.properties ?? {},
-        }),
-      );
+      const features = responses.flatMap((response, index) => {
+        const profile = this.profiles[Math.min(index, this.profiles.length - 1)];
 
-      this.routelines = this.buildRoutelines(
-        this.configuration.requestOptions,
-        response.routes,
-        this.selectedRouteIndex,
-        this.snappoints,
-      );
-      if (response.routes.length <= this.selectedRouteIndex) this.selectedRouteIndex = 0;
+        const snappoints = response.waypoints.map((snappoint, i) =>
+          this.buildPoint(snappoint.location, "SNAPPOINT", {
+            profile,
+            waypointProperties: this._waypoints[index * 2 + i]?.properties ?? {},
+          }),
+        );
+
+        const routelines = this.buildRoutelines(
+          this.configuration.requestOptions,
+          response.routes,
+          this.selectedRouteIndex,
+          snappoints,
+        );
+
+        return { snappoints, routelines };
+      });
+      const routes = responses.flatMap((response) => response.routes);
+
+      this.snappoints = features.flatMap((features) => features.snappoints);
+      this.routelines = features.flatMap((features) => features.routelines);
+      if (routes.length <= this.selectedRouteIndex) this.selectedRouteIndex = 0;
     } else {
       this.snappoints = [];
       this.routelines = [];
@@ -919,21 +961,32 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
    * Replaces all the waypoints with the specified ones and re-fetches the routes.
    *
    * @param waypoints The coordinates at which the waypoints should be added
+   * @param profiles Profiles for fetching directions between waypoints
    * @return Resolved after the routing request has finished
    */
-  async setWaypoints(waypoints: [number, number][]) {
+  async setWaypoints(waypoints: [number, number][], profiles: string[] = []) {
     this.abortController?.abort();
 
-    this._waypoints = waypoints.map((waypoint, index) => {
-      return this.buildPoint(
-        waypoint,
-        "WAYPOINT",
-        this.configuration.bearings
-          ? {
-              bearing: this.waypointsBearings[index],
-            }
-          : undefined,
-      );
+    this.profiles = profiles.slice(0, waypoints.length - 1);
+    if (this.profiles.length === 0) {
+      this.profiles.push(this.configuration.profile);
+    }
+
+    this._waypoints = this.profiles.flatMap((profile, index) => {
+      const isLast = index === this.profiles.length - 1;
+      const waypointsStart = index;
+      const waypointsEnd = isLast ? waypoints.length : index + 2;
+
+      return waypoints.slice(waypointsStart, waypointsEnd).map((waypoint, index) => {
+        return this.buildPoint(waypoint, "WAYPOINT", {
+          profile,
+          ...(this.configuration.bearings
+            ? {
+                bearing: this.waypointsBearings[index],
+              }
+            : undefined),
+        });
+      });
     });
 
     this.assignWaypointsCategories();
