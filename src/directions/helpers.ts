@@ -1,5 +1,6 @@
 import type { GeoJSONGeometry, Geometry, Leg, MapLibreGlDirectionsConfiguration, PolylineGeometry } from "./types";
 import { decode } from "@placemarkio/polyline";
+import type { Feature, Point } from "geojson";
 
 /**
  * Decodes the geometry of a route to the form of a coordinates array.
@@ -61,4 +62,18 @@ export function coordinatesComparator(
   } else {
     return a[0] === b[0] && a[1] === b[1];
   }
+}
+
+export function getWaypointsCoordinates(waypoints: Feature<Point>[]): [number, number][] {
+  return waypoints.map((waypoint) => {
+    return [waypoint.geometry.coordinates[0], waypoint.geometry.coordinates[1]];
+  });
+}
+
+export function getWaypointsBearings(waypoints: Feature<Point>[]): ([number, number] | undefined)[] {
+  return waypoints.map((waypoint) => {
+    return Array.isArray(waypoint.properties?.bearing)
+      ? [waypoint.properties?.bearing[0], waypoint.properties?.bearing[1]]
+      : undefined;
+  });
 }

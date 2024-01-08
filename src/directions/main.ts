@@ -14,6 +14,7 @@ import {
   buildRoutelines,
   type RequestData,
 } from "./utils";
+import { getWaypointsBearings, getWaypointsCoordinates } from "./helpers";
 
 /**
  * The main class responsible for all the user interaction and for the routing itself.
@@ -73,9 +74,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
    * Aliased for the sakes of naming-consistency.
    */
   protected get waypointsCoordinates(): [number, number][] {
-    return this._waypoints.map((waypoint) => {
-      return [waypoint.geometry.coordinates[0], waypoint.geometry.coordinates[1]];
-    });
+    return getWaypointsCoordinates(this._waypoints);
   }
 
   protected get snappointsCoordinates(): [number, number][] {
@@ -156,15 +155,30 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         this.profiles = [this.configuration.profile];
       }
 
-      const requests = this.profiles.map((profile, index) => {
-        const isLast = index === this.profiles.length - 1;
-        const waypointsStart = index * 2;
-        const waypointsEnd = isLast ? this._waypoints.length : waypointsStart + 2;
+      const waypoints: Feature<Point>[][] = [];
+      const profiles: string[] = [];
 
+      this.profiles.reduce((waypointsIndex, profile, index) => {
+        const isLast = index === this.profiles.length - 1;
+        const prevProfile = index > 0 ? this.profiles[index - 1] : undefined;
+        const isSameProfile = profile === prevProfile;
+        const waypointsEnd = isLast ? this._waypoints.length : isSameProfile ? waypointsIndex + 1 : waypointsIndex + 2;
+
+        if (isSameProfile) {
+          waypoints[waypoints.length - 1].push(...this._waypoints.slice(waypointsIndex, waypointsEnd));
+        } else {
+          waypoints.push(this._waypoints.slice(waypointsIndex, waypointsEnd));
+          profiles.push(profile);
+        }
+
+        return waypointsEnd;
+      }, 0);
+
+      const requests = profiles.map((profile, index) => {
         return this.buildRequest(
           { ...this.configuration, profile },
-          this.waypointsCoordinates.slice(waypointsStart, waypointsEnd),
-          this.configuration.bearings ? this.waypointsBearings.slice(waypointsStart, waypointsEnd) : undefined,
+          getWaypointsCoordinates(waypoints[index]),
+          this.configuration.bearings ? getWaypointsBearings(waypoints[index]) : undefined,
         );
       });
 
@@ -192,12 +206,12 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       }
 
       const features = responses.flatMap((response, index) => {
-        const profile = this.profiles[Math.min(index, this.profiles.length - 1)];
+        const profile = profiles[index];
 
         const snappoints = response.waypoints.map((snappoint, i) =>
           this.buildPoint(snappoint.location, "SNAPPOINT", {
             profile,
-            waypointProperties: this._waypoints[index * 2 + i]?.properties ?? {},
+            waypointProperties: waypoints[index][i].properties ?? {},
           }),
         );
 
@@ -922,11 +936,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       return [];
     }
 
-    return this._waypoints.map((waypoint) => {
-      return Array.isArray(waypoint.properties.bearing)
-        ? [waypoint.properties.bearing[0], waypoint.properties.bearing[1]]
-        : undefined;
-    });
+    return getWaypointsBearings(this._waypoints);
   }
 
   /**
@@ -974,7 +984,9 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     this._waypoints = this.profiles.flatMap((profile, index) => {
       const isLast = index === this.profiles.length - 1;
-      const waypointsStart = index;
+      const prevProfile = index > 0 ? this.profiles[index - 1] : undefined;
+      const isSameProfile = profile === prevProfile;
+      const waypointsStart = isSameProfile ? index + 1 : index;
       const waypointsEnd = isLast ? waypoints.length : index + 2;
 
       return waypoints.slice(waypointsStart, waypointsEnd).map((waypoint, index) => {
