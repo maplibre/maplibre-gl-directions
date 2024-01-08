@@ -68,7 +68,7 @@ export function buildRequest(
     payload = new URLSearchParams(formData);
   }
 
-  if (configuration.bearings) {
+  if (configuration.bearings && waypointsBearings) {
     payload.set(
       "bearings",
       waypointsBearings

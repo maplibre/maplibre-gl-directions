@@ -109,9 +109,9 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
   protected async fetch({ method, url, payload }: RequestData) {
     const response = (await (method === "get"
-      ? await fetch(`${url}?${payload}`, { signal: this.abortController.signal })
+      ? await fetch(`${url}?${payload}`, { signal: this.abortController?.signal })
       : await fetch(`${url}`, {
-          signal: this.abortController.signal,
+          signal: this.abortController?.signal,
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
@@ -210,7 +210,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       try {
         responses = await Promise.all(
           requests.map(async (request) => {
-            let response: Directions;
+            let response: Directions | undefined = undefined;
             try {
               response = await this.fetch(request);
             } finally {
@@ -326,7 +326,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     });
   }
 
-  protected onMove(e: MapMouseEvent) {
+  protected onMove(e: MapMouseEvent | MapTouchEvent) {
     const feature: MapGeoJSONFeature | undefined = this.map.queryRenderedFeatures(e.point, {
       layers: [
         ...this.configuration.sensitiveWaypointLayers,
@@ -359,12 +359,14 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       const highlightedWaypoint = this._waypoints.find((waypoint) => {
         return waypoint.properties?.id === feature?.properties?.id;
       });
-      const highlightedSnappoint = this.snappoints.find(
-        (snappoint) => snappoint.properties.waypointProperties?.id === highlightedWaypoint.properties.id,
-      );
+      const highlightedSnappoint =
+        highlightedWaypoint &&
+        this.snappoints.find(
+          (snappoint) => snappoint.properties?.waypointProperties?.id === highlightedWaypoint.properties?.id,
+        );
 
-      this.highlightedWaypoints = [highlightedWaypoint];
-      this.highlightedSnappoints = [highlightedSnappoint];
+      highlightedWaypoint && (this.highlightedWaypoints = [highlightedWaypoint]);
+      highlightedSnappoint && (this.highlightedSnappoints = [highlightedSnappoint]);
 
       if (this.highlightedWaypoints[0]?.properties) {
         this.highlightedWaypoints[0].properties.highlight = true;
@@ -537,7 +539,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
             /*
              * This new waypoint is set as the one now being dragged, in order to not interrupt the user's dragging action
              */
-            this.waypointBeingDragged = this._waypoints[departedSnapPointIndex];
+            this.waypointBeingDragged = departedSnapPointIndex ? this._waypoints[departedSnapPointIndex] : undefined;
             this.hoverpoint = undefined;
           } else {
             this.hoverpoint.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
@@ -636,7 +638,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     }
   }
 
-  protected noMouseMovementTimer: ReturnType<typeof setTimeout>;
+  protected noMouseMovementTimer?: ReturnType<typeof setTimeout>;
 
   protected async onDragUp(e: MapMouseEvent | MapTouchEvent) {
     /*
@@ -785,7 +787,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     }
   }
 
-  protected onClick(e: MapMouseEvent) {
+  protected onClick(e: MapMouseEvent | MapTouchEvent) {
     const feature: MapGeoJSONFeature | undefined = this.map.queryRenderedFeatures(e.point, {
       layers: [
         ...this.configuration.sensitiveWaypointLayers,
@@ -1011,7 +1013,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
    * Sets the waypoints' bearings values. Does not produce any effect in case the `bearings` configuration option is
    * disabled.
    */
-  set waypointsBearings(bearings: [number, number | undefined][]) {
+  set waypointsBearings(bearings: ([number, number] | undefined)[]) {
     if (!this.configuration.bearings) {
       console.warn(
         "The `waypointsBearings` setter was referred to, but the `bearings` configuration option is not enabled!",
@@ -1020,7 +1022,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     }
 
     this._waypoints.forEach((waypoint, i) => {
-      waypoint.properties.bearing = bearings[i];
+      (waypoint.properties || (waypoint.properties = {})).bearing = bearings[i];
     });
 
     const waypointEvent = new MapLibreGlDirectionsWaypointEvent("rotatewaypoints", undefined);

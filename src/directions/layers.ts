@@ -20,7 +20,7 @@ export const colors = {
   waypointHighlight: "#6d26d7",
 };
 
-const routelineColor: LineLayerSpecification["paint"]["line-color"] = [
+const routelineColor: NonNullable<LineLayerSpecification["paint"]>["line-color"] = [
   "case",
   ["==", ["get", "profile", ["get", "arriveSnappointProperties"]], "foot"],
   colors.routelineFoot,
@@ -39,7 +39,7 @@ const routelineColor: LineLayerSpecification["paint"]["line-color"] = [
   ],
 ];
 
-const waypointColor: CircleLayerSpecification["paint"]["circle-color"] = [
+const waypointColor: NonNullable<CircleLayerSpecification["paint"]>["circle-color"] = [
   "case",
   ["==", ["get", "profile"], "foot"],
   ["case", ["boolean", ["get", "highlight"], false], colors.waypointFootHighlight, colors.waypointFoot],
@@ -48,7 +48,7 @@ const waypointColor: CircleLayerSpecification["paint"]["circle-color"] = [
   ["case", ["boolean", ["get", "highlight"], false], colors.waypointHighlight, colors.waypoint],
 ];
 
-const snappointColor: CircleLayerSpecification["paint"]["circle-color"] = [
+const snappointColor: NonNullable<CircleLayerSpecification["paint"]>["circle-color"] = [
   "case",
   ["boolean", ["get", "highlight"], false],
   colors.snappointHighlight,
@@ -69,7 +69,7 @@ export default function layersFactory(
   linesScalingFactor = 1,
   sourceName = "maplibre-gl-directions",
 ): LayerSpecification[] {
-  const pointCasingCircleRadius: CircleLayerSpecification["paint"]["circle-radius"] = [
+  const pointCasingCircleRadius: NonNullable<CircleLayerSpecification["paint"]>["circle-radius"] = [
     "interpolate",
     ["exponential", 1.5],
     ["zoom"],
@@ -103,7 +103,7 @@ export default function layersFactory(
     ],
   ];
 
-  const pointCircleRadius: CircleLayerSpecification["paint"]["circle-radius"] = [
+  const pointCircleRadius: NonNullable<CircleLayerSpecification["paint"]>["circle-radius"] = [
     "interpolate",
     ["exponential", 1.5],
     ["zoom"],
@@ -136,7 +136,7 @@ export default function layersFactory(
     ],
   ];
 
-  const lineWidth: LineLayerSpecification["paint"]["line-width"] = [
+  const lineWidth: NonNullable<LineLayerSpecification["paint"]>["line-width"] = [
     "interpolate",
     ["exponential", 1.5],
     ["zoom"],
@@ -153,7 +153,7 @@ export default function layersFactory(
     10 * linesScalingFactor,
   ];
 
-  const lineCasingWidth: LineLayerSpecification["paint"]["line-width"] = [
+  const lineCasingWidth: NonNullable<LineLayerSpecification["paint"]>["line-width"] = [
     "interpolate",
     ["exponential", 1.5],
     ["zoom"],

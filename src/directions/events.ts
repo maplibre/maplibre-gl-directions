@@ -8,26 +8,29 @@ export class MapLibreGlDirectionsEvented {
 
   protected readonly map: Map;
 
-  private listeners: Partial<Record<keyof MapLibreGlDirectionsEventType, ((ev: never) => void)[]>> = {};
-  private oneTimeListeners: Partial<Record<keyof MapLibreGlDirectionsEventType, ((ev: never) => void)[]>> = {};
+  private listeners: ListenersStore = {};
+  private oneTimeListeners: ListenersStore = {};
 
   protected fire<T extends keyof MapLibreGlDirectionsEventType>(event: MapLibreGlDirectionsEventType[T]) {
     event.target = this.map;
 
-    this.listeners[event.type]?.forEach((listener) => listener(event));
-    this.oneTimeListeners[event.type]?.forEach((listener) => {
+    const type: T = event.type as T;
+
+    this.listeners[type]?.forEach((listener) => listener(event));
+    this.oneTimeListeners[type]?.forEach((listener) => {
       listener(event);
 
-      const index = this.oneTimeListeners[event.type]?.indexOf(listener);
-      if (index && ~index) this.oneTimeListeners[event.type]?.splice(index, 1);
+      const index = this.oneTimeListeners[type]?.indexOf(listener);
+      if (index !== undefined && ~index) this.oneTimeListeners[type]?.splice(index, 1);
     });
   }
 
   /**
    * Registers an event listener.
    */
-  on<T extends keyof MapLibreGlDirectionsEventType>(type: T, listener: (ev: MapLibreGlDirectionsEventType[T]) => void) {
-    (this.listeners[type] = this.listeners[type] ?? ([] as ((ev: never) => void)[])).push(listener);
+  on<T extends keyof MapLibreGlDirectionsEventType>(type: T, listener: MapLibreGlDirectionsEventListener<T>) {
+    this.listeners[type] = this.listeners[type] ?? [];
+    this.listeners[type]!.push(listener);
   }
 
   /**
@@ -35,17 +38,15 @@ export class MapLibreGlDirectionsEvented {
    */
   off<T extends keyof MapLibreGlDirectionsEventType>(type: T, listener: (e: MapLibreGlDirectionsEventType[T]) => void) {
     const index = this.listeners[type]?.indexOf(listener);
-    if (~index) this.listeners[type]?.splice(index, 1);
+    if (index !== undefined && ~index) this.listeners[type]?.splice(index, 1);
   }
 
   /**
    * Registers an event listener to be invoked only once.
    */
-  once<T extends keyof MapLibreGlDirectionsEventType>(
-    type: T,
-    listener: (e: MapLibreGlDirectionsEventType[T]) => void,
-  ) {
-    (this.oneTimeListeners[type] = this.oneTimeListeners[type] ?? ([] as ((ev: never) => void)[])).push(listener);
+  once<T extends keyof MapLibreGlDirectionsEventType>(type: T, listener: MapLibreGlDirectionsEventListener<T>) {
+    this.oneTimeListeners[type] = this.oneTimeListeners[type] ?? [];
+    this.oneTimeListeners[type]!.push(listener);
   }
 }
 
@@ -92,8 +93,16 @@ export interface MapLibreGlDirectionsEventType {
   fetchroutesend: MapLibreGlDirectionsRoutingEvent;
 }
 
-export interface MapLibreGlDirectionsEvent<TOrig = undefined> {
-  type: keyof MapLibreGlDirectionsEventType;
+export type MapLibreGlDirectionsEventListener<T extends keyof MapLibreGlDirectionsEventType> = (
+  event: MapLibreGlDirectionsEventType[T],
+) => void;
+
+type ListenersStore = Partial<{
+  [T in keyof MapLibreGlDirectionsEventType]: MapLibreGlDirectionsEventListener<T>[];
+}>;
+
+export interface MapLibreGlDirectionsEvent<TOrig, T extends keyof MapLibreGlDirectionsEventType> {
+  type: T;
   target: Map;
   originalEvent: TOrig;
 }
@@ -116,7 +125,11 @@ export interface MapLibreGlDirectionsWaypointEventData {
 }
 
 export class MapLibreGlDirectionsWaypointEvent
-  implements MapLibreGlDirectionsEvent<MapMouseEvent | MapTouchEvent | undefined>
+  implements
+    MapLibreGlDirectionsEvent<
+      MapMouseEvent | MapTouchEvent | undefined,
+      "setwaypoints" | "rotatewaypoints" | "addwaypoint" | "removewaypoint" | "movewaypoint"
+    >
 {
   /**
    * @private
@@ -139,7 +152,9 @@ export class MapLibreGlDirectionsWaypointEvent
 
 export type MapLibreGlDirectionsRoutingEventData = Directions;
 
-export class MapLibreGlDirectionsRoutingEvent implements MapLibreGlDirectionsEvent<MapLibreGlDirectionsWaypointEvent> {
+export class MapLibreGlDirectionsRoutingEvent
+  implements MapLibreGlDirectionsEvent<MapLibreGlDirectionsWaypointEvent, "fetchroutesstart" | "fetchroutesend">
+{
   /**
    * @private
    */
