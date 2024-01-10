@@ -13,10 +13,10 @@
   import balloonHoverpointImgUrl from "../assets/map/images/balloon-hoverpoint.png?url";
   import routelineImgUrl from "../assets/map/images/routeline.png?url";
 
-  const meta = examples.find((example) => example.path === $location);
+  const meta = examples.find((example) => example.path === $location)!;
 
-  let mapRef: HTMLElement | undefined = undefined;
-  let directions: MapLibreGlDirections | undefined = undefined;
+  let mapRef: HTMLElement;
+  let directions: MapLibreGlDirections;
 
   onMount(() => {
     const map = new maplibregl.Map({
@@ -33,22 +33,22 @@
       // make sure to load and add the images used by the custom directions' styles first:
       // a balloon for thw waypoints,
       map.loadImage(balloonWaypointImgUrl, (error, image) => {
-        if (!error) map.addImage("balloon-waypoint", image);
+        if (!error && image) map.addImage("balloon-waypoint", image);
       });
 
       // a balloon for the snappoints,
       map.loadImage(balloonSnappointImgUrl, (error, image) => {
-        if (!error) map.addImage("balloon-snappoint", image);
+        if (!error && image) map.addImage("balloon-snappoint", image);
       });
 
       // a balloon for the hoverpoints
       map.loadImage(balloonHoverpointImgUrl, (error, image) => {
-        if (!error) map.addImage("balloon-hoverpoint", image);
+        if (!error && image) map.addImage("balloon-hoverpoint", image);
       });
 
       // and a pattern-image for the routelines.
       map.loadImage(routelineImgUrl, (error, image) => {
-        if (!error) map.addImage("routeline", image);
+        if (!error && image) map.addImage("routeline", image);
       });
 
       directions = new MapLibreGlDirections(map, {

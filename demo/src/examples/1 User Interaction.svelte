@@ -8,11 +8,11 @@
   import style from "../assets/map/style/style.json?url";
   import MapLibreGlDirections from "@maplibre/maplibre-gl-directions";
 
-  const meta = examples.find((example) => example.path === $location);
+  const meta = examples.find((example) => example.path === $location)!;
 
-  let mapRef: HTMLElement | undefined = undefined;
-  let map: maplibregl.Map | undefined = undefined;
-  let directions: MapLibreGlDirections | undefined = undefined;
+  let mapRef: HTMLElement;
+  let map: maplibregl.Map;
+  let directions: MapLibreGlDirections;
   let interactive = true;
   let hoverable = false;
   let routeSwitch = false;
@@ -47,7 +47,7 @@
     });
   });
 
-  let message;
+  let message: string;
 
   $: if (directions) {
     if (directions.hoverable !== hoverable) {
@@ -61,7 +61,7 @@
     }
 
     directions.on("fetchroutesend", (event) => {
-      if (event.data.code !== "Ok") {
+      if (event.data && event.data.code !== "Ok") {
         message = `${event.data.code}: ${event.data.message ?? "no details available."}`;
       } else {
         message = "";

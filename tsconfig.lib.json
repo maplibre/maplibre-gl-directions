@@ -16,7 +16,8 @@
     "isolatedModules": true,
     "paths": {
       "@placemarkio/polyline": ["node_modules/@placemarkio/polyline/dist/index.d.ts"]
-    }
+    },
+    "types": []
   },
   "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.svelte"],
   "references": [

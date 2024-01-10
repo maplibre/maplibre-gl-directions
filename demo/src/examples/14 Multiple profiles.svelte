@@ -10,11 +10,11 @@
   import { shuffle } from "lodash";
   import { colors } from "src/directions/layers";
 
-  const meta = examples.find((example) => example.path === $location);
+  const meta = examples.find((example) => example.path === $location)!;
 
-  let mapRef: HTMLElement | undefined = undefined;
-  let map: Map | undefined = undefined;
-  let directions: MapLibreGlDirections | undefined = undefined;
+  let mapRef: HTMLElement;
+  let map: Map;
+  let directions: MapLibreGlDirections;
 
   onMount(() => {
     const _map = new maplibregl.Map({
@@ -53,11 +53,11 @@
     foot: colors.routelineFoot,
   };
 
-  const initialProfiles = ["car", "bike", "car", "car", "foot"];
+  const initialProfiles: (keyof typeof profileColors)[] = ["car", "bike", "car", "car", "foot"];
 
   let profiles = initialProfiles;
 
-  $: displayedProfiles = profiles.reduce((res, profile) => {
+  $: displayedProfiles = profiles.reduce<typeof profiles>((res, profile) => {
     if (res[res.length - 1] !== profile) {
       res.push(profile);
     }
