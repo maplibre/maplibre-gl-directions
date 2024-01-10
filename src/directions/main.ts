@@ -107,9 +107,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     });
   }
 
-  protected async fetch(data: RequestData) {
-    const { method, url, payload } = data;
-
+  protected async fetch({ method, url, payload }: RequestData) {
     const response = (await (method === "get"
       ? await fetch(`${url}?${payload}`, { signal: this.abortController.signal })
       : await fetch(`${url}`, {
@@ -155,18 +153,43 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         this.profiles = [this.configuration.profile];
       }
 
-      const waypoints: Feature<Point>[][] = [];
+      // Profiles for requests
       const profiles: string[] = [];
+      // Waypoints split by profile
+      const waypoints: Feature<Point>[][] = [];
 
+      /**
+       * Prepares data for the requests
+       */
       this.profiles.reduce((waypointsIndex, profile, index) => {
         const isLast = index === this.profiles.length - 1;
         const prevProfile = index > 0 ? this.profiles[index - 1] : undefined;
         const isSameProfile = profile === prevProfile;
-        const waypointsEnd = isLast ? this._waypoints.length : isSameProfile ? waypointsIndex + 1 : waypointsIndex + 2;
+        const waypointsEnd = isLast
+          ? /**
+             * If it's the last supplied profile include all remaining waypoints
+             */
+            this._waypoints.length
+          : isSameProfile
+            ? /**
+               * If profile is same as previous one add a slice of one element only
+               */
+              waypointsIndex + 1
+            : /**
+               * If profile is different slice corresponding pair of coordinates
+               */
+              waypointsIndex + 2;
 
         if (isSameProfile) {
+          /**
+           * If route to the next waypoint is to be found with the same profile, add waypoints to the previous chunk to
+           * fetch them in one request
+           */
           waypoints[waypoints.length - 1].push(...this._waypoints.slice(waypointsIndex, waypointsEnd));
         } else {
+          /**
+           * Otherwise add waypoints as the next chunk and push new profile
+           */
           waypoints.push(this._waypoints.slice(waypointsIndex, waypointsEnd));
           profiles.push(profile);
         }
@@ -971,14 +994,18 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
    * Replaces all the waypoints with the specified ones and re-fetches the routes.
    *
    * @param waypoints The coordinates at which the waypoints should be added
-   * @param profiles Profiles for fetching directions between waypoints
+   * @param profiles Profiles for fetching directions between waypoints.
    * @return Resolved after the routing request has finished
    */
   async setWaypoints(waypoints: [number, number][], profiles: string[] = []) {
     this.abortController?.abort();
 
     this.profiles = profiles.slice(0, waypoints.length - 1);
+
     if (this.profiles.length === 0) {
+      /**
+       * Set profile from config if override is not provided
+       */
       this.profiles.push(this.configuration.profile);
     }
 

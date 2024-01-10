@@ -64,12 +64,18 @@ export function coordinatesComparator(
   }
 }
 
+/**
+ * Gets coordinates of a point feature
+ */
 export function getWaypointsCoordinates(waypoints: Feature<Point>[]): [number, number][] {
   return waypoints.map((waypoint) => {
     return [waypoint.geometry.coordinates[0], waypoint.geometry.coordinates[1]];
   });
 }
 
+/**
+ * Gets bearings out of properties of point features
+ */
 export function getWaypointsBearings(waypoints: Feature<Point>[]): ([number, number] | undefined)[] {
   return waypoints.map((waypoint) => {
     return Array.isArray(waypoint.properties?.bearing)
