@@ -75,7 +75,7 @@
     "eslint": "^8.56.0",
     "eslint-plugin-svelte": "^2.32.4",
     "husky": "^8.0.3",
-    "lint-staged": "^13.2.3",
+    "lint-staged": "^15.2.0",
     "maplibre-gl": "^3.3.0",
     "postcss": "^8.4.33",
     "postcss-load-config": "^4.0.1",
