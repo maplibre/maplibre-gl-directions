@@ -32,6 +32,10 @@ Supports the Mapbox Directions API congestions (both plain and numeric!)
 
 Supports the waypoints' bearings settings with the help of a custom Control.
 
+### Multiple routing profiles per single directions request
+
+Originally, backends (e.g. OSRM and Mapbox Directions API) don't support multiple routing profiles per single routing request. But the plugin overcomes the limitation, and it becomes possible to retrieve directions for a walk to a bus stop, then riding on a bus and then again walking from the next bus stop to the final destination all in one request!
+
 ### Customization
 
 The powerful customization interface allows to customize everything starting from visual aspects all the way up to request logic.
