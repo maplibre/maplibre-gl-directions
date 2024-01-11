@@ -60,8 +60,7 @@
   },
   "dependencies": {
     "@placemarkio/polyline": "^1.2.0",
-    "nanoid": "^5.0.4",
-    "svelte-spa-router": "^3.3.0"
+    "nanoid": "^5.0.4"
   },
   "peerDependencies": {
     "maplibre-gl": "^3.0.0"
