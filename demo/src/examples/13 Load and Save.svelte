@@ -8,10 +8,10 @@
   import style from "../assets/map/style/style.json?url";
   import CustomMapLibreGlDirections from "../assets/map/custom-directions";
 
-  const meta = examples.find((example) => example.path === $location);
+  const meta = examples.find((example) => example.path === $location)!;
 
-  let mapRef: HTMLElement | undefined = undefined;
-  let directions: CustomMapLibreGlDirections | undefined = undefined;
+  let mapRef: HTMLElement;
+  let directions: CustomMapLibreGlDirections;
 
   onMount(() => {
     const map = new maplibregl.Map({
@@ -39,9 +39,9 @@
   let noDataToLoad = !checkDataToLoad();
 
   function loadRoute() {
-    directions.setWaypointsFeatures(JSON.parse(localStorage.getItem("saved-waypoints-features")));
-    directions.setSnappointsFeatures(JSON.parse(localStorage.getItem("saved-snappoints-features")));
-    directions.setRoutelinesFeatures(JSON.parse(localStorage.getItem("saved-routelines-features")));
+    directions.setWaypointsFeatures(JSON.parse(localStorage.getItem("saved-waypoints-features") || ""));
+    directions.setSnappointsFeatures(JSON.parse(localStorage.getItem("saved-snappoints-features") || ""));
+    directions.setRoutelinesFeatures(JSON.parse(localStorage.getItem("saved-routelines-features") || ""));
   }
 
   function saveRoute() {

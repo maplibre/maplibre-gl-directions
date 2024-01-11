@@ -7,10 +7,10 @@
   import "maplibre-gl/dist/maplibre-gl.css";
   import style from "../assets/map/style/style.json?url";
   import DistanceMeasurementMapLibreGlDirections, { config } from "../assets/map/distance-measurement-directions";
-  const meta = examples.find((example) => example.path === $location);
+  const meta = examples.find((example) => example.path === $location)!;
 
-  let mapRef: HTMLElement | undefined = undefined;
-  let directions: DistanceMeasurementMapLibreGlDirections | undefined = undefined;
+  let mapRef: HTMLElement;
+  let directions: DistanceMeasurementMapLibreGlDirections;
 
   let totalDistance = 0;
 

@@ -11,11 +11,11 @@
     type BearingsControlConfiguration,
   } from "@maplibre/maplibre-gl-directions";
 
-  const meta = examples.find((example) => example.path === $location);
+  const meta = examples.find((example) => example.path === $location)!;
 
-  let mapRef: HTMLElement | undefined = undefined;
-  let map: Map | undefined = undefined;
-  let directions: MapLibreGlDirections | undefined = undefined;
+  let mapRef: HTMLElement;
+  let map: Map;
+  let directions: MapLibreGlDirections;
 
   onMount(() => {
     map = new maplibregl.Map({
