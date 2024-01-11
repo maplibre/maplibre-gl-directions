@@ -22,6 +22,12 @@ export function buildConfiguration(
   return Object.assign({}, MapLibreGlDirectionsDefaultConfiguration, { layers }, customConfiguration);
 }
 
+export type RequestData = {
+  method: "get" | "post";
+  url: string;
+  payload: URLSearchParams;
+};
+
 /**
  * @protected
  *
@@ -32,11 +38,7 @@ export function buildRequest(
   configuration: MapLibreGlDirectionsConfiguration,
   waypointsCoordinates: [number, number][],
   waypointsBearings?: ([number, number] | undefined)[],
-): {
-  method: "get" | "post";
-  url: string;
-  payload: URLSearchParams;
-} {
+): RequestData {
   const method = configuration.makePostRequest ? "post" : "get";
 
   let url: string;

@@ -34,8 +34,8 @@
         degrees: waypointBearing
           ? waypointBearing[1]
           : configuration.fixedDegrees
-          ? configuration.fixedDegrees
-          : configuration.degreesDefault,
+            ? configuration.fixedDegrees
+            : configuration.degreesDefault,
       };
     });
   }
