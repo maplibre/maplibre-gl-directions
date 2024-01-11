@@ -72,7 +72,7 @@
     "@typescript-eslint/parser": "^6.3.0",
     "@typescript-eslint/eslint-plugin": "^6.3.0",
     "autoprefixer": "^10.4.14",
-    "eslint": "^8.46.0",
+    "eslint": "^8.56.0",
     "eslint-plugin-svelte": "^2.32.4",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.3",
