@@ -35,7 +35,7 @@
   "scripts": {
     "prepare": "husky install",
     "env:prep": "npm run build:lib && npm link && npm link @maplibre/maplibre-gl-directions",
-    "dev:lib": "vite build --watch --mode development --config vite.lib.config.ts",
+    "dev:lib": "npm run check:lib && npm run tsc:lib && vite build --watch --mode development --config vite.lib.config.ts",
     "dev:doc": "typedoc --tsconfig tsconfig.lib.json --watch",
     "dev:demo": "vite --config vite.demo.config.ts",
     "tsc:lib": "tsc --project ./tsconfig.lib.json",
