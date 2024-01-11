@@ -6,7 +6,15 @@ import {
   MapLibreGlDirectionsRoutingEvent,
   MapLibreGlDirectionsWaypointEvent,
 } from "./events";
-import { buildConfiguration, buildRequest, buildPoint, buildSnaplines, buildRoutelines } from "./utils";
+import {
+  buildConfiguration,
+  buildRequest,
+  buildPoint,
+  buildSnaplines,
+  buildRoutelines,
+  type RequestData,
+} from "./utils";
+import { getWaypointsBearings, getWaypointsCoordinates } from "./helpers";
 
 /**
  * The main class responsible for all the user interaction and for the routing itself.
@@ -40,6 +48,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   protected readonly configuration: MapLibreGlDirectionsConfiguration;
 
   protected _interactive = false;
+  protected _hoverable = false;
   protected buildRequest = buildRequest;
   protected buildPoint = buildPoint;
   protected buildSnaplines = buildSnaplines;
@@ -52,6 +61,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   protected onClickHandler: (e: MapMouseEvent | MapTouchEvent) => void;
   protected liveRefreshHandler: (e: MapMouseEvent | MapTouchEvent) => void;
 
+  protected profiles: string[] = [];
   protected _waypoints: Feature<Point>[] = [];
   protected snappoints: Feature<Point>[] = [];
   protected routelines: Feature<LineString>[][] = [];
@@ -64,9 +74,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
    * Aliased for the sakes of naming-consistency.
    */
   protected get waypointsCoordinates(): [number, number][] {
-    return this._waypoints.map((waypoint) => {
-      return [waypoint.geometry.coordinates[0], waypoint.geometry.coordinates[1]];
-    });
+    return getWaypointsCoordinates(this._waypoints);
   }
 
   protected get snappointsCoordinates(): [number, number][] {
@@ -99,6 +107,24 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     });
   }
 
+  protected async fetch({ method, url, payload }: RequestData) {
+    const response = (await (method === "get"
+      ? await fetch(`${url}?${payload}`, { signal: this.abortController?.signal })
+      : await fetch(`${url}`, {
+          signal: this.abortController?.signal,
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: payload,
+        })
+    ).json()) as Directions;
+
+    if (response.code !== "Ok") throw new Error(response.message ?? "An unexpected error occurred.");
+
+    return response;
+  }
+
   protected async fetchDirections(originalEvent: MapLibreGlDirectionsWaypointEvent) {
     /*
      * If a request from a previous fetchDirections is already running,
@@ -123,32 +149,76 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         timer = setTimeout(() => this.abortController?.abort(), this.configuration.requestTimeout);
       }
 
-      const { method, url, payload } = this.buildRequest(
-        this.configuration,
-        this.waypointsCoordinates,
-        this.configuration.bearings ? this.waypointsBearings : undefined,
-      );
-      let response: Directions;
+      if (!this.profiles.length) {
+        this.profiles = [this.configuration.profile];
+      }
 
-      try {
-        if (method === "get") {
-          response = (await (
-            await fetch(`${url}?${payload}`, { signal: this.abortController.signal })
-          ).json()) as Directions;
+      // Profiles for requests
+      const profiles: string[] = [];
+      // Waypoints split by profile
+      const waypoints: Feature<Point>[][] = [];
+
+      /**
+       * Prepares data for the requests
+       */
+      this.profiles.reduce((waypointsIndex, profile, index) => {
+        const isLast = index === this.profiles.length - 1;
+        const prevProfile = index > 0 ? this.profiles[index - 1] : undefined;
+        const isSameProfile = profile === prevProfile;
+        const waypointsEnd = isLast
+          ? /**
+             * If it's the last supplied profile include all remaining waypoints
+             */
+            this._waypoints.length
+          : isSameProfile
+            ? /**
+               * If profile is same as previous one add a slice of one element only
+               */
+              waypointsIndex + 1
+            : /**
+               * If profile is different slice corresponding pair of coordinates
+               */
+              waypointsIndex + 2;
+
+        if (isSameProfile) {
+          /**
+           * If route to the next waypoint is to be found with the same profile, add waypoints to the previous chunk to
+           * fetch them in one request
+           */
+          waypoints[waypoints.length - 1].push(...this._waypoints.slice(waypointsIndex, waypointsEnd));
         } else {
-          response = (await (
-            await fetch(`${url}`, {
-              signal: this.abortController.signal,
-              method: "POST",
-              headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-              },
-              body: payload,
-            })
-          ).json()) as Directions;
+          /**
+           * Otherwise add waypoints as the next chunk and push new profile
+           */
+          waypoints.push(this._waypoints.slice(waypointsIndex, waypointsEnd));
+          profiles.push(profile);
         }
 
-        if (response.code !== "Ok") throw new Error(response.message ?? "An unexpected error occurred.");
+        return waypointsEnd;
+      }, 0);
+
+      const requests = profiles.map((profile, index) => {
+        return this.buildRequest(
+          { ...this.configuration, profile },
+          getWaypointsCoordinates(waypoints[index]),
+          this.configuration.bearings ? getWaypointsBearings(waypoints[index]) : undefined,
+        );
+      });
+
+      let responses: Directions[];
+
+      try {
+        responses = await Promise.all(
+          requests.map(async (request) => {
+            let response: Directions | undefined = undefined;
+            try {
+              response = await this.fetch(request);
+            } finally {
+              this.fire(new MapLibreGlDirectionsRoutingEvent("fetchroutesend", originalEvent, response));
+            }
+            return response;
+          }),
+        );
       } finally {
         // see #189 (https://github.com/maplibre/maplibre-gl-directions/issues/189)
         if (this.abortController?.signal.reason !== "DESTROY") this.interactive = prevInteractive;
@@ -156,23 +226,32 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         this.abortController = undefined;
 
         clearTimeout(timer);
-
-        this.fire(new MapLibreGlDirectionsRoutingEvent("fetchroutesend", originalEvent, response));
       }
 
-      this.snappoints = response.waypoints.map((snappoint, i) =>
-        this.buildPoint(snappoint.location, "SNAPPOINT", {
-          waypointProperties: this._waypoints[i]?.properties ?? {},
-        }),
-      );
+      const features = responses.flatMap((response, index) => {
+        const profile = profiles[index];
 
-      this.routelines = this.buildRoutelines(
-        this.configuration.requestOptions,
-        response.routes,
-        this.selectedRouteIndex,
-        this.snappoints,
-      );
-      if (response.routes.length <= this.selectedRouteIndex) this.selectedRouteIndex = 0;
+        const snappoints = response.waypoints.map((snappoint, i) =>
+          this.buildPoint(snappoint.location, "SNAPPOINT", {
+            profile,
+            waypointProperties: waypoints[index][i].properties ?? {},
+          }),
+        );
+
+        const routelines = this.buildRoutelines(
+          this.configuration.requestOptions,
+          response.routes,
+          this.selectedRouteIndex,
+          snappoints,
+        );
+
+        return { snappoints, routelines };
+      });
+      const routes = responses.flatMap((response) => response.routes);
+
+      this.snappoints = features.flatMap((features) => features.snappoints);
+      this.routelines = features.flatMap((features) => features.routelines);
+      if (routes.length <= this.selectedRouteIndex) this.selectedRouteIndex = 0;
     } else {
       this.snappoints = [];
       this.routelines = [];
@@ -247,7 +326,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     });
   }
 
-  protected onMove(e: MapMouseEvent) {
+  protected onMove(e: MapMouseEvent | MapTouchEvent) {
     const feature: MapGeoJSONFeature | undefined = this.map.queryRenderedFeatures(e.point, {
       layers: [
         ...this.configuration.sensitiveWaypointLayers,
@@ -272,14 +351,22 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
        */
 
       this.map.getCanvas().style.cursor = "pointer";
-      this.map.dragPan.disable();
 
-      const highlightedWaypointIndex = this._waypoints.findIndex((waypoint) => {
+      if (this.interactive) {
+        this.map.dragPan.disable();
+      }
+
+      const highlightedWaypoint = this._waypoints.find((waypoint) => {
         return waypoint.properties?.id === feature?.properties?.id;
       });
+      const highlightedSnappoint =
+        highlightedWaypoint &&
+        this.snappoints.find(
+          (snappoint) => snappoint.properties?.waypointProperties?.id === highlightedWaypoint.properties?.id,
+        );
 
-      this.highlightedWaypoints = [this._waypoints[highlightedWaypointIndex]];
-      this.highlightedSnappoints = [this.snappoints[highlightedWaypointIndex]];
+      highlightedWaypoint && (this.highlightedWaypoints = [highlightedWaypoint]);
+      highlightedSnappoint && (this.highlightedSnappoints = [highlightedSnappoint]);
 
       if (this.highlightedWaypoints[0]?.properties) {
         this.highlightedWaypoints[0].properties.highlight = true;
@@ -324,19 +411,22 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
        */
 
       this.map.getCanvas().style.cursor = "pointer";
-      this.map.dragPan.disable();
 
-      if (this.hoverpoint) {
-        this.hoverpoint.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
-      } else {
-        this.hoverpoint = this.buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT", {
-          departSnappointProperties: {
-            ...JSON.parse(feature?.properties?.departSnappointProperties ?? "{}"),
-          },
-          arriveSnappointProperties: {
-            ...JSON.parse(feature?.properties?.arriveSnappointProperties ?? "{}"),
-          },
-        });
+      if (this.interactive) {
+        this.map.dragPan.disable();
+
+        if (this.hoverpoint) {
+          this.hoverpoint.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
+        } else {
+          this.hoverpoint = this.buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT", {
+            departSnappointProperties: {
+              ...JSON.parse(feature?.properties?.departSnappointProperties ?? "{}"),
+            },
+            arriveSnappointProperties: {
+              ...JSON.parse(feature?.properties?.arriveSnappointProperties ?? "{}"),
+            },
+          });
+        }
       }
 
       this.routelines.forEach((routeline) => {
@@ -449,7 +539,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
             /*
              * This new waypoint is set as the one now being dragged, in order to not interrupt the user's dragging action
              */
-            this.waypointBeingDragged = this._waypoints[departedSnapPointIndex];
+            this.waypointBeingDragged = departedSnapPointIndex ? this._waypoints[departedSnapPointIndex] : undefined;
             this.hoverpoint = undefined;
           } else {
             this.hoverpoint.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
@@ -548,7 +638,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     }
   }
 
-  protected noMouseMovementTimer: ReturnType<typeof setTimeout>;
+  protected noMouseMovementTimer?: ReturnType<typeof setTimeout>;
 
   protected async onDragUp(e: MapMouseEvent | MapTouchEvent) {
     /*
@@ -697,7 +787,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     }
   }
 
-  protected onClick(e: MapMouseEvent) {
+  protected onClick(e: MapMouseEvent | MapTouchEvent) {
     const feature: MapGeoJSONFeature | undefined = this.map.queryRenderedFeatures(e.point, {
       layers: [
         ...this.configuration.sensitiveWaypointLayers,
@@ -707,7 +797,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       ],
     })[0];
 
-    if (this.configuration.sensitiveWaypointLayers.includes(feature?.layer.id ?? "")) {
+    if (this._interactive && this.configuration.sensitiveWaypointLayers.includes(feature?.layer.id ?? "")) {
       /*
        * If a waypoint is clicked, remove it.
        */
@@ -719,7 +809,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       if (~respectiveWaypointIndex) {
         this._removeWaypoint(respectiveWaypointIndex, e);
       }
-    } else if (this.configuration.sensitiveSnappointLayers.includes(feature?.layer.id ?? "")) {
+    } else if (this._interactive && this.configuration.sensitiveSnappointLayers.includes(feature?.layer.id ?? "")) {
       /*
        * If a snappoint is clicked, find its respective waypoint and remove it.
        */
@@ -731,7 +821,10 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       if (~respectiveWaypointIndex) {
         this._removeWaypoint(respectiveWaypointIndex, e);
       }
-    } else if (this.configuration.sensitiveAltRoutelineLayers.includes(feature?.layer.id ?? "")) {
+    } else if (
+      (this.interactive || this.allowRouteSwitch) &&
+      this.configuration.sensitiveAltRoutelineLayers.includes(feature?.layer.id ?? "")
+    ) {
       /*
        * If an alternative route line is clicked, set its index as the selected route's one.
        */
@@ -741,7 +834,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
           return segment.properties?.id === feature?.properties?.id;
         });
       });
-    } else if (!this.configuration.sensitiveRoutelineLayers.includes(feature?.layer.id ?? "")) {
+    } else if (this._interactive && !this.configuration.sensitiveRoutelineLayers.includes(feature?.layer.id ?? "")) {
       /*
        * If the selected route line is clicked, don't add a new waypoint. Else do.
        */
@@ -842,17 +935,50 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     if (interactive) {
       this.map.on("touchstart", this.onMoveHandler);
       this.map.on("touchstart", this.onDragDownHandler);
-      this.map.on("mousemove", this.onMoveHandler);
       this.map.on("mousedown", this.onDragDownHandler);
       this.map.on("click", this.onClickHandler);
+
+      if (!this.hoverable) {
+        this.map.on("mousemove", this.onMoveHandler);
+        this.map.on("click", this.onClickHandler);
+      }
     } else {
       this.map.off("touchstart", this.onMoveHandler);
       this.map.off("touchstart", this.onDragDownHandler);
-      this.map.off("mousemove", this.onMoveHandler);
       this.map.off("mousedown", this.onDragDownHandler);
+
+      if (!this.hoverable) {
+        this.map.off("mousemove", this.onMoveHandler);
+        this.map.off("click", this.onClickHandler);
+      }
+    }
+  }
+
+  /**
+   * Allows hover effects in non-interactive mode. Can be set to `true` while `interactive` is `false` for the features
+   * to be highlighted when hovered over by the user. Does nothing when `interactive` is `true`.
+   */
+  get hoverable() {
+    return this._hoverable;
+  }
+
+  set hoverable(hoverable) {
+    this._hoverable = hoverable;
+
+    if (hoverable && !this.interactive) {
+      this.map.on("mousemove", this.onMoveHandler);
+      this.map.on("click", this.onClickHandler);
+    } else if (!this.interactive) {
+      this.map.off("mousemove", this.onMoveHandler);
       this.map.off("click", this.onClickHandler);
     }
   }
+
+  /**
+   * Allows user to switch to alternative routes while in non-interactive mode. Only takes effect when `hoverable` is
+   * `true`.
+   */
+  public allowRouteSwitch = false;
 
   /**
    * Returns all the waypoints' coordinates in the order they appear.
@@ -880,18 +1006,14 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       return [];
     }
 
-    return this._waypoints.map((waypoint) => {
-      return Array.isArray(waypoint.properties.bearing)
-        ? [waypoint.properties.bearing[0], waypoint.properties.bearing[1]]
-        : undefined;
-    });
+    return getWaypointsBearings(this._waypoints);
   }
 
   /**
    * Sets the waypoints' bearings values. Does not produce any effect in case the `bearings` configuration option is
    * disabled.
    */
-  set waypointsBearings(bearings: [number, number | undefined][]) {
+  set waypointsBearings(bearings: ([number, number] | undefined)[]) {
     if (!this.configuration.bearings) {
       console.warn(
         "The `waypointsBearings` setter was referred to, but the `bearings` configuration option is not enabled!",
@@ -900,7 +1022,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     }
 
     this._waypoints.forEach((waypoint, i) => {
-      waypoint.properties.bearing = bearings[i];
+      (waypoint.properties || (waypoint.properties = {})).bearing = bearings[i];
     });
 
     const waypointEvent = new MapLibreGlDirectionsWaypointEvent("rotatewaypoints", undefined);
@@ -919,21 +1041,38 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
    * Replaces all the waypoints with the specified ones and re-fetches the routes.
    *
    * @param waypoints The coordinates at which the waypoints should be added
+   * @param profiles Profiles for fetching directions between waypoints.
    * @return Resolved after the routing request has finished
    */
-  async setWaypoints(waypoints: [number, number][]) {
+  async setWaypoints(waypoints: [number, number][], profiles: string[] = []) {
     this.abortController?.abort();
 
-    this._waypoints = waypoints.map((waypoint, index) => {
-      return this.buildPoint(
-        waypoint,
-        "WAYPOINT",
-        this.configuration.bearings
-          ? {
-              bearing: this.waypointsBearings[index],
-            }
-          : undefined,
-      );
+    this.profiles = profiles.slice(0, waypoints.length - 1);
+
+    if (this.profiles.length === 0) {
+      /**
+       * Set profile from config if override is not provided
+       */
+      this.profiles.push(this.configuration.profile);
+    }
+
+    this._waypoints = this.profiles.flatMap((profile, index) => {
+      const isLast = index === this.profiles.length - 1;
+      const prevProfile = index > 0 ? this.profiles[index - 1] : undefined;
+      const isSameProfile = profile === prevProfile;
+      const waypointsStart = isSameProfile ? index + 1 : index;
+      const waypointsEnd = isLast ? waypoints.length : index + 2;
+
+      return waypoints.slice(waypointsStart, waypointsEnd).map((waypoint, index) => {
+        return this.buildPoint(waypoint, "WAYPOINT", {
+          profile,
+          ...(this.configuration.bearings
+            ? {
+                bearing: this.waypointsBearings[index],
+              }
+            : undefined),
+        });
+      });
     });
 
     this.assignWaypointsCategories();
@@ -1000,6 +1139,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.abortController?.abort("DESTROY");
 
     this.clear();
+    this.hoverable = false;
     this.interactive = false;
 
     this.configuration.layers.forEach((layer) => {

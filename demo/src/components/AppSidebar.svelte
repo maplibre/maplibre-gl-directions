@@ -4,7 +4,7 @@
 
   export let noHeader = false;
 
-  const meta = examples.find((example) => example.path === $location);
+  const meta = examples.find((example) => example.path === $location)!;
 </script>
 
 <aside class="basis-full lg:basis-1/3 overflow-hidden shadow-xl">

@@ -1,5 +1,6 @@
 import type { GeoJSONGeometry, Geometry, Leg, MapLibreGlDirectionsConfiguration, PolylineGeometry } from "./types";
 import { decode } from "@placemarkio/polyline";
+import type { Position, Feature, Point } from "geojson";
 
 /**
  * Decodes the geometry of a route to the form of a coordinates array.
@@ -7,7 +8,7 @@ import { decode } from "@placemarkio/polyline";
 export function geometryDecoder(
   requestOptions: MapLibreGlDirectionsConfiguration["requestOptions"],
   geometry: Geometry,
-): [number, number][] {
+): Position[] {
   if (requestOptions.geometries === "geojson") {
     return (geometry as GeoJSONGeometry).coordinates;
   } else if (requestOptions.geometries === "polyline6") {
@@ -53,12 +54,32 @@ export function congestionLevelDecoder(
  */
 export function coordinatesComparator(
   requestOptions: MapLibreGlDirectionsConfiguration["requestOptions"],
-  a: [number, number],
-  b: [number, number],
+  a: Position,
+  b: Position,
 ): boolean {
   if (!requestOptions.geometries || requestOptions.geometries === "polyline") {
     return Math.abs(a[0] - b[0]) <= 0.00001 && Math.abs(a[1] - b[1]) <= 0.00001;
   } else {
     return a[0] === b[0] && a[1] === b[1];
   }
+}
+
+/**
+ * Gets coordinates of a point feature
+ */
+export function getWaypointsCoordinates(waypoints: Feature<Point>[]): [number, number][] {
+  return waypoints.map((waypoint) => {
+    return [waypoint.geometry.coordinates[0], waypoint.geometry.coordinates[1]];
+  });
+}
+
+/**
+ * Gets bearings out of properties of point features
+ */
+export function getWaypointsBearings(waypoints: Feature<Point>[]): ([number, number] | undefined)[] {
+  return waypoints.map((waypoint) => {
+    return Array.isArray(waypoint.properties?.bearing)
+      ? [waypoint.properties?.bearing[0], waypoint.properties?.bearing[1]]
+      : undefined;
+  });
 }

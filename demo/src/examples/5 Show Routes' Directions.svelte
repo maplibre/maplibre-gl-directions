@@ -9,10 +9,10 @@
   import MapLibreGlDirections, { layersFactory } from "@maplibre/maplibre-gl-directions";
   import DirectionArrowImageUrl from "../assets/map/images/direction-arrow.png?url";
 
-  const meta = examples.find((example) => example.path === $location);
+  const meta = examples.find((example) => example.path === $location)!;
 
-  let mapRef: HTMLElement | undefined = undefined;
-  let directions: MapLibreGlDirections | undefined = undefined;
+  let mapRef: HTMLElement;
+  let directions: MapLibreGlDirections;
 
   onMount(() => {
     const map = new maplibregl.Map({

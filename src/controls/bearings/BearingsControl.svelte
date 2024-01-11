@@ -34,15 +34,15 @@
         degrees: waypointBearing
           ? waypointBearing[1]
           : configuration.fixedDegrees
-          ? configuration.fixedDegrees
-          : configuration.degreesDefault,
+            ? configuration.fixedDegrees
+            : configuration.degreesDefault,
       };
     });
   }
 
   onWaypointsChanged();
 
-  let timeout;
+  let timeout: number | undefined;
 
   $: {
     // update the directions' value with simple debouncing to avoid `fetchDirections` spamming
@@ -75,9 +75,8 @@
   }
 
   function onDocumentMousemove(e: MouseEvent) {
-    if (~imageBeingRotatedIndex && images[imageBeingRotatedIndex]) {
-      const image = images[imageBeingRotatedIndex];
-
+    const image = images[imageBeingRotatedIndex];
+    if (image) {
       const centerX = image.getBoundingClientRect().x + configuration.imageSize / 2;
       const centerY = image.getBoundingClientRect().y + configuration.imageSize / 2;
 

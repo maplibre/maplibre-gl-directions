@@ -8,11 +8,11 @@
   import style from "../assets/map/style/style.json?url";
   import MapLibreGlDirections, { layersFactory } from "@maplibre/maplibre-gl-directions";
 
-  const meta = examples.find((example) => example.path === $location);
+  const meta = examples.find((example) => example.path === $location)!;
 
-  let mapRef: HTMLElement | undefined = undefined;
-  let map: Map | undefined = undefined;
-  let directions: MapLibreGlDirections | undefined = undefined;
+  let mapRef: HTMLElement;
+  let map: Map;
+  let directions: MapLibreGlDirections;
   // `maxTouchPoints` isn't recognized by TS. Safe to ignore.
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
