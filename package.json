@@ -80,7 +80,7 @@
     "eslint": "^8.56.0",
     "eslint-plugin-svelte": "^2.35.1",
     "husky": "^8.0.3",
-    "lint-staged": "^15.2.0",
+    "lint-staged": "^15.2.2",
     "lodash": "^4.17.21",
     "maplibre-gl": "^3.6.2",
     "postcss": "^8.4.33",
