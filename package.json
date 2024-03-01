@@ -84,7 +84,7 @@
     "lodash": "^4.17.21",
     "maplibre-gl": "^3.6.2",
     "postcss": "^8.4.33",
-    "postcss-load-config": "^4.0.1",
+    "postcss-load-config": "^5.0.3",
     "prettier": "^3.1.1",
     "prettier-plugin-svelte": "^3.0.3",
     "rollup-plugin-visualizer": "^5.9.2",
