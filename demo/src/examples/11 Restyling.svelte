@@ -24,31 +24,45 @@
       style,
       center: [-74.1197632, 40.6974034],
       zoom: 11,
-      customAttribution:
-        '<a href=\'http://project-osrm.org/\' target=\'_blank\'>&copy; OSRM</a> | Icons made by <a href="https://www.flaticon.com/authors/vectors-market" title="Vectors Market">Vectors Market</a> and by <a href="https://www.flaticon.com/authors/dinosoftlabs" title="DinosoftLabs">DinosoftLabs</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>',
       fadeDuration: 0,
+      attributionControl: false,
     });
+
+    map.addControl(
+      new maplibregl.AttributionControl({
+        customAttribution:
+          '<a href=\'http://project-osrm.org/\' target=\'_blank\'>&copy; OSRM</a> | Icons made by <a href="https://www.flaticon.com/authors/vectors-market" title="Vectors Market">Vectors Market</a> and by <a href="https://www.flaticon.com/authors/dinosoftlabs" title="DinosoftLabs">DinosoftLabs</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>',
+      }),
+    );
 
     map.on("load", () => {
       // make sure to load and add the images used by the custom directions' styles first:
       // a balloon for thw waypoints,
-      map.loadImage(balloonWaypointImgUrl, (error, image) => {
-        if (!error && image) map.addImage("balloon-waypoint", image);
+      map.loadImage(balloonWaypointImgUrl).then((image) => {
+        if (image) {
+          map.addImage("balloon-waypoint", image.data);
+        }
       });
 
       // a balloon for the snappoints,
-      map.loadImage(balloonSnappointImgUrl, (error, image) => {
-        if (!error && image) map.addImage("balloon-snappoint", image);
+      map.loadImage(balloonSnappointImgUrl).then((image) => {
+        if (image) {
+          map.addImage("balloon-snappoint", image.data);
+        }
       });
 
-      // a balloon for the hoverpoints
-      map.loadImage(balloonHoverpointImgUrl, (error, image) => {
-        if (!error && image) map.addImage("balloon-hoverpoint", image);
+      // a balloon for the hoverpoints,
+      map.loadImage(balloonHoverpointImgUrl).then((image) => {
+        if (image) {
+          map.addImage("balloon-hoverpoint", image.data);
+        }
       });
 
       // and a pattern-image for the routelines.
-      map.loadImage(routelineImgUrl, (error, image) => {
-        if (!error && image) map.addImage("routeline", image);
+      map.loadImage(routelineImgUrl).then((image) => {
+        if (image) {
+          map.addImage("routeline", image.data);
+        }
       });
 
       directions = new MapLibreGlDirections(map, {
