@@ -23,8 +23,14 @@
       style,
       center: [-74.1197632, 40.6974034],
       zoom: 11,
-      customAttribution: "<a href='http://project-osrm.org/' target='_blank'>&copy; OSRM</a>",
+      attributionControl: false,
     });
+
+    map.addControl(
+      new maplibregl.AttributionControl({
+        customAttribution: "<a href='http://project-osrm.org/' target='_blank' rel='noreferrer'>&copy; OSRM</a>",
+      }),
+    );
 
     map.on("load", () => {
       directions = new MapLibreGlDirections(map, {

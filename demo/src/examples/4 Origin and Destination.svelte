@@ -19,9 +19,15 @@
       style,
       center: [-74.1197632, 40.6974034],
       zoom: 11,
-      customAttribution: "<a href='http://project-osrm.org/' target='_blank'>&copy; OSRM</a>",
       fadeDuration: 0,
+      attributionControl: false,
     });
+
+    map.addControl(
+      new maplibregl.AttributionControl({
+        customAttribution: "<a href='http://project-osrm.org/' target='_blank'>&copy; OSRM</a>",
+      }),
+    );
 
     const layers = layersFactory();
     layers.push({

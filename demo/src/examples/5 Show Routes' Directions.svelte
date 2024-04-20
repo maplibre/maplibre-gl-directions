@@ -20,13 +20,19 @@
       style,
       center: [-74.1197632, 40.6974034],
       zoom: 11,
-      customAttribution: "<a href='http://project-osrm.org/' target='_blank'>&copy; OSRM</a>",
+      attributionControl: false,
     });
 
+    map.addControl(
+      new maplibregl.AttributionControl({
+        customAttribution: "<a href='http://project-osrm.org/' target='_blank'>&copy; OSRM</a>",
+      }),
+    );
+
     // load the arrow image and add it to the map
-    map.loadImage(DirectionArrowImageUrl, (error, image) => {
-      if (!error && image) {
-        map.addImage("direction-arrow", image);
+    map.loadImage(DirectionArrowImageUrl).then((image) => {
+      if (image) {
+        map.addImage("direction-arrow", image.data);
       }
     });
 

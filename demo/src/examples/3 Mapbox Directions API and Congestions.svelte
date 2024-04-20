@@ -21,9 +21,15 @@
       style,
       center: [-74.1197632, 40.6974034],
       zoom: 11,
-      customAttribution:
-        "<a href='//docs.mapbox.com/help/getting-started/directions/' target='_blank'>&copy; Mapbox Directions</a>",
+      attributionControl: false,
     });
+
+    _map.addControl(
+      new maplibregl.AttributionControl({
+        customAttribution:
+          "<a href='//docs.mapbox.com/help/getting-started/directions/' target='_blank'>&copy; Mapbox Directions</a>",
+      }),
+    );
 
     _map.on("load", () => {
       map = _map;
