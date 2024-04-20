@@ -108,16 +108,17 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   }
 
   protected async fetch({ method, url, payload }: RequestData) {
-    const response = (await (method === "get"
-      ? await fetch(`${url}?${payload}`, { signal: this.abortController?.signal })
-      : await fetch(`${url}`, {
-          signal: this.abortController?.signal,
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: payload,
-        })
+    const response = (await (
+      method === "get"
+        ? await fetch(`${url}?${payload}`, { signal: this.abortController?.signal })
+        : await fetch(`${url}`, {
+            signal: this.abortController?.signal,
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: payload,
+          })
     ).json()) as Directions;
 
     if (response.code !== "Ok") throw new Error(response.message ?? "An unexpected error occurred.");
