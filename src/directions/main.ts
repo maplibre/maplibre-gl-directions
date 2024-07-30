@@ -747,6 +747,12 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.map.dragPan.enable();
 
     this.draw();
+
+    // A bugfix (#232). It should be possible to drag a waypoint again right after the previous drag ended. Whether
+    // the waypoint is draggable or not is decided by the `onMove` handler, but the handler is only invoked on mouse
+    // moves. So, instead of waiting for a follow-up mouse move, we trigger the respective callback manually.
+    // @see https://github.com/maplibre/maplibre-gl-directions/issues/232
+    this.onMove(e);
   }
 
   protected lastRequestMousePosition = {
@@ -845,6 +851,16 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     // the selected route might have changed, so it's important not to skip its redraw
     this.draw(false);
+
+    // A bugfix (#232). It should be possible to drag a waypoint to a new location right after it was created. Whether
+    // the waypoint is draggable or not is decided by the `onMove` handler, but the handler is only invoked on mouse
+    // moves. So, instead of waiting for a follow-up mouse move, we trigger the respective callback manually.
+    // The `idle` event is fired only after it's possible to actually find the waypoint on the map (after it has been
+    // rendered).
+    // @see https://github.com/maplibre/maplibre-gl-directions/issues/232
+    this.map.once("idle", () => {
+      this.onMove(e);
+    });
   }
 
   protected assignWaypointsCategories() {
