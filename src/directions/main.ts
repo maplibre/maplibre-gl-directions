@@ -952,6 +952,12 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         this.map.off("mousemove", this.onMoveHandler);
         this.map.off("click", this.onClickHandler);
       }
+
+      // see #192 (https://github.com/maplibre/maplibre-gl-directions/issues/192)
+      // There may be cases when the interactivity gets disabled while fetching the routes. In this case it's important
+      // to manually restore the map's drag-pan functionality, because after the map becomes non-interactive, the event
+      // listeners responsible for doing that won't be fired anymore.
+      this.map.dragPan.enable();
     }
   }
 
