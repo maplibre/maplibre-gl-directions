@@ -642,7 +642,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
   protected noMouseMovementTimer?: ReturnType<typeof setTimeout>;
 
-  protected async onDragUp(e: MapMouseEvent | MapTouchEvent) {
+  protected onDragUp(e: MapMouseEvent | MapTouchEvent) {
     /*
      * If the routes should update while dragging, there's some cleanup to do when releasing the mouse.
      */
@@ -680,15 +680,14 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         /*
          * If the routing request has failed for some reason, restore the waypoint's original position.
          */
-        try {
-          await this.fetchDirections(waypointEvent);
-        } catch (err) {
+
+        this.fetchDirections(waypointEvent).catch((err) => {
           if (!(err instanceof DOMException && err.name == "AbortError")) {
-            if (this.waypointBeingDraggedInitialCoordinates) {
+            if (this.waypointBeingDragged && this.waypointBeingDraggedInitialCoordinates) {
               this.waypointBeingDragged.geometry.coordinates = this.waypointBeingDraggedInitialCoordinates;
             }
           }
-        }
+        });
 
         this.waypointBeingDragged = undefined;
         this.waypointBeingDraggedInitialCoordinates = undefined;
