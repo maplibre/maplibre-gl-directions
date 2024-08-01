@@ -132,18 +132,11 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
      * implied be calling this method), we abort it as we don't need the previous value anymore.
      */
     this.abortController?.abort();
-    const prevInteractive = this.interactive;
 
     if (this._waypoints.length >= 2) {
       this.fire(new MapLibreGlDirectionsRoutingEvent("fetchroutesstart", originalEvent));
 
       this.abortController = new AbortController();
-      const signal = this.abortController.signal;
-      signal.onabort = () => {
-        this.interactive = prevInteractive;
-      };
-
-      this.interactive = false;
 
       let timer;
       if (this.configuration.requestTimeout !== null) {
@@ -221,11 +214,6 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
           }),
         );
       } finally {
-        // see #189 (https://github.com/maplibre/maplibre-gl-directions/issues/189)
-        if (this.abortController?.signal.reason !== "DESTROY") this.interactive = prevInteractive;
-
-        this.abortController = undefined;
-
         clearTimeout(timer);
       }
 
@@ -747,6 +735,12 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.map.dragPan.enable();
 
     this.draw();
+
+    // After the moved waypoint was rendered, imitate hovering the mouse over it (because it actually keeps being
+    // hovered right after the drug-up event ends).
+    this.map.once("idle", () => {
+      this.onMove(e);
+    });
   }
 
   protected lastRequestMousePosition = {
@@ -845,6 +839,12 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     // The selected route might have changed, so it's important not to skip its redraw.
     this.draw(false);
+
+    // After the added waypoint was rendered, imitate hovering the mouse over it (because it actually keeps being
+    // hovered right after the click event ends).
+    this.map.once("idle", () => {
+      this.onMove(e);
+    });
   }
 
   protected assignWaypointsCategories() {
@@ -1136,8 +1136,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
    * de-initializing the instance.
    */
   destroy() {
-    // see #189 (https://github.com/maplibre/maplibre-gl-directions/issues/189)
-    this.abortController?.abort("DESTROY");
+    this.abortController?.abort();
 
     this.clear();
     this.hoverable = false;
