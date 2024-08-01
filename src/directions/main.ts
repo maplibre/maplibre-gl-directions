@@ -128,8 +128,8 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
   protected async fetchDirections(originalEvent: MapLibreGlDirectionsWaypointEvent) {
     /*
-     * If a request from a previous fetchDirections is already running,
-     * we abort it as we don't need the previous value anymore
+     * If a request from a previous fetchDirections is already running (there's no such a check really, but this is
+     * implied be calling this method), we abort it as we don't need the previous value anymore.
      */
     this.abortController?.abort();
     const prevInteractive = this.interactive;
@@ -600,8 +600,8 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
   protected onDragMove(e: MapMouseEvent | MapTouchEvent) {
     /*
-     * when updateOnMove is active, if this timeout ever triggers it means we are dragging,
-     * but not moving the mouse.
+     * When the `updateOnMove` option is on, if this timeout ever triggers, it means we are dragging, but not moving the
+     * mouse.
      */
     if (this.configuration.refreshOnMove) {
       clearTimeout(this.noMouseMovementTimer);
@@ -627,12 +627,13 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
       this.hoverpoint.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
     }
+
     this.currentMousePosition = e.point;
     this.draw();
 
     /*
-     * If the user selected a waypoint or a routeline and routes should update while dragging,
-     * we initiate the live updating process.
+     * If the user selected a waypoint or a routeline and routes should update while dragging, we initiate the live
+     * updating process.
      */
     if (this.configuration.refreshOnMove && !this.refreshOnMoveIsRefreshing) {
       this.liveRefreshHandler(e);
@@ -643,7 +644,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
   protected async onDragUp(e: MapMouseEvent | MapTouchEvent) {
     /*
-     * if routes should update while dragging, there's some cleanup to do when releasing the mouse
+     * If the routes should update while dragging, there's some cleanup to do when releasing the mouse.
      */
     if (this.configuration.refreshOnMove) {
       clearTimeout(this.noMouseMovementTimer);
@@ -655,7 +656,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     /*
      * Only add a new waypoint or change the dragged one's position if the mouse has been dragged for more than the
-     * specified threshold. If the specified threshold's value is less than zero then treat it as if it was zero.
+     * configured threshold. If the specified threshold's value is less than zero then treat it as if it was zero.
      */
     if (
       Math.abs(e.point.x - this.dragDownPosition?.x) >
@@ -693,7 +694,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         this.waypointBeingDraggedInitialCoordinates = undefined;
       } else if (this.hoverpoint) {
         /*
-         * If the selected route line has been dragged then add a waypoint at the previously saved index and remove the
+         * If the selected routeline has been dragged then add a waypoint at the previously saved index and remove the
          * hoverpoint.
          */
 
@@ -726,7 +727,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.deHighlight();
 
     /*
-     * Remove the specifically assigned for the drag-related events listeners.
+     * Remove the listeners assigned specifically for the drag-related events.
      */
     if (e.type === "touchend") {
       this.map.off("touchmove", this.onDragMoveHandler);
@@ -747,12 +748,6 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.map.dragPan.enable();
 
     this.draw();
-
-    // A bugfix (#232). It should be possible to drag a waypoint again right after the previous drag ended. Whether
-    // the waypoint is draggable or not is decided by the `onMove` handler, but the handler is only invoked on mouse
-    // moves. So, instead of waiting for a follow-up mouse move, we trigger the respective callback manually.
-    // @see https://github.com/maplibre/maplibre-gl-directions/issues/232
-    this.onMove(e);
   }
 
   protected lastRequestMousePosition = {
@@ -804,7 +799,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       ],
     })[0];
 
-    if (this._interactive && this.configuration.sensitiveWaypointLayers.includes(feature?.layer.id ?? "")) {
+    if (this.interactive && this.configuration.sensitiveWaypointLayers.includes(feature?.layer.id ?? "")) {
       /*
        * If a waypoint is clicked, remove it.
        */
@@ -816,7 +811,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       if (~respectiveWaypointIndex) {
         this._removeWaypoint(respectiveWaypointIndex, e);
       }
-    } else if (this._interactive && this.configuration.sensitiveSnappointLayers.includes(feature?.layer.id ?? "")) {
+    } else if (this.interactive && this.configuration.sensitiveSnappointLayers.includes(feature?.layer.id ?? "")) {
       /*
        * If a snappoint is clicked, find its respective waypoint and remove it.
        */
@@ -833,7 +828,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       this.configuration.sensitiveAltRoutelineLayers.includes(feature?.layer.id ?? "")
     ) {
       /*
-       * If an alternative route line is clicked, set its index as the selected route's one.
+       * If an alternative routeline is clicked, set its index as the selected route's one.
        */
 
       this.selectedRouteIndex = this.routelines.findIndex((routeline) => {
@@ -841,26 +836,16 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
           return segment.properties?.id === feature?.properties?.id;
         });
       });
-    } else if (this._interactive && !this.configuration.sensitiveRoutelineLayers.includes(feature?.layer.id ?? "")) {
+    } else if (this.interactive && !this.configuration.sensitiveRoutelineLayers.includes(feature?.layer.id ?? "")) {
       /*
-       * If the selected route line is clicked, don't add a new waypoint. Else do.
+       * If the selected routeline is clicked, don't add a new waypoint. Else do.
        */
 
       this._addWaypoint([e.lngLat.lng, e.lngLat.lat], undefined, e);
     }
 
-    // the selected route might have changed, so it's important not to skip its redraw
+    // The selected route might have changed, so it's important not to skip its redraw.
     this.draw(false);
-
-    // A bugfix (#232). It should be possible to drag a waypoint to a new location right after it was created. Whether
-    // the waypoint is draggable or not is decided by the `onMove` handler, but the handler is only invoked on mouse
-    // moves. So, instead of waiting for a follow-up mouse move, we trigger the respective callback manually.
-    // The `idle` event is fired only after it's possible to actually find the waypoint on the map (after it has been
-    // rendered).
-    // @see https://github.com/maplibre/maplibre-gl-directions/issues/232
-    this.map.once("idle", () => {
-      this.onMove(e);
-    });
   }
 
   protected assignWaypointsCategories() {
