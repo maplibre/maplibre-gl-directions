@@ -1,6 +1,13 @@
 {
   "name": "@maplibre/maplibre-gl-directions",
   "version": "0.7.1",
+  "type": "module",
+  "main": "./dist/maplibre-gl-directions.js",
+  "module": "./dist/maplibre-gl-directions.js",
+  "types": "./dist/src/main.d.ts",
+  "files": [
+    "dist"
+  ],
   "license": "MIT",
   "homepage": "https://maplibre.org/maplibre-gl-directions/#/",
   "repository": "https://github.com/maplibre/maplibre-gl-directions",
@@ -11,12 +18,6 @@
     "mapbox",
     "maplibre"
   ],
-  "files": [
-    "dist"
-  ],
-  "module": "./dist/maplibre-gl-directions.js",
-  "types": "./dist/src/main.d.ts",
-  "type": "module",
   "prettier": {
     "tabWidth": 2,
     "semi": true,
