@@ -15,5 +15,12 @@ export default defineConfig({
       entry: "src/main.ts",
       formats: ["es", "cjs"],
     },
+
+    rollupOptions: {
+      output: {
+        // Because the plugin provides both the default and named exports.
+        exports: "named",
+      },
+    },
   },
 });
