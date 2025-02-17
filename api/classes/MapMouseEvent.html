@@ -19,7 +19,7 @@
 <div class="tsd-comment tsd-typography"><p><code>MapMouseEvent</code> is the event type for mouse-related map events.</p>
 </div>
 <div class="tsd-comment tsd-typography">
-<h4>Example</h4><pre><code class="language-ts"><span class="hl-7">// The `click` event is an example of a `MapMouseEvent`.</span><br/><span class="hl-7">// Set up an event listener on the map.</span><br/><span class="hl-2">map</span><span class="hl-1">.</span><span class="hl-4">on</span><span class="hl-1">(</span><span class="hl-3">&#39;click&#39;</span><span class="hl-1">, </span><span class="hl-5">function</span><span class="hl-1">(</span><span class="hl-2">e</span><span class="hl-1">) {</span><br/><span class="hl-1">  </span><span class="hl-7">// The event object (e) contains information like the</span><br/><span class="hl-1">  </span><span class="hl-7">// coordinates of the point on the map that was clicked.</span><br/><span class="hl-1">  </span><span class="hl-2">console</span><span class="hl-1">.</span><span class="hl-4">log</span><span class="hl-1">(</span><span class="hl-3">&#39;A click event has occurred at &#39;</span><span class="hl-1"> + </span><span class="hl-2">e</span><span class="hl-1">.</span><span class="hl-2">lngLat</span><span class="hl-1">);</span><br/><span class="hl-1">});</span>
+<h4>Example</h4><pre><code class="language-ts"><span class="hl-7">// The `click` event is an example of a `MapMouseEvent`.</span><br/><span class="hl-7">// Set up an event listener on the map.</span><br/><span class="hl-2">map</span><span class="hl-1">.</span><span class="hl-4">on</span><span class="hl-1">(</span><span class="hl-3">&#39;click&#39;</span><span class="hl-1">, (</span><span class="hl-2">e</span><span class="hl-1">) </span><span class="hl-5">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-7">// The event object (e) contains information like the</span><br/><span class="hl-1">  </span><span class="hl-7">// coordinates of the point on the map that was clicked.</span><br/><span class="hl-1">  </span><span class="hl-2">console</span><span class="hl-1">.</span><span class="hl-4">log</span><span class="hl-1">(</span><span class="hl-3">&#39;A click event has occurred at &#39;</span><span class="hl-1"> + </span><span class="hl-2">e</span><span class="hl-1">.</span><span class="hl-2">lngLat</span><span class="hl-1">);</span><br/><span class="hl-1">});</span>
 </code><button>Copy</button></pre>
 </div></section>
 <section class="tsd-panel tsd-hierarchy">
@@ -33,7 +33,7 @@
 <ul class="tsd-hierarchy">
 <li><span class="tsd-signature-type ">MapLibreEvent</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">MouseEvent</span><span class="tsd-signature-symbol">&gt;</span></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in node_modules/maplibre-gl/dist/maplibre-gl.d.ts:8025</li></ul></aside>
+<li>Defined in node_modules/maplibre-gl/dist/maplibre-gl.d.ts:9279</li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -81,14 +81,14 @@
 <h4 class="tsd-returns-title">Returns <a href="MapMouseEvent.html" class="tsd-signature-type tsd-kind-class">MapMouseEvent</a></h4><aside class="tsd-sources">
 <p>Overrides Event$1.constructor</p>
 <ul>
-<li>Defined in node_modules/maplibre-gl/dist/maplibre-gl.d.ts:8063</li></ul></aside></li></ul></section></section>
+<li>Defined in node_modules/maplibre-gl/dist/maplibre-gl.d.ts:9317</li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Properties</h2>
 <section class="tsd-panel tsd-member tsd-is-external"><a id="_defaultPrevented" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>_default<wbr/>Prevented</span><a href="#_defaultPrevented" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">_default<wbr/>Prevented</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in node_modules/maplibre-gl/dist/maplibre-gl.d.ts:8062</li></ul></aside></section>
+<li>Defined in node_modules/maplibre-gl/dist/maplibre-gl.d.ts:9316</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-external"><a id="lngLat" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>lng<wbr/>Lat</span><a href="#lngLat" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">lng<wbr/>Lat</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">LngLat</span></div>
@@ -96,7 +96,7 @@
 </div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in node_modules/maplibre-gl/dist/maplibre-gl.d.ts:8045</li></ul></aside></section>
+<li>Defined in node_modules/maplibre-gl/dist/maplibre-gl.d.ts:9299</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-external"><a id="originalEvent" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>original<wbr/>Event</span><a href="#originalEvent" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">original<wbr/>Event</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">MouseEvent</span></div>
@@ -105,7 +105,7 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Implementation of MapLibreEvent.originalEvent</p>
 <ul>
-<li>Defined in node_modules/maplibre-gl/dist/maplibre-gl.d.ts:8037</li></ul></aside></section>
+<li>Defined in node_modules/maplibre-gl/dist/maplibre-gl.d.ts:9291</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-external"><a id="point" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>point</span><a href="#point" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">point</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">Point</span></div>
@@ -113,7 +113,7 @@
 </div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in node_modules/maplibre-gl/dist/maplibre-gl.d.ts:8041</li></ul></aside></section>
+<li>Defined in node_modules/maplibre-gl/dist/maplibre-gl.d.ts:9295</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-external"><a id="target" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>target</span><a href="#target" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">target</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type ">Map$1</span></div>
@@ -122,7 +122,7 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Implementation of MapLibreEvent.target</p>
 <ul>
-<li>Defined in node_modules/maplibre-gl/dist/maplibre-gl.d.ts:8033</li></ul></aside></section>
+<li>Defined in node_modules/maplibre-gl/dist/maplibre-gl.d.ts:9287</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-external"><a id="type" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>type</span><a href="#type" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">type</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;mousedown&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;mouseup&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;click&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;dblclick&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;mousemove&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;mouseover&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;mouseenter&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;mouseleave&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;mouseout&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;contextmenu&quot;</span></div>
@@ -132,7 +132,7 @@
 <p>Implementation of MapLibreEvent.type</p>
 <p>Overrides Event$1.type</p>
 <ul>
-<li>Defined in node_modules/maplibre-gl/dist/maplibre-gl.d.ts:8029</li></ul></aside></section></section>
+<li>Defined in node_modules/maplibre-gl/dist/maplibre-gl.d.ts:9283</li></ul></aside></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Accessors</h2>
 <section class="tsd-panel tsd-member tsd-is-external"><a id="defaultPrevented" class="tsd-anchor"></a>
@@ -145,7 +145,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in node_modules/maplibre-gl/dist/maplibre-gl.d.ts:8061</li></ul></aside></li></ul></section></section>
+<li>Defined in node_modules/maplibre-gl/dist/maplibre-gl.d.ts:9315</li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Methods</h2>
 <section class="tsd-panel tsd-member tsd-is-external"><a id="preventDefault" class="tsd-anchor"></a>
@@ -165,7 +165,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in node_modules/maplibre-gl/dist/maplibre-gl.d.ts:8057</li></ul></aside></li></ul></section></section></div>
+<li>Defined in node_modules/maplibre-gl/dist/maplibre-gl.d.ts:9311</li></ul></aside></li></ul></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
