@@ -67,7 +67,7 @@
     "maplibre-gl": "^5.0.0"
   },
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^2.5.3",
+    "@sveltejs/vite-plugin-svelte": "^5.0.3",
     "@tailwindcss/forms": "^0.5.7",
     "@tsconfig/svelte": "^5.0.4",
     "@types/geojson": "^7946.0.13",
@@ -97,6 +97,6 @@
     "tslib": "^2.6.2",
     "typedoc": "^0.24.8",
     "typescript": "^5.1.6",
-    "vite": "^4.5.3"
+    "vite": "^6.2.3"
   }
 }
