@@ -12,6 +12,8 @@
 
   let mapRef: HTMLElement;
   let directions: MapLibreGlDirections;
+
+  let preventDefault = false;
   let messages: string[] = [];
 
   onMount(() => {
@@ -39,11 +41,13 @@
       directions.interactive = true;
 
       directions.on("beforeaddwaypoint", (e) => {
-        // e.preventDefault();
+        if (preventDefault) {
+          e.preventDefault();
+        }
 
-        messages.push(
-          `<strong>${e.type}</strong>: waypoint will be added at index <strong>${e.data.index}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`,
-        );
+        let message = `<strong>${e.type}</strong>: waypoint will be added at index <strong>${e.data.index}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`;
+        if (preventDefault) message = `<s>${message}</s>`;
+        messages.push(message);
         messages = messages;
       });
 
@@ -55,11 +59,13 @@
       });
 
       directions.on("beforeremovewaypoint", (e) => {
-        // e.preventDefault();
+        if (preventDefault) {
+          e.preventDefault();
+        }
 
-        messages.push(
-          `<strong>${e.type}</strong>: waypoint will be removed at index <strong>${e.data.index}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`,
-        );
+        let message = `<strong>${e.type}</strong>: waypoint will be removed at index <strong>${e.data.index}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`;
+        if (preventDefault) message = `<s>${message}</s>`;
+        messages.push(message);
         messages = messages;
       });
 
@@ -71,15 +77,17 @@
       });
 
       directions.on("beforemovewaypoint", (e) => {
-        e.preventDefault();
+        if (preventDefault) {
+          e.preventDefault();
+        }
 
-        messages.push(
-          `<strong>${e.type}</strong>: waypoint at index <strong>${
-            e.data.index
-          }</strong> will be moved from coordinates ${e.data.initialCoordinates
-            ?.map((c) => c.toFixed(5))
-            .join(", ")}. Original event - <strong>${e.originalEvent?.type}</strong>`,
-        );
+        let message = `<strong>${e.type}</strong>: waypoint at index <strong>${
+          e.data.index
+        }</strong> will be moved from coordinates ${e.data.initialCoordinates
+          ?.map((c) => c.toFixed(5))
+          .join(", ")}. Original event - <strong>${e.originalEvent?.type}</strong>`;
+        if (preventDefault) message = `<s>${message}</s>`;
+        messages.push(message);
         messages = messages;
       });
 
@@ -118,6 +126,17 @@
     This example listens for all the available events and logs them below. Interact with the map to see the emitted
     events.
   </p>
+
+  <label>
+    <input type="checkbox" bind:checked={preventDefault} />
+    Prevent Default
+  </label>
+
+  <small>
+    While the checkbox above is selected, all the subsequent cancelable events will have their default behavior
+    prevented by calling the event's <code>preventDefault()</code> method. Such events will be displayed below as a strikethrough
+    text
+  </small>
 
   <ol>
     {#each messages as message}
