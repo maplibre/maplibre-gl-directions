@@ -39,7 +39,7 @@
       directions.interactive = true;
 
       directions.on("addwaypoint", (e) => {
-        e.preventDefault();
+        // e.preventDefault();
 
         messages.push(
           `<strong>${e.type}</strong>: waypoint added at index <strong>${e.data.index}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`,
@@ -48,6 +48,8 @@
       });
 
       directions.on("removewaypoint", (e) => {
+        e.preventDefault();
+
         messages.push(
           `<strong>${e.type}</strong>: waypoint removed at index <strong>${e.data.index}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`,
         );
@@ -55,6 +57,8 @@
       });
 
       directions.on("movewaypoint", (e) => {
+        // e.preventDefault();
+
         messages.push(
           `<strong>${e.type}</strong>: waypoint at index <strong>${
             e.data.index
