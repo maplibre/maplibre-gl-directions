@@ -870,11 +870,6 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     index = index ?? this._waypoints.length;
 
-    const waypointEvent = new MapLibreGlDirectionsCancelableEvent("addwaypoint", originalEvent, {
-      index,
-    });
-    if (!this.fire(waypointEvent)) return;
-
     this._waypoints.splice(
       index,
       0,
@@ -891,6 +886,11 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     this.assignWaypointsCategories();
 
+    const waypointEvent = new MapLibreGlDirectionsCancelableEvent("addwaypoint", originalEvent, {
+      index,
+    });
+    this.fire(waypointEvent);
+
     this.draw();
 
     try {
@@ -903,15 +903,15 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   protected async _removeWaypoint(index: number, originalEvent?: MapMouseEvent | MapTouchEvent) {
     this.abortController?.abort();
 
-    const waypointEvent = new MapLibreGlDirectionsCancelableEvent("removewaypoint", originalEvent, {
-      index,
-    });
-    if (!this.fire(waypointEvent)) return;
-
     this._waypoints.splice(index, 1);
     this.snappoints.splice(index, 1);
 
     this.assignWaypointsCategories();
+
+    const waypointEvent = new MapLibreGlDirectionsCancelableEvent("removewaypoint", originalEvent, {
+      index,
+    });
+    this.fire(waypointEvent);
 
     this.draw();
 

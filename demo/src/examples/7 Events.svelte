@@ -48,7 +48,7 @@
       });
 
       directions.on("removewaypoint", (e) => {
-        e.preventDefault();
+        // e.preventDefault();
 
         messages.push(
           `<strong>${e.type}</strong>: waypoint removed at index <strong>${e.data.index}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`,
