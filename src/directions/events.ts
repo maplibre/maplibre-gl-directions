@@ -2,17 +2,17 @@ import type { Map, MapMouseEvent, MapTouchEvent } from "maplibre-gl";
 import type { Directions } from "./types";
 
 /**
- * The base class that provides event functionality (`on`, `off`, `fire`).
+ * The base class that provides event functionality (`on`, `off`, `once` and `fire`).
  */
 export class MapLibreGlDirectionsEvented {
+  constructor(map: Map) {
+    this.map = map;
+  }
+
   protected readonly map: Map;
 
   private listeners: ListenersStore = {};
   private oneTimeListeners: ListenersStore = {};
-
-  constructor(map: Map) {
-    this.map = map;
-  }
 
   /**
    * Fires an event and notifies all listeners.
@@ -26,9 +26,9 @@ export class MapLibreGlDirectionsEvented {
     const type: T = event.type as T;
 
     // Fire one-time listeners.
-    const oneTime = this.oneTimeListeners[type];
+    const oneTime = { ...this.oneTimeListeners[type] };
     if (oneTime && oneTime.length > 0) {
-      // Clear the list *before* calling listeners.
+      // Clear the original listeners map.
       this.oneTimeListeners[type] = [];
 
       // Fire all listeners that were in the list.
@@ -46,8 +46,8 @@ export class MapLibreGlDirectionsEvented {
       });
     }
 
-    // This still works because .defaultPrevented exists on the base class, but it can only be *set* by the
-    // CancelableEvent subclass.
+    // Callers can check the method's result to act accordingly when it's needed to cancel some operation as a result of
+    // default action being prevented.
     return !event.defaultPrevented;
   }
 
@@ -97,13 +97,6 @@ export class MapLibreGlDirectionsEvented {
 }
 
 /**
- * Defines the function signature for an event listener.
- */
-export type MapLibreGlDirectionsEventListener<T extends keyof MapLibreGlDirectionsEventType> = (
-  event: MapLibreGlDirectionsEventType[T],
-) => void;
-
-/**
  * Internal type for storing listeners.
  */
 type ListenersStore = Partial<{
@@ -111,12 +104,18 @@ type ListenersStore = Partial<{
 }>;
 
 /**
+ * Defines the function signature for an event listener.
+ */
+export type MapLibreGlDirectionsEventListener<T extends keyof MapLibreGlDirectionsEventType> = (
+  event: MapLibreGlDirectionsEventType[T],
+) => void;
+
+/**
  * Base marker interface for all event data payloads.
  * Events with no data use this directly.
  */
 export interface MapLibreGlDirectionsEventData {
-  // Intentionally empty.
-  // This ensures a common base type without allowing `any`.
+  // Intentionally empty. This ensures a common base type without allowing `any`.
 }
 
 /**
@@ -154,12 +153,16 @@ export interface MapLibreGlDirectionsRoutingData extends MapLibreGlDirectionsEve
   /**
    * The server's response.
    * Only present for the `fetchroutesend` event.
-   * Might be `undefined` if the request failed.
+   * Might be `undefined` if the request has failed.
    */
   directions?: Directions;
 }
 
-// The "any" event type, used for the `originalEvent` property.
+/**
+ * The "any" event type exported to be used by clients when they need a type for a generic event listener.
+ *
+ * This is also used for the `originalEvent` property.
+ */
 export type AnyMapLibreGlDirectionsEvent = MapLibreGlDirectionsEvent<
   keyof MapLibreGlDirectionsEventType,
   MapLibreGlDirectionsEventData
@@ -167,7 +170,7 @@ export type AnyMapLibreGlDirectionsEvent = MapLibreGlDirectionsEvent<
 
 /**
  * The base event object, containing all common logic.
- * This class is not intended to be instantiated directly.
+ * This is an abstract class, and it's not intended to be instantiated directly.
  *
  * @template T - The event type string (e.g., "addwaypoint").
  * @template D - The data payload interface for this event type.
@@ -176,25 +179,28 @@ export abstract class MapLibreGlDirectionsEvent<
   T extends keyof MapLibreGlDirectionsEventType,
   D extends MapLibreGlDirectionsEventData = MapLibreGlDirectionsEventData,
 > {
+  /**
+   * @private
+   */
+  protected constructor(
+    type: T,
+    originalEvent: MapMouseEvent | MapTouchEvent | AnyMapLibreGlDirectionsEvent | undefined,
+    data: D,
+    cancelable: boolean, // Internal flag set by subclasses.
+  ) {
+    this.type = type;
+    this.originalEvent = originalEvent;
+    this.data = data;
+    this._cancelable = cancelable;
+  }
+
   readonly type: T;
   target!: Map;
   originalEvent?: MapMouseEvent | MapTouchEvent | AnyMapLibreGlDirectionsEvent;
   data: D;
 
-  readonly cancelable: boolean;
+  protected readonly _cancelable: boolean;
   protected _defaultPrevented: boolean = false;
-
-  protected constructor(
-    type: T,
-    originalEvent: MapMouseEvent | MapTouchEvent | AnyMapLibreGlDirectionsEvent | undefined,
-    data: D,
-    cancelable: boolean, // Internal flag set by subclasses
-  ) {
-    this.type = type;
-    this.originalEvent = originalEvent;
-    this.data = data;
-    this.cancelable = cancelable;
-  }
 
   /**
    * Whether `preventDefault()` has been called on this event.
@@ -207,14 +213,12 @@ export abstract class MapLibreGlDirectionsEvent<
 
 /**
  * A non-cancelable event.
- * It does NOT have a `preventDefault()` method.
+ * It does NOT have the `preventDefault()` method.
  */
 export class MapLibreGlDirectionsNonCancelableEvent<
   T extends keyof MapLibreGlDirectionsEventType,
   D extends MapLibreGlDirectionsEventData = MapLibreGlDirectionsEventData,
 > extends MapLibreGlDirectionsEvent<T, D> {
-  declare readonly cancelable: false;
-
   /**
    * @private
    */
@@ -225,6 +229,8 @@ export class MapLibreGlDirectionsNonCancelableEvent<
   ) {
     super(type, originalEvent, data, false); // Always pass `false`.
   }
+
+  declare readonly _cancelable: false;
 }
 
 /**
@@ -235,8 +241,6 @@ export class MapLibreGlDirectionsCancelableEvent<
   T extends keyof MapLibreGlDirectionsEventType,
   D extends MapLibreGlDirectionsEventData = MapLibreGlDirectionsEventData,
 > extends MapLibreGlDirectionsEvent<T, D> {
-  declare readonly cancelable: true;
-
   /**
    * @private
    */
@@ -247,6 +251,8 @@ export class MapLibreGlDirectionsCancelableEvent<
   ) {
     super(type, originalEvent, data, true); // Always pass `true`.
   }
+
+  declare readonly _cancelable: true;
 
   /**
    * Prevents the default action associated with this event.
