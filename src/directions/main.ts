@@ -488,6 +488,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
           this.configuration.sensitiveRoutelineLayers.includes(feature?.layer.id ?? "")
         );
       })[0];
+
       /*
        * Save the cursor's position to be able to check later whether the dragged feature moved at all.
        */
@@ -506,6 +507,14 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         this.waypointBeingDraggedInitialCoordinates = this.waypointBeingDragged?.geometry.coordinates as
           | [number, number]
           | undefined;
+
+        if (this.waypointBeingDragged && this.waypointBeingDraggedInitialCoordinates) {
+          const event = new MapLibreGlDirectionsCancelableEvent("beforemovewaypoint", e, {
+            index: this._waypoints.indexOf(this.waypointBeingDragged),
+            initialCoordinates: this.waypointBeingDraggedInitialCoordinates,
+          });
+          if (!this.fire(event)) return;
+        }
       } else if (this.configuration.sensitiveRoutelineLayers.includes(feature?.layer.id ?? "")) {
         /*
          * When a routeline (a leg in particular) is being dragged, find its respective depart snappoint's index and save

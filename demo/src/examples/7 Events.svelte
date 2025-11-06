@@ -55,7 +55,7 @@
       });
 
       directions.on("beforeremovewaypoint", (e) => {
-        e.preventDefault();
+        // e.preventDefault();
 
         messages.push(
           `<strong>${e.type}</strong>: waypoint will be removed at index <strong>${e.data.index}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`,
@@ -66,6 +66,19 @@
       directions.on("removewaypoint", (e) => {
         messages.push(
           `<strong>${e.type}</strong>: waypoint removed at index <strong>${e.data.index}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`,
+        );
+        messages = messages;
+      });
+
+      directions.on("beforemovewaypoint", (e) => {
+        e.preventDefault();
+
+        messages.push(
+          `<strong>${e.type}</strong>: waypoint at index <strong>${
+            e.data.index
+          }</strong> will be moved from coordinates ${e.data.initialCoordinates
+            ?.map((c) => c.toFixed(5))
+            .join(", ")}. Original event - <strong>${e.originalEvent?.type}</strong>`,
         );
         messages = messages;
       });
