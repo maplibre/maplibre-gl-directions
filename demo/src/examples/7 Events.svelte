@@ -39,15 +39,17 @@
       directions.interactive = true;
 
       directions.on("addwaypoint", (e) => {
+        e.preventDefault();
+
         messages.push(
-          `<strong>${e.type}</strong>: waypoint added at index <strong>${e.data?.index}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`,
+          `<strong>${e.type}</strong>: waypoint added at index <strong>${e.data.index}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`,
         );
         messages = messages;
       });
 
       directions.on("removewaypoint", (e) => {
         messages.push(
-          `<strong>${e.type}</strong>: waypoint removed at index <strong>${e.data?.index}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`,
+          `<strong>${e.type}</strong>: waypoint removed at index <strong>${e.data.index}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`,
         );
         messages = messages;
       });
@@ -55,8 +57,8 @@
       directions.on("movewaypoint", (e) => {
         messages.push(
           `<strong>${e.type}</strong>: waypoint at index <strong>${
-            e.data?.index
-          }</strong> moved from coordinates ${e.data?.initialCoordinates
+            e.data.index
+          }</strong> moved from coordinates ${e.data.initialCoordinates
             ?.map((c) => c.toFixed(5))
             .join(", ")}. Original event - <strong>${e.originalEvent?.type}</strong>`,
         );
@@ -65,14 +67,14 @@
 
       directions.on("fetchroutesstart", (e) => {
         messages.push(
-          `<strong>${e.type}</strong>: routing request started. Original event - <strong>${e.originalEvent.type}</strong>`,
+          `<strong>${e.type}</strong>: routing request started. Original event - <strong>${e.originalEvent?.type}</strong>`,
         );
         messages = messages;
       });
 
       directions.on("fetchroutesend", (e) => {
         messages.push(
-          `<strong>${e.type}</strong>: routing request finished with code <strong>${e.data?.code}</strong>. Original event - <strong>${e.originalEvent.type}</strong>`,
+          `<strong>${e.type}</strong>: routing request finished with code <strong>${e.data.directions?.code}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`,
         );
         messages = messages;
       });

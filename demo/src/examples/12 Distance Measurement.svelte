@@ -33,7 +33,7 @@
       directions = new DistanceMeasurementMapLibreGlDirections(map, config);
 
       directions.on("fetchroutesend", (ev) => {
-        totalDistance = ev.data?.routes[0].distance as number;
+        totalDistance = ev.data.directions?.routes[0].distance as number;
       });
 
       directions.on("removewaypoint", () => {
