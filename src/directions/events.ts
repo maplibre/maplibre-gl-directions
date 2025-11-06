@@ -270,6 +270,7 @@ export class MapLibreGlDirectionsCancelableEvent<
 export interface MapLibreGlDirectionsEventType {
   /**
    * Fired *before* a waypoint is added.
+   *
    * This event is **cancelable**.
    *
    * Fired from `_addWaypoint`.
@@ -278,6 +279,7 @@ export interface MapLibreGlDirectionsEventType {
 
   /**
    * Fired *after* a waypoint is added and drawn on the map, but before a new routes fetch has been triggered.
+   *
    * This event is **not** cancelable.
    *
    * Fired from `_addWaypoint`.
@@ -286,7 +288,21 @@ export interface MapLibreGlDirectionsEventType {
 
   /**
    * Fired *before* a waypoint is removed.
+   *
    * This event is **cancelable**.
+   *
+   * Fired from `_removeWaypoint`.
+   */
+  beforeremovewaypoint: MapLibreGlDirectionsCancelableEvent<
+    "beforeremovewaypoint",
+    MapLibreGlDirectionsRemoveWaypointData
+  >;
+
+  /**
+   * Fired *after* a waypoint is removed and the changes are drawn on the map, but before a new routes fetch has been
+   * triggered.
+   *
+   * This event is **not** cancelable.
    *
    * Fired from `_removeWaypoint`.
    */

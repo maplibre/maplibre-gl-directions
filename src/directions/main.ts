@@ -908,20 +908,29 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   protected async _removeWaypoint(index: number, originalEvent?: MapMouseEvent | MapTouchEvent) {
     this.abortController?.abort();
 
+    const beforeRemoveWaypointEvent = new MapLibreGlDirectionsCancelableEvent("beforeremovewaypoint", originalEvent, {
+      index,
+    });
+    if (!this.fire(beforeRemoveWaypointEvent)) return;
+
     this._waypoints.splice(index, 1);
     this.snappoints.splice(index, 1);
 
     this.assignWaypointsCategories();
 
-    const waypointEvent = new MapLibreGlDirectionsNonCancelableEvent("removewaypoint", originalEvent, {
-      index,
-    });
-    this.fire(waypointEvent);
-
     this.draw();
 
+    const removeWaypointEvent = new MapLibreGlDirectionsNonCancelableEvent(
+      "removewaypoint",
+      beforeRemoveWaypointEvent,
+      {
+        index,
+      },
+    );
+    this.fire(removeWaypointEvent);
+
     try {
-      await this.fetchDirections(waypointEvent);
+      await this.fetchDirections(removeWaypointEvent);
     } catch (err) {
       // noop
     }
