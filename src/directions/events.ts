@@ -274,6 +274,14 @@ export interface MapLibreGlDirectionsEventType {
    *
    * Fired from `_addWaypoint`.
    */
+  beforeaddwaypoint: MapLibreGlDirectionsCancelableEvent<"beforeaddwaypoint", MapLibreGlDirectionsAddWaypointData>;
+
+  /**
+   * Fired *after* a waypoint is added and drawn on the map, but before a new routes fetch has been triggered.
+   * This event is **not** cancelable.
+   *
+   * Fired from `_addWaypoint`.
+   */
   addwaypoint: MapLibreGlDirectionsNonCancelableEvent<"addwaypoint", MapLibreGlDirectionsAddWaypointData>;
 
   /**
