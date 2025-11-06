@@ -3,7 +3,6 @@ import type { Directions, MapLibreGlDirectionsConfiguration } from "./types";
 import type { Feature, FeatureCollection, LineString, Point } from "geojson";
 import {
   type AnyMapLibreGlDirectionsEvent,
-  MapLibreGlDirectionsCancelableEvent,
   MapLibreGlDirectionsEvented,
   MapLibreGlDirectionsNonCancelableEvent,
 } from "./events";
@@ -886,7 +885,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     this.assignWaypointsCategories();
 
-    const waypointEvent = new MapLibreGlDirectionsCancelableEvent("addwaypoint", originalEvent, {
+    const waypointEvent = new MapLibreGlDirectionsNonCancelableEvent("addwaypoint", originalEvent, {
       index,
     });
     this.fire(waypointEvent);
@@ -908,7 +907,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     this.assignWaypointsCategories();
 
-    const waypointEvent = new MapLibreGlDirectionsCancelableEvent("removewaypoint", originalEvent, {
+    const waypointEvent = new MapLibreGlDirectionsNonCancelableEvent("removewaypoint", originalEvent, {
       index,
     });
     this.fire(waypointEvent);

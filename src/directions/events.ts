@@ -268,7 +268,7 @@ export interface MapLibreGlDirectionsEventType {
    *
    * Fired from `_addWaypoint`.
    */
-  addwaypoint: MapLibreGlDirectionsCancelableEvent<"addwaypoint", MapLibreGlDirectionsAddWaypointData>;
+  addwaypoint: MapLibreGlDirectionsNonCancelableEvent<"addwaypoint", MapLibreGlDirectionsAddWaypointData>;
 
   /**
    * Fired *before* a waypoint is removed.
@@ -276,7 +276,7 @@ export interface MapLibreGlDirectionsEventType {
    *
    * Fired from `_removeWaypoint`.
    */
-  removewaypoint: MapLibreGlDirectionsCancelableEvent<"removewaypoint", MapLibreGlDirectionsRemoveWaypointData>;
+  removewaypoint: MapLibreGlDirectionsNonCancelableEvent<"removewaypoint", MapLibreGlDirectionsRemoveWaypointData>;
 
   /**
    * Fired *after* a waypoint has been moved by dragging.
