@@ -270,7 +270,17 @@ export class MapLibreGlDirectionsCancelableEvent<
 export interface MapLibreGlDirectionsEventType {
   /**
    * Fired *before* a waypoint is added.
+   *
    * This event is **cancelable**.
+   *
+   * Fired from `_addWaypoint`.
+   */
+  beforeaddwaypoint: MapLibreGlDirectionsCancelableEvent<"beforeaddwaypoint", MapLibreGlDirectionsAddWaypointData>;
+
+  /**
+   * Fired *after* a waypoint is added and drawn on the map, but before a new routes fetch has been triggered.
+   *
+   * This event is **not** cancelable.
    *
    * Fired from `_addWaypoint`.
    */
@@ -278,23 +288,57 @@ export interface MapLibreGlDirectionsEventType {
 
   /**
    * Fired *before* a waypoint is removed.
+   *
    * This event is **cancelable**.
+   *
+   * Fired from `_removeWaypoint`.
+   */
+  beforeremovewaypoint: MapLibreGlDirectionsCancelableEvent<
+    "beforeremovewaypoint",
+    MapLibreGlDirectionsRemoveWaypointData
+  >;
+
+  /**
+   * Fired *after* a waypoint is removed and the changes are drawn on the map, but before a new routes fetch has been
+   * triggered.
+   *
+   * This event is **not** cancelable.
    *
    * Fired from `_removeWaypoint`.
    */
   removewaypoint: MapLibreGlDirectionsNonCancelableEvent<"removewaypoint", MapLibreGlDirectionsRemoveWaypointData>;
 
   /**
+   * Fired *before* a waypoint has been moved by dragging.
+   *
+   * This event is **cancelable**.
+   *
+   * Fired from `onDragDown`.
+   */
+  beforemovewaypoint: MapLibreGlDirectionsCancelableEvent<"beforemovewaypoint", MapLibreGlDirectionsMoveWaypointData>;
+
+  /**
    * Fired *after* a waypoint has been moved by dragging.
-   * This event is **not cancelable**.
+   *
+   * This event is **not** cancelable.
    *
    * Fired from `onDragUp` and `liveRefresh`.
    */
   movewaypoint: MapLibreGlDirectionsNonCancelableEvent<"movewaypoint", MapLibreGlDirectionsMoveWaypointData>;
 
   /**
+   * Fired right *before* a hoverpoint is created after starting to drag a routeline.
+   *
+   * This event is **cancelable**.
+   *
+   * Fired from `onMove`.
+   */
+  beforecreatehoverpoint: MapLibreGlDirectionsCancelableEvent<"beforecreatehoverpoint", MapLibreGlDirectionsEventData>;
+
+  /**
    * Fired *after* waypoints are set programmatically.
-   * This event is **not cancelable**.
+   *
+   * This event is **not** cancelable.
    *
    * Fired from `setWaypoints`.
    */
@@ -302,7 +346,8 @@ export interface MapLibreGlDirectionsEventType {
 
   /**
    * Fired *after* waypoints' bearings are rotated.
-   * This event is **not cancelable**.
+   *
+   * This event is **not** cancelable.
    *
    * Fired from `waypointsBearings` setter.
    */
@@ -310,16 +355,19 @@ export interface MapLibreGlDirectionsEventType {
 
   /**
    * Fired when a routing request is about to be made.
-   * This event is **not cancelable**.
+   *
+   * This event is  **cancelable**.
    *
    * Fired from `fetchDirections`.
    */
-  fetchroutesstart: MapLibreGlDirectionsNonCancelableEvent<"fetchroutesstart", MapLibreGlDirectionsEventData>;
+  fetchroutesstart: MapLibreGlDirectionsCancelableEvent<"fetchroutesstart", MapLibreGlDirectionsEventData>;
 
   /**
    * Fired *after* a routing request has finished (successfully or not).
-   * This event is **not cancelable**. Check `event.data.directions`
-   * for the response.
+   *
+   * Check `event.data.directions` for the response.
+   *
+   * This event is **not** cancelable.
    *
    * Fired from `fetchDirections`.
    */

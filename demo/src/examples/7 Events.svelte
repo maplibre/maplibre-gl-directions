@@ -12,6 +12,9 @@
 
   let mapRef: HTMLElement;
   let directions: MapLibreGlDirections;
+
+  let preventDefault = false;
+  let forceAllowAddingWaypoints = false;
   let messages: string[] = [];
 
   onMount(() => {
@@ -38,22 +41,59 @@
 
       directions.interactive = true;
 
+      directions.on("beforeaddwaypoint", (e) => {
+        if (preventDefault && !forceAllowAddingWaypoints) {
+          e.preventDefault();
+        }
+
+        let message = `<strong>${e.type}</strong>: waypoint will be added at index <strong>${e.data.index}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`;
+        if (preventDefault && !forceAllowAddingWaypoints) message = `<s>${message}</s>`;
+        messages.unshift(message);
+        messages = messages;
+      });
+
       directions.on("addwaypoint", (e) => {
-        messages.push(
+        messages.unshift(
           `<strong>${e.type}</strong>: waypoint added at index <strong>${e.data.index}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`,
         );
         messages = messages;
       });
 
+      directions.on("beforeremovewaypoint", (e) => {
+        if (preventDefault) {
+          e.preventDefault();
+        }
+
+        let message = `<strong>${e.type}</strong>: waypoint will be removed at index <strong>${e.data.index}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`;
+        if (preventDefault) message = `<s>${message}</s>`;
+        messages.unshift(message);
+        messages = messages;
+      });
+
       directions.on("removewaypoint", (e) => {
-        messages.push(
+        messages.unshift(
           `<strong>${e.type}</strong>: waypoint removed at index <strong>${e.data.index}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`,
         );
         messages = messages;
       });
 
+      directions.on("beforemovewaypoint", (e) => {
+        if (preventDefault) {
+          e.preventDefault();
+        }
+
+        let message = `<strong>${e.type}</strong>: waypoint at index <strong>${
+          e.data.index
+        }</strong> will be moved from coordinates ${e.data.initialCoordinates
+          ?.map((c) => c.toFixed(5))
+          .join(", ")}. Original event - <strong>${e.originalEvent?.type}</strong>`;
+        if (preventDefault) message = `<s>${message}</s>`;
+        messages.unshift(message);
+        messages = messages;
+      });
+
       directions.on("movewaypoint", (e) => {
-        messages.push(
+        messages.unshift(
           `<strong>${e.type}</strong>: waypoint at index <strong>${
             e.data.index
           }</strong> moved from coordinates ${e.data.initialCoordinates
@@ -63,15 +103,30 @@
         messages = messages;
       });
 
+      directions.on("beforecreatehoverpoint", (e) => {
+        if (preventDefault) {
+          e.preventDefault();
+        }
+
+        let message = `<strong>${e.type}</strong>: a hoverpoint will be created`;
+        if (preventDefault) message = `<s>${message}</s>`;
+        messages.unshift(message);
+        messages = messages;
+      });
+
       directions.on("fetchroutesstart", (e) => {
-        messages.push(
-          `<strong>${e.type}</strong>: routing request started. Original event - <strong>${e.originalEvent?.type}</strong>`,
-        );
+        if (preventDefault) {
+          e.preventDefault();
+        }
+
+        let message = `<strong>${e.type}</strong>: routing request started. Original event - <strong>${e.originalEvent?.type}</strong>`;
+        if (preventDefault) message = `<s>${message}</s>`;
+        messages.unshift(message);
         messages = messages;
       });
 
       directions.on("fetchroutesend", (e) => {
-        messages.push(
+        messages.unshift(
           `<strong>${e.type}</strong>: routing request finished with code <strong>${e.data.directions?.code}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`,
         );
         messages = messages;
@@ -88,15 +143,38 @@
     events.
   </p>
 
-  <ol>
-    {#each messages as message}
-      <li>{@html message}</li>
-    {/each}
-  </ol>
+  <label class="flex items-center gap-3">
+    <input type="checkbox" bind:checked={preventDefault} />
+    <strong>Prevent Default</strong>
+  </label>
+
+  {#if preventDefault}
+    <label class="flex items-center gap-3">
+      <input type="checkbox" bind:checked={forceAllowAddingWaypoints} />
+      <strong>Force-allow adding waypoints</strong>
+    </label>
+  {/if}
+
+  <small>
+    While the "Prevent Default" checkbox above is selected, all the subsequent cancelable events will have their default
+    behavior prevented by calling the event's <code>preventDefault()</code> method. Such events will be displayed below
+    as a strikethrough text.
+
+    {#if preventDefault}
+      Checking the "Force-allow adding waypoints" will make adding waypoints ignore its
+      <code>preventDefault()</code> invocations
+    {/if}
+  </small>
 
   {#if messages.length}
     <button on:click={() => (messages = [])}>Clear</button>
   {/if}
+
+  <ol reversed>
+    {#each messages as message}
+      <li>{@html message}</li>
+    {/each}
+  </ol>
 </AppSidebar>
 
 <div bind:this={mapRef} class="basis-full lg:basis-2/3 shadow-xl" />

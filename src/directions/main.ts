@@ -3,6 +3,7 @@ import type { Directions, MapLibreGlDirectionsConfiguration } from "./types";
 import type { Feature, FeatureCollection, LineString, Point } from "geojson";
 import {
   type AnyMapLibreGlDirectionsEvent,
+  MapLibreGlDirectionsCancelableEvent,
   MapLibreGlDirectionsEvented,
   MapLibreGlDirectionsNonCancelableEvent,
 } from "./events";
@@ -134,7 +135,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.abortController?.abort();
 
     if (this._waypoints.length >= 2) {
-      this.fire(new MapLibreGlDirectionsNonCancelableEvent("fetchroutesstart", originalEvent, {}));
+      if (!this.fire(new MapLibreGlDirectionsCancelableEvent("fetchroutesstart", originalEvent, {}))) return;
 
       this.abortController = new AbortController();
 
@@ -409,6 +410,19 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         if (this.hoverpoint) {
           this.hoverpoint.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
         } else {
+          /*
+            If the hoverpoint creation event was canceled, then it's impossible to create a new waypoint in-between
+            existing ones. Therefore, there's no point anymore in disabling drag-pan functionality and changing the
+            cursor shape. So here we're restoring their defaults.
+           */
+          const beforeCreateHoverpointEvent = new MapLibreGlDirectionsCancelableEvent("beforecreatehoverpoint", e, {});
+          if (!this.fire(beforeCreateHoverpointEvent)) {
+            this.map.getCanvas().style.cursor = "";
+            this.map.dragPan.enable();
+
+            return;
+          }
+
           this.hoverpoint = this.buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT", {
             departSnappointProperties: {
               ...JSON.parse(feature?.properties?.departSnappointProperties ?? "{}"),
@@ -487,6 +501,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
           this.configuration.sensitiveRoutelineLayers.includes(feature?.layer.id ?? "")
         );
       })[0];
+
       /*
        * Save the cursor's position to be able to check later whether the dragged feature moved at all.
        */
@@ -505,6 +520,14 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         this.waypointBeingDraggedInitialCoordinates = this.waypointBeingDragged?.geometry.coordinates as
           | [number, number]
           | undefined;
+
+        if (this.waypointBeingDragged && this.waypointBeingDraggedInitialCoordinates) {
+          const beforeMoveWaypointEvent = new MapLibreGlDirectionsCancelableEvent("beforemovewaypoint", e, {
+            index: this._waypoints.indexOf(this.waypointBeingDragged),
+            initialCoordinates: this.waypointBeingDraggedInitialCoordinates,
+          });
+          if (!this.fire(beforeMoveWaypointEvent)) return;
+        }
       } else if (this.configuration.sensitiveRoutelineLayers.includes(feature?.layer.id ?? "")) {
         /*
          * When a routeline (a leg in particular) is being dragged, find its respective depart snappoint's index and save
@@ -536,6 +559,9 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
             this.hoverpoint.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
           }
         } else {
+          const beforeCreateHoverpointEvent = new MapLibreGlDirectionsCancelableEvent("beforecreatehoverpoint", e, {});
+          if (!this.fire(beforeCreateHoverpointEvent)) return;
+
           this.hoverpoint = this.buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT", {
             departSnappointProperties: {
               ...JSON.parse(feature?.properties?.departSnappointProperties ?? "{}"),
@@ -869,6 +895,11 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     index = index ?? this._waypoints.length;
 
+    const beforeAddWaypointEvent = new MapLibreGlDirectionsCancelableEvent("beforeaddwaypoint", originalEvent, {
+      index,
+    });
+    if (!this.fire(beforeAddWaypointEvent)) return;
+
     this._waypoints.splice(
       index,
       0,
@@ -885,15 +916,15 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     this.assignWaypointsCategories();
 
-    const waypointEvent = new MapLibreGlDirectionsNonCancelableEvent("addwaypoint", originalEvent, {
-      index,
-    });
-    this.fire(waypointEvent);
-
     this.draw();
 
+    const addWaypointEvent = new MapLibreGlDirectionsNonCancelableEvent("addwaypoint", beforeAddWaypointEvent, {
+      index,
+    });
+    this.fire(addWaypointEvent);
+
     try {
-      await this.fetchDirections(waypointEvent);
+      await this.fetchDirections(addWaypointEvent);
     } catch (err) {
       // noop
     }
@@ -902,20 +933,29 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   protected async _removeWaypoint(index: number, originalEvent?: MapMouseEvent | MapTouchEvent) {
     this.abortController?.abort();
 
+    const beforeRemoveWaypointEvent = new MapLibreGlDirectionsCancelableEvent("beforeremovewaypoint", originalEvent, {
+      index,
+    });
+    if (!this.fire(beforeRemoveWaypointEvent)) return;
+
     this._waypoints.splice(index, 1);
     this.snappoints.splice(index, 1);
 
     this.assignWaypointsCategories();
 
-    const waypointEvent = new MapLibreGlDirectionsNonCancelableEvent("removewaypoint", originalEvent, {
-      index,
-    });
-    this.fire(waypointEvent);
-
     this.draw();
 
+    const removeWaypointEvent = new MapLibreGlDirectionsNonCancelableEvent(
+      "removewaypoint",
+      beforeRemoveWaypointEvent,
+      {
+        index,
+      },
+    );
+    this.fire(removeWaypointEvent);
+
     try {
-      await this.fetchDirections(waypointEvent);
+      await this.fetchDirections(removeWaypointEvent);
     } catch (err) {
       // noop
     }
