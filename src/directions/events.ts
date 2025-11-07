@@ -170,7 +170,7 @@ export interface MapLibreGlDirectionsRoutingData extends MapLibreGlDirectionsEve
   /**
    * The server's response.
    *
-   * Only present for the `fetchroutesend` event, and even them might be `undefined` if the request has failed.
+   * Only present for the `fetchroutesend` event, and even then might be `undefined` if the request has failed.
    */
   directions?: Directions;
 }
