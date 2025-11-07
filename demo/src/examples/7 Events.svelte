@@ -107,7 +107,7 @@
           e.preventDefault();
         }
 
-        let message = `<strong>${e.type}</strong>: a hoverpoint will be created`;
+        let message = `<strong>${e.type}</strong>: a hoverpoint will be created between waypoints <strong>#${e.data.departSnappointIndex}</strong> and <strong>#${e.data.departSnappointIndex + 1}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`;
         if (preventDefault) message = `<s>${message}</s>`;
         messages.unshift(message);
         messages = messages;
