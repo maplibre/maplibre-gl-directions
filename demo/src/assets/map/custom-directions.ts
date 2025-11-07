@@ -1,7 +1,7 @@
 import type maplibregl from "maplibre-gl";
 import type { MapLibreGlDirectionsConfiguration, Feature, LineString, Point } from "@maplibre/maplibre-gl-directions";
 import MapLibreGlDirections from "@maplibre/maplibre-gl-directions";
-import { MapLibreGlDirectionsWaypointEvent } from "@maplibre/maplibre-gl-directions";
+import { MapLibreGlDirectionsNonCancelableEvent } from "@maplibre/maplibre-gl-directions";
 
 export default class CustomMapLibreGlDirections extends MapLibreGlDirections {
   constructor(map: maplibregl.Map, configuration?: Partial<MapLibreGlDirectionsConfiguration>) {
@@ -19,7 +19,7 @@ export default class CustomMapLibreGlDirections extends MapLibreGlDirections {
 
     this.assignWaypointsCategories();
 
-    const waypointEvent = new MapLibreGlDirectionsWaypointEvent("setwaypoints", undefined);
+    const waypointEvent = new MapLibreGlDirectionsNonCancelableEvent("setwaypoints", undefined, {});
     this.fire(waypointEvent);
 
     this.draw();

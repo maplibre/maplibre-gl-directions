@@ -67,8 +67,8 @@
     }
 
     directions.on("fetchroutesend", (event) => {
-      if (event.data && event.data.code !== "Ok") {
-        message = `${event.data.code}: ${event.data.message ?? "no details available."}`;
+      if (event.data.directions && event.data.directions.code !== "Ok") {
+        message = `${event.data.directions.code}: ${event.data.directions.message ?? "no details available."}`;
       } else {
         message = "";
       }

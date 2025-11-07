@@ -2,9 +2,9 @@ import type { Map, MapGeoJSONFeature, MapMouseEvent, MapTouchEvent } from "mapli
 import type { Directions, MapLibreGlDirectionsConfiguration } from "./types";
 import type { Feature, FeatureCollection, LineString, Point } from "geojson";
 import {
+  type AnyMapLibreGlDirectionsEvent,
   MapLibreGlDirectionsEvented,
-  MapLibreGlDirectionsRoutingEvent,
-  MapLibreGlDirectionsWaypointEvent,
+  MapLibreGlDirectionsNonCancelableEvent,
 } from "./events";
 import {
   buildConfiguration,
@@ -126,7 +126,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     return response;
   }
 
-  protected async fetchDirections(originalEvent: MapLibreGlDirectionsWaypointEvent) {
+  protected async fetchDirections(originalEvent: AnyMapLibreGlDirectionsEvent) {
     /*
      * If a request from a previous fetchDirections is already running (there's no such a check really, but this is
      * implied be calling this method), we abort it as we don't need the previous value anymore.
@@ -134,7 +134,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.abortController?.abort();
 
     if (this._waypoints.length >= 2) {
-      this.fire(new MapLibreGlDirectionsRoutingEvent("fetchroutesstart", originalEvent));
+      this.fire(new MapLibreGlDirectionsNonCancelableEvent("fetchroutesstart", originalEvent, {}));
 
       this.abortController = new AbortController();
 
@@ -208,7 +208,9 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
             try {
               response = await this.fetch(request);
             } finally {
-              this.fire(new MapLibreGlDirectionsRoutingEvent("fetchroutesend", originalEvent, response));
+              this.fire(
+                new MapLibreGlDirectionsNonCancelableEvent("fetchroutesend", originalEvent, { directions: response }),
+              );
             }
             return response;
           }),
@@ -659,7 +661,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
         this.waypointBeingDragged.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
 
-        const waypointEvent = new MapLibreGlDirectionsWaypointEvent("movewaypoint", e, {
+        const waypointEvent = new MapLibreGlDirectionsNonCancelableEvent("movewaypoint", e, {
           index: this._waypoints.indexOf(this.waypointBeingDragged),
           initialCoordinates: this.waypointBeingDraggedInitialCoordinates,
         });
@@ -766,7 +768,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         /*
          * If a waypoint has been dragged, we fire a "movewaypoint" just like "onDragUp" does.
          */
-        const waypointEvent = new MapLibreGlDirectionsWaypointEvent("movewaypoint", e, {
+        const waypointEvent = new MapLibreGlDirectionsNonCancelableEvent("movewaypoint", e, {
           index: this._waypoints.indexOf(this.waypointBeingDragged),
           initialCoordinates: this.waypointBeingDraggedInitialCoordinates,
         });
@@ -883,7 +885,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     this.assignWaypointsCategories();
 
-    const waypointEvent = new MapLibreGlDirectionsWaypointEvent("addwaypoint", originalEvent, {
+    const waypointEvent = new MapLibreGlDirectionsNonCancelableEvent("addwaypoint", originalEvent, {
       index,
     });
     this.fire(waypointEvent);
@@ -905,7 +907,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     this.assignWaypointsCategories();
 
-    const waypointEvent = new MapLibreGlDirectionsWaypointEvent("removewaypoint", originalEvent, {
+    const waypointEvent = new MapLibreGlDirectionsNonCancelableEvent("removewaypoint", originalEvent, {
       index,
     });
     this.fire(waypointEvent);
@@ -1032,7 +1034,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
       (waypoint.properties || (waypoint.properties = {})).bearing = bearings[i];
     });
 
-    const waypointEvent = new MapLibreGlDirectionsWaypointEvent("rotatewaypoints", undefined);
+    const waypointEvent = new MapLibreGlDirectionsNonCancelableEvent("rotatewaypoints", undefined, {});
     this.fire(waypointEvent);
 
     this.draw();
@@ -1084,7 +1086,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     this.assignWaypointsCategories();
 
-    const waypointEvent = new MapLibreGlDirectionsWaypointEvent("setwaypoints", undefined);
+    const waypointEvent = new MapLibreGlDirectionsNonCancelableEvent("setwaypoints", undefined, {});
     this.fire(waypointEvent);
 
     this.draw();

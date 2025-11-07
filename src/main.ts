@@ -9,10 +9,14 @@ import type {
 } from "./directions/types";
 import {
   type MapLibreGlDirectionsEventType,
-  MapLibreGlDirectionsWaypointEvent,
-  type MapLibreGlDirectionsWaypointEventData,
-  MapLibreGlDirectionsRoutingEvent,
-  type MapLibreGlDirectionsRoutingEventData,
+  type AnyMapLibreGlDirectionsEvent,
+  type MapLibreGlDirectionsEventData,
+  type MapLibreGlDirectionsAddWaypointData,
+  type MapLibreGlDirectionsRemoveWaypointData,
+  type MapLibreGlDirectionsMoveWaypointData,
+  type MapLibreGlDirectionsRoutingData,
+  MapLibreGlDirectionsCancelableEvent,
+  MapLibreGlDirectionsNonCancelableEvent,
 } from "./directions/events";
 import layersFactory from "./directions/layers";
 import type { LayerSpecification, MapMouseEvent, MapTouchEvent } from "maplibre-gl";
@@ -38,14 +42,18 @@ export type {
   Route,
   Leg,
   Snappoint,
-  MapLibreGlDirectionsWaypointEventData,
-  MapLibreGlDirectionsRoutingEventData,
+  AnyMapLibreGlDirectionsEvent,
+  MapLibreGlDirectionsEventData,
+  MapLibreGlDirectionsAddWaypointData,
+  MapLibreGlDirectionsRemoveWaypointData,
+  MapLibreGlDirectionsMoveWaypointData,
+  MapLibreGlDirectionsRoutingData,
 };
 
 /**
  * @protected
  */
-export { MapLibreGlDirectionsWaypointEvent, MapLibreGlDirectionsRoutingEvent };
+export { MapLibreGlDirectionsCancelableEvent, MapLibreGlDirectionsNonCancelableEvent };
 
 /**
  * @protected
