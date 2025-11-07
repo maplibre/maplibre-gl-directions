@@ -101,8 +101,6 @@
       });
 
       directions.on("beforecreatehoverpoint", (e) => {
-        console.log(e);
-
         if (preventDefault) {
           e.preventDefault();
         }
