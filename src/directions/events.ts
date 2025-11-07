@@ -153,6 +153,17 @@ export interface MapLibreGlDirectionsMoveWaypointData extends MapLibreGlDirectio
 }
 
 /**
+ * Data payload for the `beforecreatehoverpoint` event.
+ */
+export interface MapLibreGlDirectionsCreateHoverpointData extends MapLibreGlDirectionsEventData {
+  /**
+   * The index of the snappoint after which the hoverpoint is about to be added. The arrival index will be this plus
+   * one.
+   */
+  departSnappointIndex: number;
+}
+
+/**
  * Data payload for routing-related events.
  */
 export interface MapLibreGlDirectionsRoutingData extends MapLibreGlDirectionsEventData {
@@ -339,7 +350,10 @@ export interface MapLibreGlDirectionsEventType {
    *
    * Fired from `onMove`.
    */
-  beforecreatehoverpoint: MapLibreGlDirectionsCancelableEvent<"beforecreatehoverpoint", MapLibreGlDirectionsEventData>;
+  beforecreatehoverpoint: MapLibreGlDirectionsCancelableEvent<
+    "beforecreatehoverpoint",
+    MapLibreGlDirectionsCreateHoverpointData
+  >;
 
   /**
    * Fired *after* waypoints are set programmatically.

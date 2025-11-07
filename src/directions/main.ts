@@ -415,7 +415,9 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
             existing ones. Therefore, there's no point anymore in disabling drag-pan functionality and changing the
             cursor shape. So here we're restoring their defaults.
            */
-          const beforeCreateHoverpointEvent = new MapLibreGlDirectionsCancelableEvent("beforecreatehoverpoint", e, {});
+          const beforeCreateHoverpointEvent = new MapLibreGlDirectionsCancelableEvent("beforecreatehoverpoint", e, {
+            departSnappointIndex: this.departSnappointIndex,
+          });
           if (!this.fire(beforeCreateHoverpointEvent)) {
             this.map.getCanvas().style.cursor = "";
             this.map.dragPan.enable();
@@ -559,7 +561,9 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
             this.hoverpoint.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
           }
         } else {
-          const beforeCreateHoverpointEvent = new MapLibreGlDirectionsCancelableEvent("beforecreatehoverpoint", e, {});
+          const beforeCreateHoverpointEvent = new MapLibreGlDirectionsCancelableEvent("beforecreatehoverpoint", e, {
+            departSnappointIndex: this.departSnappointIndex,
+          });
           if (!this.fire(beforeCreateHoverpointEvent)) return;
 
           this.hoverpoint = this.buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT", {
