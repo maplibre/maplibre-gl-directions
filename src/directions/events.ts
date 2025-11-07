@@ -327,6 +327,15 @@ export interface MapLibreGlDirectionsEventType {
   movewaypoint: MapLibreGlDirectionsNonCancelableEvent<"movewaypoint", MapLibreGlDirectionsMoveWaypointData>;
 
   /**
+   * Fired right *before* a hoverpoint is created after starting to drag a routeline.
+   *
+   * This event is **cancelable**.
+   *
+   * Fired from `onMove`.
+   */
+  beforecreatehoverpoint: MapLibreGlDirectionsCancelableEvent<"beforecreatehoverpoint", MapLibreGlDirectionsEventData>;
+
+  /**
    * Fired *after* waypoints are set programmatically.
    *
    * This event is **not** cancelable.

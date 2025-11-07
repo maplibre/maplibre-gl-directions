@@ -410,6 +410,19 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         if (this.hoverpoint) {
           this.hoverpoint.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
         } else {
+          /*
+            If the hoverpoint creation event was canceled, then it's impossible to create a new waypoint in-between
+            existing ones. Therefore, there's no point anymore in disabling drag-pan functionality and changing the
+            cursor shape. So here we're restoring their defaults.
+           */
+          const event = new MapLibreGlDirectionsCancelableEvent("beforecreatehoverpoint", e, {});
+          if (!this.fire(event)) {
+            this.map.getCanvas().style.cursor = "";
+            this.map.dragPan.enable();
+
+            return;
+          }
+
           this.hoverpoint = this.buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT", {
             departSnappointProperties: {
               ...JSON.parse(feature?.properties?.departSnappointProperties ?? "{}"),
@@ -546,6 +559,9 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
             this.hoverpoint.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
           }
         } else {
+          const event = new MapLibreGlDirectionsCancelableEvent("beforecreatehoverpoint", e, {});
+          if (!this.fire(event)) return;
+
           this.hoverpoint = this.buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT", {
             departSnappointProperties: {
               ...JSON.parse(feature?.properties?.departSnappointProperties ?? "{}"),

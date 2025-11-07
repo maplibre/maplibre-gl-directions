@@ -102,6 +102,17 @@
         messages = messages;
       });
 
+      directions.on("beforecreatehoverpoint", (e) => {
+        if (preventDefault) {
+          e.preventDefault();
+        }
+
+        let message = `<strong>${e.type}</strong>: a hoverpoint will be created`;
+        if (preventDefault) message = `<s>${message}</s>`;
+        messages.push(message);
+        messages = messages;
+      });
+
       directions.on("fetchroutesstart", (e) => {
         if (preventDefault) {
           e.preventDefault();
