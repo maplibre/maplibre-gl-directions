@@ -416,7 +416,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
             cursor shape. So here we're restoring their defaults.
            */
           const beforeCreateHoverpointEvent = new MapLibreGlDirectionsCancelableEvent("beforecreatehoverpoint", e, {
-            departSnappointIndex: this.departSnappointIndex,
+            departSnappointIndex: JSON.parse(feature.properties.legIndex),
           });
           if (!this.fire(beforeCreateHoverpointEvent)) {
             this.map.getCanvas().style.cursor = "";
