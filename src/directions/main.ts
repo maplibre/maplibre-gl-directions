@@ -415,8 +415,8 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
             existing ones. Therefore, there's no point anymore in disabling drag-pan functionality and changing the
             cursor shape. So here we're restoring their defaults.
            */
-          const event = new MapLibreGlDirectionsCancelableEvent("beforecreatehoverpoint", e, {});
-          if (!this.fire(event)) {
+          const beforeCreateHoverpointEvent = new MapLibreGlDirectionsCancelableEvent("beforecreatehoverpoint", e, {});
+          if (!this.fire(beforeCreateHoverpointEvent)) {
             this.map.getCanvas().style.cursor = "";
             this.map.dragPan.enable();
 
@@ -522,11 +522,11 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
           | undefined;
 
         if (this.waypointBeingDragged && this.waypointBeingDraggedInitialCoordinates) {
-          const event = new MapLibreGlDirectionsCancelableEvent("beforemovewaypoint", e, {
+          const beforeMoveWaypointEvent = new MapLibreGlDirectionsCancelableEvent("beforemovewaypoint", e, {
             index: this._waypoints.indexOf(this.waypointBeingDragged),
             initialCoordinates: this.waypointBeingDraggedInitialCoordinates,
           });
-          if (!this.fire(event)) return;
+          if (!this.fire(beforeMoveWaypointEvent)) return;
         }
       } else if (this.configuration.sensitiveRoutelineLayers.includes(feature?.layer.id ?? "")) {
         /*
@@ -559,8 +559,8 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
             this.hoverpoint.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
           }
         } else {
-          const event = new MapLibreGlDirectionsCancelableEvent("beforecreatehoverpoint", e, {});
-          if (!this.fire(event)) return;
+          const beforeCreateHoverpointEvent = new MapLibreGlDirectionsCancelableEvent("beforecreatehoverpoint", e, {});
+          if (!this.fire(beforeCreateHoverpointEvent)) return;
 
           this.hoverpoint = this.buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT", {
             departSnappointProperties: {
