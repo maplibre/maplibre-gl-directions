@@ -143,23 +143,27 @@
     events.
   </p>
 
-  <label>
+  <label class="flex items-center gap-3">
     <input type="checkbox" bind:checked={preventDefault} />
-    Prevent Default
+    <strong>Prevent Default</strong>
   </label>
 
   {#if preventDefault}
-    <label>
+    <label class="flex items-center gap-3">
       <input type="checkbox" bind:checked={forceAllowAddingWaypoints} />
-      Force-allow adding waypoints
+      <strong>Force-allow adding waypoints</strong>
     </label>
   {/if}
 
   <small>
     While the "Prevent Default" checkbox above is selected, all the subsequent cancelable events will have their default
     behavior prevented by calling the event's <code>preventDefault()</code> method. Such events will be displayed below
-    as a strikethrough text. Checking the "Force-allow adding waypoints" will make adding waypoints ignore its
-    <code>preventDefault()</code> invocations
+    as a strikethrough text.
+
+    {#if preventDefault}
+      Checking the "Force-allow adding waypoints" will make adding waypoints ignore its
+      <code>preventDefault()</code> invocations
+    {/if}
   </small>
 
   {#if messages.length}
