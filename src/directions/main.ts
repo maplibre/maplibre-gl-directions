@@ -415,7 +415,9 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
             existing ones. Therefore, there's no point anymore in disabling drag-pan functionality and changing the
             cursor shape. So here we're restoring their defaults.
            */
-          const beforeCreateHoverpointEvent = new MapLibreGlDirectionsCancelableEvent("beforecreatehoverpoint", e, {});
+          const beforeCreateHoverpointEvent = new MapLibreGlDirectionsCancelableEvent("beforecreatehoverpoint", e, {
+            departSnappointIndex: JSON.parse(feature.properties.legIndex),
+          });
           if (!this.fire(beforeCreateHoverpointEvent)) {
             this.map.getCanvas().style.cursor = "";
             this.map.dragPan.enable();
@@ -559,7 +561,9 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
             this.hoverpoint.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat];
           }
         } else {
-          const beforeCreateHoverpointEvent = new MapLibreGlDirectionsCancelableEvent("beforecreatehoverpoint", e, {});
+          const beforeCreateHoverpointEvent = new MapLibreGlDirectionsCancelableEvent("beforecreatehoverpoint", e, {
+            departSnappointIndex: this.departSnappointIndex,
+          });
           if (!this.fire(beforeCreateHoverpointEvent)) return;
 
           this.hoverpoint = this.buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT", {
@@ -690,6 +694,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         const waypointEvent = new MapLibreGlDirectionsNonCancelableEvent("movewaypoint", e, {
           index: this._waypoints.indexOf(this.waypointBeingDragged),
           initialCoordinates: this.waypointBeingDraggedInitialCoordinates,
+          newCoordinates: this.waypointBeingDragged.geometry.coordinates as [number, number],
         });
         this.fire(waypointEvent);
 
@@ -797,6 +802,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         const waypointEvent = new MapLibreGlDirectionsNonCancelableEvent("movewaypoint", e, {
           index: this._waypoints.indexOf(this.waypointBeingDragged),
           initialCoordinates: this.waypointBeingDraggedInitialCoordinates,
+          newCoordinates: this.waypointBeingDragged.geometry.coordinates as [number, number],
         });
         this.fire(waypointEvent);
 
@@ -897,6 +903,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     const beforeAddWaypointEvent = new MapLibreGlDirectionsCancelableEvent("beforeaddwaypoint", originalEvent, {
       index,
+      coordinates: waypoint,
     });
     if (!this.fire(beforeAddWaypointEvent)) return;
 
@@ -920,6 +927,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     const addWaypointEvent = new MapLibreGlDirectionsNonCancelableEvent("addwaypoint", beforeAddWaypointEvent, {
       index,
+      coordinates: waypoint,
     });
     this.fire(addWaypointEvent);
 

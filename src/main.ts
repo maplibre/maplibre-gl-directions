@@ -14,6 +14,7 @@ import {
   type MapLibreGlDirectionsAddWaypointData,
   type MapLibreGlDirectionsRemoveWaypointData,
   type MapLibreGlDirectionsMoveWaypointData,
+  type MapLibreGlDirectionsCreateHoverpointData,
   type MapLibreGlDirectionsRoutingData,
   MapLibreGlDirectionsCancelableEvent,
   MapLibreGlDirectionsNonCancelableEvent,
@@ -47,6 +48,7 @@ export type {
   MapLibreGlDirectionsAddWaypointData,
   MapLibreGlDirectionsRemoveWaypointData,
   MapLibreGlDirectionsMoveWaypointData,
+  MapLibreGlDirectionsCreateHoverpointData,
   MapLibreGlDirectionsRoutingData,
 };
 

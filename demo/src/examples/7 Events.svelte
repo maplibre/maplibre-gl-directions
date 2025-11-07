@@ -17,6 +17,11 @@
   let forceAllowAddingWaypoints = false;
   let messages: string[] = [];
 
+  // "Format Coordinates".
+  function fc(coordinates?: number[] | [number, number]): string {
+    return `[${coordinates?.map((c) => c.toFixed(5)).join(", ") ?? "N/A, N/A"}]`;
+  }
+
   onMount(() => {
     const map = new maplibregl.Map({
       container: mapRef,
@@ -46,7 +51,7 @@
           e.preventDefault();
         }
 
-        let message = `<strong>${e.type}</strong>: waypoint will be added at index <strong>${e.data.index}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`;
+        let message = `<strong>${e.type}</strong>: waypoint <strong>#${e.data.index}</strong> will be added at <strong>${fc(e.data.coordinates)}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`;
         if (preventDefault && !forceAllowAddingWaypoints) message = `<s>${message}</s>`;
         messages.unshift(message);
         messages = messages;
@@ -54,7 +59,7 @@
 
       directions.on("addwaypoint", (e) => {
         messages.unshift(
-          `<strong>${e.type}</strong>: waypoint added at index <strong>${e.data.index}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`,
+          `<strong>${e.type}</strong>: waypoint <strong>#${e.data.index}</strong> is added at <strong>${fc(e.data.coordinates)}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`,
         );
         messages = messages;
       });
@@ -64,7 +69,7 @@
           e.preventDefault();
         }
 
-        let message = `<strong>${e.type}</strong>: waypoint will be removed at index <strong>${e.data.index}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`;
+        let message = `<strong>${e.type}</strong>: waypoint <strong>#${e.data.index}</strong> will be removed. Original event - <strong>${e.originalEvent?.type}</strong>`;
         if (preventDefault) message = `<s>${message}</s>`;
         messages.unshift(message);
         messages = messages;
@@ -72,7 +77,7 @@
 
       directions.on("removewaypoint", (e) => {
         messages.unshift(
-          `<strong>${e.type}</strong>: waypoint removed at index <strong>${e.data.index}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`,
+          `<strong>${e.type}</strong>: waypoint <strong>#${e.data.index}</strong> is removed. Original event - <strong>${e.originalEvent?.type}</strong>`,
         );
         messages = messages;
       });
@@ -82,11 +87,7 @@
           e.preventDefault();
         }
 
-        let message = `<strong>${e.type}</strong>: waypoint at index <strong>${
-          e.data.index
-        }</strong> will be moved from coordinates ${e.data.initialCoordinates
-          ?.map((c) => c.toFixed(5))
-          .join(", ")}. Original event - <strong>${e.originalEvent?.type}</strong>`;
+        let message = `<strong>${e.type}</strong>: waypoint <strong>#${e.data.index}</strong> will be moved from its initial coordinates <strong>${fc(e.data.initialCoordinates)}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`;
         if (preventDefault) message = `<s>${message}</s>`;
         messages.unshift(message);
         messages = messages;
@@ -94,11 +95,7 @@
 
       directions.on("movewaypoint", (e) => {
         messages.unshift(
-          `<strong>${e.type}</strong>: waypoint at index <strong>${
-            e.data.index
-          }</strong> moved from coordinates ${e.data.initialCoordinates
-            ?.map((c) => c.toFixed(5))
-            .join(", ")}. Original event - <strong>${e.originalEvent?.type}</strong>`,
+          `<strong>${e.type}</strong>: waypoint <strong>#${e.data.index}</strong> is moved from its initial coordinates <strong>${fc(e.data.initialCoordinates)}</strong> to <strong>${fc(e.data.newCoordinates)}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`,
         );
         messages = messages;
       });
@@ -108,7 +105,7 @@
           e.preventDefault();
         }
 
-        let message = `<strong>${e.type}</strong>: a hoverpoint will be created`;
+        let message = `<strong>${e.type}</strong>: a hoverpoint will be created between waypoints <strong>#${e.data.departSnappointIndex}</strong> and <strong>#${e.data.departSnappointIndex + 1}</strong>. Original event - <strong>${e.originalEvent?.type}</strong>`;
         if (preventDefault) message = `<s>${message}</s>`;
         messages.unshift(message);
         messages = messages;
