@@ -897,6 +897,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     const beforeAddWaypointEvent = new MapLibreGlDirectionsCancelableEvent("beforeaddwaypoint", originalEvent, {
       index,
+      coordinates: waypoint,
     });
     if (!this.fire(beforeAddWaypointEvent)) return;
 
@@ -920,6 +921,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
     const addWaypointEvent = new MapLibreGlDirectionsNonCancelableEvent("addwaypoint", beforeAddWaypointEvent, {
       index,
+      coordinates: waypoint,
     });
     this.fire(addWaypointEvent);
 

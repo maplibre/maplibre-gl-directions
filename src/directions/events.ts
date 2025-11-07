@@ -124,6 +124,8 @@ export interface MapLibreGlDirectionsEventData {
 export interface MapLibreGlDirectionsAddWaypointData extends MapLibreGlDirectionsEventData {
   /** The index at which the waypoint was added. */
   index: number;
+  /** The added waypoint's coordinate. */
+  coordinates: [number, number];
 }
 
 /**
