@@ -119,7 +119,7 @@ export interface MapLibreGlDirectionsEventData {
 }
 
 /**
- * Data payload for the `addwaypoint` event.
+ * Data payload for the `addwaypoint` and `beforeaddwaypoint` events.
  */
 export interface MapLibreGlDirectionsAddWaypointData extends MapLibreGlDirectionsEventData {
   /** The index at which the waypoint was added. */
@@ -129,7 +129,7 @@ export interface MapLibreGlDirectionsAddWaypointData extends MapLibreGlDirection
 }
 
 /**
- * Data payload for the `removewaypoint` event.
+ * Data payload for the `removewaypoint` and `beforeremovewaypoint` events.
  */
 export interface MapLibreGlDirectionsRemoveWaypointData extends MapLibreGlDirectionsEventData {
   /** The index of the waypoint that was removed. */
@@ -137,14 +137,12 @@ export interface MapLibreGlDirectionsRemoveWaypointData extends MapLibreGlDirect
 }
 
 /**
- * Data payload for the `movewaypoint` event.
+ * Data payload for the `movewaypoint` and `beforemovewaypoint` events.
  */
 export interface MapLibreGlDirectionsMoveWaypointData extends MapLibreGlDirectionsEventData {
   /** The index of the waypoint that was moved. */
   index: number;
-  /**
-   * The coordinates from which the waypoint was moved.
-   */
+  /** The coordinates from which the waypoint was moved. */
   initialCoordinates?: [number, number];
   /**
    * The coordinates to which the waypoint was moved.
@@ -160,8 +158,8 @@ export interface MapLibreGlDirectionsMoveWaypointData extends MapLibreGlDirectio
 export interface MapLibreGlDirectionsRoutingData extends MapLibreGlDirectionsEventData {
   /**
    * The server's response.
-   * Only present for the `fetchroutesend` event.
-   * Might be `undefined` if the request has failed.
+   *
+   * Only present for the `fetchroutesend` event, and even them might be `undefined` if the request has failed.
    */
   directions?: Directions;
 }
