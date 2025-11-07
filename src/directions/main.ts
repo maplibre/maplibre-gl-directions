@@ -690,6 +690,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         const waypointEvent = new MapLibreGlDirectionsNonCancelableEvent("movewaypoint", e, {
           index: this._waypoints.indexOf(this.waypointBeingDragged),
           initialCoordinates: this.waypointBeingDraggedInitialCoordinates,
+          newCoordinates: this.waypointBeingDragged.geometry.coordinates as [number, number],
         });
         this.fire(waypointEvent);
 
@@ -797,6 +798,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         const waypointEvent = new MapLibreGlDirectionsNonCancelableEvent("movewaypoint", e, {
           index: this._waypoints.indexOf(this.waypointBeingDragged),
           initialCoordinates: this.waypointBeingDraggedInitialCoordinates,
+          newCoordinates: this.waypointBeingDragged.geometry.coordinates as [number, number],
         });
         this.fire(waypointEvent);
 

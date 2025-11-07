@@ -146,6 +146,12 @@ export interface MapLibreGlDirectionsMoveWaypointData extends MapLibreGlDirectio
    * The coordinates from which the waypoint was moved.
    */
   initialCoordinates?: [number, number];
+  /**
+   * The coordinates to which the waypoint was moved.
+   *
+   * Only present for the `movewaypoint` event.
+   */
+  newCoordinates?: [number, number];
 }
 
 /**
