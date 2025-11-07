@@ -25,7 +25,7 @@ corresponding event object type (Cancelable or NonCancelable).</p>
 <ul class="tsd-hierarchy">
 <li><span class="target">MapLibreGlDirectionsEventType</span></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/maplibre/maplibre-gl-directions/blob/d393358/src/directions/events.ts#L270">src/directions/events.ts:270</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/maplibre/maplibre-gl-directions/blob/14d2b83/src/directions/events.ts#L270">src/directions/events.ts:270</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -34,6 +34,10 @@ corresponding event object type (Cancelable or NonCancelable).</p>
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Properties</h3>
 <div class="tsd-index-list"><a href="MapLibreGlDirectionsEventType.html#addwaypoint" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-1024"><rect fill="var(--color-icon-background)" stroke="#FF984D" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12"></rect><path d="M9.354 16V7.24H12.174C12.99 7.24 13.638 7.476 14.118 7.948C14.606 8.412 14.85 9.036 14.85 9.82C14.85 10.604 14.606 11.232 14.118 11.704C13.638 12.168 12.99 12.4 12.174 12.4H10.434V16H9.354ZM10.434 11.428H12.174C12.646 11.428 13.022 11.284 13.302 10.996C13.59 10.7 13.734 10.308 13.734 9.82C13.734 9.324 13.59 8.932 13.302 8.644C13.022 8.356 12.646 8.212 12.174 8.212H10.434V11.428Z" fill="var(--color-text)"></path></g></svg><span>addwaypoint</span></a>
+<a href="MapLibreGlDirectionsEventType.html#beforeaddwaypoint" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>beforeaddwaypoint</span></a>
+<a href="MapLibreGlDirectionsEventType.html#beforecreatehoverpoint" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>beforecreatehoverpoint</span></a>
+<a href="MapLibreGlDirectionsEventType.html#beforemovewaypoint" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>beforemovewaypoint</span></a>
+<a href="MapLibreGlDirectionsEventType.html#beforeremovewaypoint" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>beforeremovewaypoint</span></a>
 <a href="MapLibreGlDirectionsEventType.html#fetchroutesend" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>fetchroutesend</span></a>
 <a href="MapLibreGlDirectionsEventType.html#fetchroutesstart" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>fetchroutesstart</span></a>
 <a href="MapLibreGlDirectionsEventType.html#movewaypoint" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>movewaypoint</span></a>
@@ -46,74 +50,115 @@ corresponding event object type (Cancelable or NonCancelable).</p>
 <section class="tsd-panel tsd-member"><a id="addwaypoint" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>addwaypoint</span><a href="#addwaypoint" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">addwaypoint</span><span class="tsd-signature-symbol">:</span> <a href="../classes/MapLibreGlDirectionsNonCancelableEvent.html" class="tsd-signature-type tsd-kind-class">MapLibreGlDirectionsNonCancelableEvent</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;addwaypoint&quot;</span><span class="tsd-signature-symbol">, </span><a href="MapLibreGlDirectionsAddWaypointData.html" class="tsd-signature-type tsd-kind-interface">MapLibreGlDirectionsAddWaypointData</a><span class="tsd-signature-symbol">&gt;</span></div>
-<div class="tsd-comment tsd-typography"><p>Fired <em>before</em> a waypoint is added.
-This event is <strong>cancelable</strong>.</p>
+<div class="tsd-comment tsd-typography"><p>Fired <em>after</em> a waypoint is added and drawn on the map, but before a new routes fetch has been triggered.</p>
+<p>This event is <strong>not</strong> cancelable.</p>
 <p>Fired from <code>_addWaypoint</code>.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/maplibre/maplibre-gl-directions/blob/d393358/src/directions/events.ts#L277">src/directions/events.ts:277</a></li></ul></aside></section>
-<section class="tsd-panel tsd-member"><a id="fetchroutesend" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>fetchroutesend</span><a href="#fetchroutesend" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
-<div class="tsd-signature"><span class="tsd-kind-property">fetchroutesend</span><span class="tsd-signature-symbol">:</span> <a href="../classes/MapLibreGlDirectionsNonCancelableEvent.html" class="tsd-signature-type tsd-kind-class">MapLibreGlDirectionsNonCancelableEvent</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;fetchroutesend&quot;</span><span class="tsd-signature-symbol">, </span><a href="MapLibreGlDirectionsRoutingData.html" class="tsd-signature-type tsd-kind-interface">MapLibreGlDirectionsRoutingData</a><span class="tsd-signature-symbol">&gt;</span></div>
-<div class="tsd-comment tsd-typography"><p>Fired <em>after</em> a routing request has finished (successfully or not).
-This event is <strong>not cancelable</strong>. Check <code>event.data.directions</code>
-for the response.</p>
-<p>Fired from <code>fetchDirections</code>.</p>
+<li>Defined in <a href="https://github.com/maplibre/maplibre-gl-directions/blob/14d2b83/src/directions/events.ts#L287">src/directions/events.ts:287</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member"><a id="beforeaddwaypoint" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>beforeaddwaypoint</span><a href="#beforeaddwaypoint" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">beforeaddwaypoint</span><span class="tsd-signature-symbol">:</span> <a href="../classes/MapLibreGlDirectionsCancelableEvent.html" class="tsd-signature-type tsd-kind-class">MapLibreGlDirectionsCancelableEvent</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;beforeaddwaypoint&quot;</span><span class="tsd-signature-symbol">, </span><a href="MapLibreGlDirectionsAddWaypointData.html" class="tsd-signature-type tsd-kind-interface">MapLibreGlDirectionsAddWaypointData</a><span class="tsd-signature-symbol">&gt;</span></div>
+<div class="tsd-comment tsd-typography"><p>Fired <em>before</em> a waypoint is added.</p>
+<p>This event is <strong>cancelable</strong>.</p>
+<p>Fired from <code>_addWaypoint</code>.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/maplibre/maplibre-gl-directions/blob/d393358/src/directions/events.ts#L326">src/directions/events.ts:326</a></li></ul></aside></section>
-<section class="tsd-panel tsd-member"><a id="fetchroutesstart" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>fetchroutesstart</span><a href="#fetchroutesstart" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
-<div class="tsd-signature"><span class="tsd-kind-property">fetchroutesstart</span><span class="tsd-signature-symbol">:</span> <a href="../classes/MapLibreGlDirectionsNonCancelableEvent.html" class="tsd-signature-type tsd-kind-class">MapLibreGlDirectionsNonCancelableEvent</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;fetchroutesstart&quot;</span><span class="tsd-signature-symbol">, </span><a href="MapLibreGlDirectionsEventData.html" class="tsd-signature-type tsd-kind-interface">MapLibreGlDirectionsEventData</a><span class="tsd-signature-symbol">&gt;</span></div>
-<div class="tsd-comment tsd-typography"><p>Fired when a routing request is about to be made.
-This event is <strong>not cancelable</strong>.</p>
-<p>Fired from <code>fetchDirections</code>.</p>
+<li>Defined in <a href="https://github.com/maplibre/maplibre-gl-directions/blob/14d2b83/src/directions/events.ts#L278">src/directions/events.ts:278</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member"><a id="beforecreatehoverpoint" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>beforecreatehoverpoint</span><a href="#beforecreatehoverpoint" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">beforecreatehoverpoint</span><span class="tsd-signature-symbol">:</span> <a href="../classes/MapLibreGlDirectionsCancelableEvent.html" class="tsd-signature-type tsd-kind-class">MapLibreGlDirectionsCancelableEvent</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;beforecreatehoverpoint&quot;</span><span class="tsd-signature-symbol">, </span><a href="MapLibreGlDirectionsEventData.html" class="tsd-signature-type tsd-kind-interface">MapLibreGlDirectionsEventData</a><span class="tsd-signature-symbol">&gt;</span></div>
+<div class="tsd-comment tsd-typography"><p>Fired right <em>before</em> a hoverpoint is created after starting to drag a routeline.</p>
+<p>This event is <strong>cancelable</strong>.</p>
+<p>Fired from <code>onMove</code>.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/maplibre/maplibre-gl-directions/blob/d393358/src/directions/events.ts#L317">src/directions/events.ts:317</a></li></ul></aside></section>
-<section class="tsd-panel tsd-member"><a id="movewaypoint" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>movewaypoint</span><a href="#movewaypoint" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
-<div class="tsd-signature"><span class="tsd-kind-property">movewaypoint</span><span class="tsd-signature-symbol">:</span> <a href="../classes/MapLibreGlDirectionsNonCancelableEvent.html" class="tsd-signature-type tsd-kind-class">MapLibreGlDirectionsNonCancelableEvent</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;movewaypoint&quot;</span><span class="tsd-signature-symbol">, </span><a href="MapLibreGlDirectionsMoveWaypointData.html" class="tsd-signature-type tsd-kind-interface">MapLibreGlDirectionsMoveWaypointData</a><span class="tsd-signature-symbol">&gt;</span></div>
-<div class="tsd-comment tsd-typography"><p>Fired <em>after</em> a waypoint has been moved by dragging.
-This event is <strong>not cancelable</strong>.</p>
-<p>Fired from <code>onDragUp</code> and <code>liveRefresh</code>.</p>
+<li>Defined in <a href="https://github.com/maplibre/maplibre-gl-directions/blob/14d2b83/src/directions/events.ts#L336">src/directions/events.ts:336</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member"><a id="beforemovewaypoint" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>beforemovewaypoint</span><a href="#beforemovewaypoint" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">beforemovewaypoint</span><span class="tsd-signature-symbol">:</span> <a href="../classes/MapLibreGlDirectionsCancelableEvent.html" class="tsd-signature-type tsd-kind-class">MapLibreGlDirectionsCancelableEvent</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;beforemovewaypoint&quot;</span><span class="tsd-signature-symbol">, </span><a href="MapLibreGlDirectionsMoveWaypointData.html" class="tsd-signature-type tsd-kind-interface">MapLibreGlDirectionsMoveWaypointData</a><span class="tsd-signature-symbol">&gt;</span></div>
+<div class="tsd-comment tsd-typography"><p>Fired <em>before</em> a waypoint has been moved by dragging.</p>
+<p>This event is <strong>cancelable</strong>.</p>
+<p>Fired from <code>onDragDown</code>.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/maplibre/maplibre-gl-directions/blob/d393358/src/directions/events.ts#L293">src/directions/events.ts:293</a></li></ul></aside></section>
-<section class="tsd-panel tsd-member"><a id="removewaypoint" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>removewaypoint</span><a href="#removewaypoint" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
-<div class="tsd-signature"><span class="tsd-kind-property">removewaypoint</span><span class="tsd-signature-symbol">:</span> <a href="../classes/MapLibreGlDirectionsNonCancelableEvent.html" class="tsd-signature-type tsd-kind-class">MapLibreGlDirectionsNonCancelableEvent</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;removewaypoint&quot;</span><span class="tsd-signature-symbol">, </span><a href="MapLibreGlDirectionsRemoveWaypointData.html" class="tsd-signature-type tsd-kind-interface">MapLibreGlDirectionsRemoveWaypointData</a><span class="tsd-signature-symbol">&gt;</span></div>
-<div class="tsd-comment tsd-typography"><p>Fired <em>before</em> a waypoint is removed.
-This event is <strong>cancelable</strong>.</p>
+<li>Defined in <a href="https://github.com/maplibre/maplibre-gl-directions/blob/14d2b83/src/directions/events.ts#L318">src/directions/events.ts:318</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member"><a id="beforeremovewaypoint" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>beforeremovewaypoint</span><a href="#beforeremovewaypoint" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">beforeremovewaypoint</span><span class="tsd-signature-symbol">:</span> <a href="../classes/MapLibreGlDirectionsCancelableEvent.html" class="tsd-signature-type tsd-kind-class">MapLibreGlDirectionsCancelableEvent</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;beforeremovewaypoint&quot;</span><span class="tsd-signature-symbol">, </span><a href="MapLibreGlDirectionsRemoveWaypointData.html" class="tsd-signature-type tsd-kind-interface">MapLibreGlDirectionsRemoveWaypointData</a><span class="tsd-signature-symbol">&gt;</span></div>
+<div class="tsd-comment tsd-typography"><p>Fired <em>before</em> a waypoint is removed.</p>
+<p>This event is <strong>cancelable</strong>.</p>
 <p>Fired from <code>_removeWaypoint</code>.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/maplibre/maplibre-gl-directions/blob/d393358/src/directions/events.ts#L285">src/directions/events.ts:285</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/maplibre/maplibre-gl-directions/blob/14d2b83/src/directions/events.ts#L296">src/directions/events.ts:296</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member"><a id="fetchroutesend" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>fetchroutesend</span><a href="#fetchroutesend" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">fetchroutesend</span><span class="tsd-signature-symbol">:</span> <a href="../classes/MapLibreGlDirectionsNonCancelableEvent.html" class="tsd-signature-type tsd-kind-class">MapLibreGlDirectionsNonCancelableEvent</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;fetchroutesend&quot;</span><span class="tsd-signature-symbol">, </span><a href="MapLibreGlDirectionsRoutingData.html" class="tsd-signature-type tsd-kind-interface">MapLibreGlDirectionsRoutingData</a><span class="tsd-signature-symbol">&gt;</span></div>
+<div class="tsd-comment tsd-typography"><p>Fired <em>after</em> a routing request has finished (successfully or not).</p>
+<p>Check <code>event.data.directions</code> for the response.</p>
+<p>This event is <strong>not</strong> cancelable.</p>
+<p>Fired from <code>fetchDirections</code>.</p>
+</div>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/maplibre/maplibre-gl-directions/blob/14d2b83/src/directions/events.ts#L374">src/directions/events.ts:374</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member"><a id="fetchroutesstart" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>fetchroutesstart</span><a href="#fetchroutesstart" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">fetchroutesstart</span><span class="tsd-signature-symbol">:</span> <a href="../classes/MapLibreGlDirectionsCancelableEvent.html" class="tsd-signature-type tsd-kind-class">MapLibreGlDirectionsCancelableEvent</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;fetchroutesstart&quot;</span><span class="tsd-signature-symbol">, </span><a href="MapLibreGlDirectionsEventData.html" class="tsd-signature-type tsd-kind-interface">MapLibreGlDirectionsEventData</a><span class="tsd-signature-symbol">&gt;</span></div>
+<div class="tsd-comment tsd-typography"><p>Fired when a routing request is about to be made.</p>
+<p>This event is  <strong>cancelable</strong>.</p>
+<p>Fired from <code>fetchDirections</code>.</p>
+</div>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/maplibre/maplibre-gl-directions/blob/14d2b83/src/directions/events.ts#L363">src/directions/events.ts:363</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member"><a id="movewaypoint" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>movewaypoint</span><a href="#movewaypoint" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">movewaypoint</span><span class="tsd-signature-symbol">:</span> <a href="../classes/MapLibreGlDirectionsNonCancelableEvent.html" class="tsd-signature-type tsd-kind-class">MapLibreGlDirectionsNonCancelableEvent</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;movewaypoint&quot;</span><span class="tsd-signature-symbol">, </span><a href="MapLibreGlDirectionsMoveWaypointData.html" class="tsd-signature-type tsd-kind-interface">MapLibreGlDirectionsMoveWaypointData</a><span class="tsd-signature-symbol">&gt;</span></div>
+<div class="tsd-comment tsd-typography"><p>Fired <em>after</em> a waypoint has been moved by dragging.</p>
+<p>This event is <strong>not</strong> cancelable.</p>
+<p>Fired from <code>onDragUp</code> and <code>liveRefresh</code>.</p>
+</div>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/maplibre/maplibre-gl-directions/blob/14d2b83/src/directions/events.ts#L327">src/directions/events.ts:327</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member"><a id="removewaypoint" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>removewaypoint</span><a href="#removewaypoint" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">removewaypoint</span><span class="tsd-signature-symbol">:</span> <a href="../classes/MapLibreGlDirectionsNonCancelableEvent.html" class="tsd-signature-type tsd-kind-class">MapLibreGlDirectionsNonCancelableEvent</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;removewaypoint&quot;</span><span class="tsd-signature-symbol">, </span><a href="MapLibreGlDirectionsRemoveWaypointData.html" class="tsd-signature-type tsd-kind-interface">MapLibreGlDirectionsRemoveWaypointData</a><span class="tsd-signature-symbol">&gt;</span></div>
+<div class="tsd-comment tsd-typography"><p>Fired <em>after</em> a waypoint is removed and the changes are drawn on the map, but before a new routes fetch has been
+triggered.</p>
+<p>This event is <strong>not</strong> cancelable.</p>
+<p>Fired from <code>_removeWaypoint</code>.</p>
+</div>
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/maplibre/maplibre-gl-directions/blob/14d2b83/src/directions/events.ts#L309">src/directions/events.ts:309</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="rotatewaypoints" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>rotatewaypoints</span><a href="#rotatewaypoints" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">rotatewaypoints</span><span class="tsd-signature-symbol">:</span> <a href="../classes/MapLibreGlDirectionsNonCancelableEvent.html" class="tsd-signature-type tsd-kind-class">MapLibreGlDirectionsNonCancelableEvent</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;rotatewaypoints&quot;</span><span class="tsd-signature-symbol">, </span><a href="MapLibreGlDirectionsEventData.html" class="tsd-signature-type tsd-kind-interface">MapLibreGlDirectionsEventData</a><span class="tsd-signature-symbol">&gt;</span></div>
-<div class="tsd-comment tsd-typography"><p>Fired <em>after</em> waypoints&#39; bearings are rotated.
-This event is <strong>not cancelable</strong>.</p>
+<div class="tsd-comment tsd-typography"><p>Fired <em>after</em> waypoints&#39; bearings are rotated.</p>
+<p>This event is <strong>not</strong> cancelable.</p>
 <p>Fired from <code>waypointsBearings</code> setter.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/maplibre/maplibre-gl-directions/blob/d393358/src/directions/events.ts#L309">src/directions/events.ts:309</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/maplibre/maplibre-gl-directions/blob/14d2b83/src/directions/events.ts#L354">src/directions/events.ts:354</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="setwaypoints" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>setwaypoints</span><a href="#setwaypoints" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">setwaypoints</span><span class="tsd-signature-symbol">:</span> <a href="../classes/MapLibreGlDirectionsNonCancelableEvent.html" class="tsd-signature-type tsd-kind-class">MapLibreGlDirectionsNonCancelableEvent</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;setwaypoints&quot;</span><span class="tsd-signature-symbol">, </span><a href="MapLibreGlDirectionsEventData.html" class="tsd-signature-type tsd-kind-interface">MapLibreGlDirectionsEventData</a><span class="tsd-signature-symbol">&gt;</span></div>
-<div class="tsd-comment tsd-typography"><p>Fired <em>after</em> waypoints are set programmatically.
-This event is <strong>not cancelable</strong>.</p>
+<div class="tsd-comment tsd-typography"><p>Fired <em>after</em> waypoints are set programmatically.</p>
+<p>This event is <strong>not</strong> cancelable.</p>
 <p>Fired from <code>setWaypoints</code>.</p>
 </div>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/maplibre/maplibre-gl-directions/blob/d393358/src/directions/events.ts#L301">src/directions/events.ts:301</a></li></ul></aside></section></section></div>
+<li>Defined in <a href="https://github.com/maplibre/maplibre-gl-directions/blob/14d2b83/src/directions/events.ts#L345">src/directions/events.ts:345</a></li></ul></aside></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -134,6 +179,10 @@ This event is <strong>not cancelable</strong>.</p>
 <div class="tsd-accordion-details">
 <ul>
 <li><a href="#addwaypoint" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>addwaypoint</span></a></li>
+<li><a href="#beforeaddwaypoint" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>beforeaddwaypoint</span></a></li>
+<li><a href="#beforecreatehoverpoint" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>beforecreatehoverpoint</span></a></li>
+<li><a href="#beforemovewaypoint" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>beforemovewaypoint</span></a></li>
+<li><a href="#beforeremovewaypoint" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>beforeremovewaypoint</span></a></li>
 <li><a href="#fetchroutesend" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>fetchroutesend</span></a></li>
 <li><a href="#fetchroutesstart" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>fetchroutesstart</span></a></li>
 <li><a href="#movewaypoint" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>movewaypoint</span></a></li>
