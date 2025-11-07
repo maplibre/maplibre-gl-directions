@@ -10,6 +10,11 @@ import type {
 import {
   type MapLibreGlDirectionsEventType,
   type AnyMapLibreGlDirectionsEvent,
+  type MapLibreGlDirectionsEventData,
+  type MapLibreGlDirectionsAddWaypointData,
+  type MapLibreGlDirectionsRemoveWaypointData,
+  type MapLibreGlDirectionsMoveWaypointData,
+  type MapLibreGlDirectionsRoutingData,
   MapLibreGlDirectionsCancelableEvent,
   MapLibreGlDirectionsNonCancelableEvent,
 } from "./directions/events";
@@ -32,7 +37,18 @@ export { layersFactory };
 /**
  * @protected
  */
-export type { Directions, Route, Leg, Snappoint, AnyMapLibreGlDirectionsEvent };
+export type {
+  Directions,
+  Route,
+  Leg,
+  Snappoint,
+  AnyMapLibreGlDirectionsEvent,
+  MapLibreGlDirectionsEventData,
+  MapLibreGlDirectionsAddWaypointData,
+  MapLibreGlDirectionsRemoveWaypointData,
+  MapLibreGlDirectionsMoveWaypointData,
+  MapLibreGlDirectionsRoutingData,
+};
 
 /**
  * @protected
