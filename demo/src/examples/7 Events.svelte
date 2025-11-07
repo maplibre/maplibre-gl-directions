@@ -103,9 +103,13 @@
       });
 
       directions.on("fetchroutesstart", (e) => {
-        messages.push(
-          `<strong>${e.type}</strong>: routing request started. Original event - <strong>${e.originalEvent?.type}</strong>`,
-        );
+        if (preventDefault) {
+          e.preventDefault();
+        }
+
+        let message = `<strong>${e.type}</strong>: routing request started. Original event - <strong>${e.originalEvent?.type}</strong>`;
+        if (preventDefault) message = `<s>${message}</s>`;
+        messages.push(message);
         messages = messages;
       });
 

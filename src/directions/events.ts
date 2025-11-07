@@ -328,6 +328,7 @@ export interface MapLibreGlDirectionsEventType {
 
   /**
    * Fired *after* waypoints are set programmatically.
+   *
    * This event is **not** cancelable.
    *
    * Fired from `setWaypoints`.
@@ -336,6 +337,7 @@ export interface MapLibreGlDirectionsEventType {
 
   /**
    * Fired *after* waypoints' bearings are rotated.
+   *
    * This event is **not** cancelable.
    *
    * Fired from `waypointsBearings` setter.
@@ -344,16 +346,19 @@ export interface MapLibreGlDirectionsEventType {
 
   /**
    * Fired when a routing request is about to be made.
-   * This event is **not** cancelable.
+   *
+   * This event is  **cancelable**.
    *
    * Fired from `fetchDirections`.
    */
-  fetchroutesstart: MapLibreGlDirectionsNonCancelableEvent<"fetchroutesstart", MapLibreGlDirectionsEventData>;
+  fetchroutesstart: MapLibreGlDirectionsCancelableEvent<"fetchroutesstart", MapLibreGlDirectionsEventData>;
 
   /**
    * Fired *after* a routing request has finished (successfully or not).
-   * This event is **not** cancelable. Check `event.data.directions`
-   * for the response.
+   *
+   * Check `event.data.directions` for the response.
+   *
+   * This event is **not** cancelable.
    *
    * Fired from `fetchDirections`.
    */

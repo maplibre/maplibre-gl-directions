@@ -135,7 +135,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     this.abortController?.abort();
 
     if (this._waypoints.length >= 2) {
-      this.fire(new MapLibreGlDirectionsNonCancelableEvent("fetchroutesstart", originalEvent, {}));
+      if (!this.fire(new MapLibreGlDirectionsCancelableEvent("fetchroutesstart", originalEvent, {}))) return;
 
       this.abortController = new AbortController();
 
