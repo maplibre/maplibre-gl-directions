@@ -1,6 +1,6 @@
 {
   "name": "@maplibre/maplibre-gl-directions",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "type": "module",
   "main": "./dist/maplibre-gl-directions.js",
   "module": "./dist/maplibre-gl-directions.js",
