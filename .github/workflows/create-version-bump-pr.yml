@@ -12,9 +12,6 @@ on:
           - minor
           - major
 
-permissions:
-  contents: write
-
 jobs:
   bump:
     uses: maplibre/reusable-workflows/.github/workflows/create-bump-version-pr.yml@main
