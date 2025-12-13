@@ -1,0 +1,15 @@
+name: Create version bump PR
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version bump type (patch, minor, major)
+        required: true
+        type: string
+
+jobs:
+  bump:
+    uses: @maplibre/reusable-workflows/.github/workflows/create-version-bump-pr.yml@main
+    with:
+      version: ${{ inputs.version }}
