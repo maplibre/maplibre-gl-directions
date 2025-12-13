@@ -10,7 +10,7 @@ updates:
     schedule:
       interval: "monthly"
     target-branch: "staging"
-    open-pull-requests-limit: 20
+    open-pull-requests-limit: 5
     labels:
       - "dependencies"
       - "semver:patch"
