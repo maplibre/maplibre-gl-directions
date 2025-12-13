@@ -13,6 +13,6 @@ permissions:
 
 jobs:
   bump:
-    uses: maplibre/reusable-workflows/.github/workflows/create-version-bump-pr.yml@main
+    uses: maplibre/reusable-workflows/.github/workflows/create-bump-version-pr.yml@main
     with:
       version: ${{ inputs.version }}
