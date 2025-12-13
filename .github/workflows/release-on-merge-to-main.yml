@@ -1,0 +1,17 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: write
+  attestations: write
+
+jobs:
+  release:
+    uses: maplibre/reusable-workflows/.github/workflows/npm-publish.yml@main
+    with:
+      docs-command: 'npm run build:demo'

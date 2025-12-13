@@ -1,34 +1,41 @@
 name: Pull Request Checks
 on:
   pull_request:
-    types: [opened, labeled, unlabeled, synchronize]
+    types: [opened, synchronize]
 
 jobs:
-  check-labels:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: mheap/github-action-required-labels@v1
-        with:
-          mode: exactly
-          count: 1
-          labels: "semver:major, semver:minor, semver:patch, release:ignore"
-
-  check-build:
+  check:
+    name: Linting, Formatting and Svelte checks
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6.0.1
 
-      - name: Use Node 16 x64
-        uses: actions/setup-node@v3
+      - name: Use Node 24
+        uses: actions/setup-node@v6.1.0
         with:
-          node-version: 16
-          architecture: x64
-          registry-url: "https://registry.npmjs.org"
+          node-version: 24
 
-      - name: Try to Build
+      - name: Prepare and Check
         run: |
           npm ci
-          npm link
-          npm link @maplibre/maplibre-gl-directions
+          npm run env:prep
+          npm run check
+
+  build:
+    name: Build Passes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v6.0.1
+
+      - name: Use Node 24
+        uses: actions/setup-node@v6.1.0
+        with:
+          node-version: 24
+
+      - name: Prepare and Check
+        run: |
+          npm ci
+          npm run env:prep
           npm run build
