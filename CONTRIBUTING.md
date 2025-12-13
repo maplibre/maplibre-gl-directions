@@ -47,7 +47,6 @@ You may keep any examples you add when creating a PR if you think the changes yo
 - `npm run dev:demo` - starts a vite-powered development server for the Demo project. The Demo project targets the library from the `/dist` folder via a symlinked `@maplibre/maplibre-gl-directions` package.
 
 - `npm run build` - Combines `npm run lint`, `npm run build:lib`, `npm run build:doc` and `npm run build:demo` into a single call.
-
   1. `npm run build:lib` - builds the library (the `/src` folder contents) and outputs the resulting es-module and its type declarations into the `/dist` folder.
 
   2. `npm run build:doc` - builds the documentation (the `/doc` folder contents and the source code comments) using the TypeDoc compiler and outputs the resulting static-website into the `/docs/api` folder.

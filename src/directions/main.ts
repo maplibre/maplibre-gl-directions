@@ -45,7 +45,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
   /*
    * Everything is `protected` to allow access from a subclass.
    */
-  protected declare readonly map: Map;
+  declare protected readonly map: Map;
   protected readonly configuration: MapLibreGlDirectionsConfiguration;
 
   protected _interactive = false;
