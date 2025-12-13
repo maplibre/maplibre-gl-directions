@@ -4,9 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Version bump type (patch, minor, major)
+        description: Version bump type
         required: true
-        type: string
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
 
 permissions:
   contents: write
