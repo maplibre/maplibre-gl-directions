@@ -1,0 +1,23 @@
+name: Pull Request Checks
+on:
+  pull_request:
+    types: [opened, labeled, unlabeled, synchronize]
+
+jobs:
+  check-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v6.0.1
+
+      - name: Use Node 24
+        uses: actions/setup-node@v6.1.0
+        with:
+          node-version: 24
+
+      - name: Try to Build
+        run: |
+          npm ci
+          npm link
+          npm link @maplibre/maplibre-gl-directions
+          npm run build
