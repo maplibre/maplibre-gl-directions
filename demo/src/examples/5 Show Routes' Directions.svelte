@@ -74,8 +74,7 @@
   <p>This time a "symbol" layer is added that shows the direction the selected route goes in.</p>
 
   <small
-    ><strong>Note</strong> that you have to manually load and add the images you intend to use for the custom layers you
-    add</small
+    ><strong>Note</strong> that you have to manually load and add the images you intend to use for the custom layers you add</small
   >
 </AppSidebar>
 
