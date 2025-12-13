@@ -1,0 +1,74 @@
+name: Create bump version PR
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: Version bump type.
+        required: true
+        type: string
+      package-folders:
+        description: |
+          Newline-separated list of package folders to bump. Defaults to root only.
+          Example:
+            .
+            some-folder/
+        required: false
+        type: string
+        default: '.'
+jobs:
+  bump-version-pr:
+    name: Bump version PR
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          fetch-depth: 0
+          ref: main
+      - name: Use Node.js from nvmrc
+        uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v4
+        with:
+          node-version-file: '.nvmrc'
+      - name: Bump version
+        id: version-details
+        run: |
+          FOLDERS='${{ inputs.package-folders }}'
+          echo "Bumping version in folders:"
+          echo "$FOLDERS"
+          VERSION_PATH="."
+          
+          # Loop through each line (folder)
+          echo "$FOLDERS" | while IFS= read -r folder; do
+            # Skip empty lines
+            [ -z "$folder" ] && continue
+          
+            if [ "$folder" = "." ]; then
+              echo "Bumping version in root package.json"
+              npm version --commit-hooks false --git-tag-version false ${{ inputs.version }}
+            else
+              echo "Bumping version in $folder/package.json"
+              cd "$folder"
+              npm version --commit-hooks false --git-tag-version false ${{ inputs.version }}
+              cd -
+              VERSION_PATH="$folder"
+            fi
+          done
+
+          echo "Using version from path: '$VERSION_PATH'"
+          echo "version-folder=$VERSION_PATH" >> $GITHUB_OUTPUT
+      - name: Update changelog
+        run: |
+          npx auto-changelog --unreleased-only
+      - name: Get version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@3cf273023a0dda27efcd3164bdfb51908dd46a5b # v1.3.1
+        with:
+          path: ${{ steps.version-details.outputs.version-folder }}
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7.0.11
+        with:
+          commit-message: Bump js version to ${{ steps.package-version.outputs.current-version }}
+          branch: bump-js-version-to-${{ steps.package-version.outputs.current-version }}
+          title: Bump js version to ${{ steps.package-version.outputs.current-version }}
