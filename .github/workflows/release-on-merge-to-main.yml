@@ -11,4 +11,4 @@ permissions:
 
 jobs:
   release:
-    uses: maplibre/reusable-workflows/.github/workflows/release.yml@main
+    uses: maplibre/reusable-workflows/.github/workflows/npm-publish.yml@main
