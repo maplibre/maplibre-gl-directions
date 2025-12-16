@@ -56,7 +56,7 @@ When changes are merged into the `main` branch:
 - If the version was **not** changed, the workflow exits early
 - If the version **was** updated:
   - A new npm package version is published
-  - A GitHub Release is created
+  - A new tag and a GitHub Release are created
   - Release artifacts and documentation are generated as needed
 
 No additional manual steps are required.
