@@ -44,7 +44,7 @@ This workflow automatically:
 - Updates the changelog based on changes since the previous release
 - Opens a pull request with these changes
 
-The generated pull request should be reviewed and merged like any other PR. Notice, however, that no pull request checks would be performed for it. This is a known limitation and it shouldn't be addressed.
+The generated pull request should be reviewed and merged like any other PR. Note, however, that by default no pull request checks are run for it. To trigger the CI, a manual change is required (even adding a blank line to `CHANGELOG.md` is sufficient). In practice, the auto-generated changelog usually needs some manual adjustment anyway, so the CI will naturally be triggered as part of that process.
 
 ---
 
