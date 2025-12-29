@@ -59,8 +59,8 @@
   <button disabled={!directions} on:click={abortManually}>Abort Manually</button>
 
   <p>
-    Instead of aborting routing-requests manually, you can set the <code>requestTimeout</code> configuration option to a
-    number of ms that a routing-request is allowed to take before getting automatically aborted.
+    Instead of aborting routing-requests manually, you can set the <code>requestTimeout</code> configuration option to a number
+    of ms that a routing-request is allowed to take before getting automatically aborted.
   </p>
 
   <label class="flex flex-col gap-2">
