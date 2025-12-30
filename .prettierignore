@@ -15,5 +15,8 @@
 dist/**
 docs/**
 
+# And the auto-generated changelog
+CHANGELOG.md
+
 # Check subdirectories too
 !*/
