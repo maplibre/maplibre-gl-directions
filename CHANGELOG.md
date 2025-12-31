@@ -5,6 +5,16 @@
 ### 🐞 Bug fixes
 - _...Add new stuff here..._
 
+- Fix npm publishing (hopefully) ([#273](https://github.com/maplibre/maplibre-gl-directions/pull/273)) (by [smellyshovel](https://github.com/smellyshovel))
+- Bump js version to 0.9.2 ([#272](https://github.com/maplibre/maplibre-gl-directions/pull/272)) (by [app/github-actions](https://github.com/app/github-actions))
+- Fix release pipeline. Again ([#271](https://github.com/maplibre/maplibre-gl-directions/pull/271)) (by [smellyshovel](https://github.com/smellyshovel))
+- Bump js version to 0.9.2 ([#270](https://github.com/maplibre/maplibre-gl-directions/pull/270)) (by [app/github-actions](https://github.com/app/github-actions))
+- Bump js version to 0.9.2 ([#268](https://github.com/maplibre/maplibre-gl-directions/pull/268)) (by [app/github-actions](https://github.com/app/github-actions))
+## 0.9.2
+### ✨ Features and improvements
+
+### 🐞 Bug fixes
+
 ## 0.9.2
 ### ✨ Features and improvements
 - Bump js version to 0.9.2 ([#263](https://github.com/maplibre/maplibre-gl-directions/pull/263)) (by [app/github-actions](https://github.com/app/github-actions))
