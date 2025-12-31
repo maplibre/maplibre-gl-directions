@@ -9,8 +9,14 @@
     "dist"
   ],
   "license": "MIT",
-  "homepage": "https://maplibre.org/maplibre-gl-directions/#/",
-  "repository": "https://github.com/maplibre/maplibre-gl-directions",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maplibre/maplibre-gl-directions.git"
+  },
+  "bugs": {
+    "url": "https://github.com/maplibre/maplibre-gl-directions/issues"
+  },
+  "homepage": "https://github.com/maplibre/maplibre-gl-directions#readme",
   "keywords": [
     "directions",
     "osrm",
