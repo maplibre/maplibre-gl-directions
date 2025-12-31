@@ -14,5 +14,5 @@ jobs:
   release:
     uses: maplibre/reusable-workflows/.github/workflows/npm-publish.yml@main
     with:
-      build-command: 'npm run env:prep && npm run build'
+      build-command: 'npm ci && npm run env:prep && npm run build'
       docs-command: 'npm run build:demo'
