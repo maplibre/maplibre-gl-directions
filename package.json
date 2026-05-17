@@ -93,7 +93,7 @@
     "lint-staged": "^15.2.0",
     "lodash": "^4.17.23",
     "maplibre-gl": "^5.1.0",
-    "postcss": "^8.4.38",
+    "postcss": "^8.5.14",
     "postcss-load-config": "^5.0.3",
     "prettier": "^3.1.1",
     "prettier-plugin-svelte": "^3.2.2",
