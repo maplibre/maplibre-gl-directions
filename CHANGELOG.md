@@ -1,6 +1,6 @@
 ## main
 ### ✨ Features and improvements
-- _...Add new stuff here..._
+- Support MapLibre GL JS 6 while retaining MapLibre GL JS 5 compatibility.
 
 ### 🐞 Bug fixes
 - _...Add new stuff here..._

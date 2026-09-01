@@ -1,4 +1,4 @@
-import type { Map, MapGeoJSONFeature, MapMouseEvent, MapTouchEvent } from "maplibre-gl";
+import type { GeoJSONSource, Map, MapGeoJSONFeature, MapMouseEvent, MapTouchEvent } from "maplibre-gl";
 import type { Directions, MapLibreGlDirectionsConfiguration } from "./types";
 import type { Feature, FeatureCollection, LineString, Point } from "geojson";
 import {
@@ -16,6 +16,17 @@ import {
   type RequestData,
 } from "./utils";
 import { getWaypointsBearings, getWaypointsCoordinates } from "./helpers";
+
+// MapLibre 5 returns nested properties as JSON text, while MapLibre 6 returns objects.
+function normalizeRenderedFeatureProperties(properties: unknown): Record<string, unknown> {
+  const normalizedProperties = typeof properties === "string" ? JSON.parse(properties) : properties;
+
+  if (normalizedProperties && typeof normalizedProperties === "object" && !Array.isArray(normalizedProperties)) {
+    return normalizedProperties as Record<string, unknown>;
+  }
+
+  return {};
+}
 
 /**
  * The main class responsible for all the user interaction and for the routing itself.
@@ -289,7 +300,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     };
 
     if (this.map.getSource(this.configuration.sourceName)) {
-      (this.map.getSource(this.configuration.sourceName) as maplibregl.GeoJSONSource).setData(geoJson);
+      (this.map.getSource(this.configuration.sourceName) as GeoJSONSource).setData(geoJson);
     }
   }
 
@@ -427,10 +438,10 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
           this.hoverpoint = this.buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT", {
             departSnappointProperties: {
-              ...JSON.parse(feature?.properties?.departSnappointProperties ?? "{}"),
+              ...normalizeRenderedFeatureProperties(feature?.properties?.departSnappointProperties),
             },
             arriveSnappointProperties: {
-              ...JSON.parse(feature?.properties?.arriveSnappointProperties ?? "{}"),
+              ...normalizeRenderedFeatureProperties(feature?.properties?.arriveSnappointProperties),
             },
           });
         }
@@ -568,10 +579,10 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
           this.hoverpoint = this.buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT", {
             departSnappointProperties: {
-              ...JSON.parse(feature?.properties?.departSnappointProperties ?? "{}"),
+              ...normalizeRenderedFeatureProperties(feature?.properties?.departSnappointProperties),
             },
             arriveSnappointProperties: {
-              ...JSON.parse(feature?.properties?.arriveSnappointProperties ?? "{}"),
+              ...normalizeRenderedFeatureProperties(feature?.properties?.arriveSnappointProperties),
             },
           });
         }

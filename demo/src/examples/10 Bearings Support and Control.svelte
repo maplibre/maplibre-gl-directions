@@ -3,7 +3,8 @@
   import { examples } from "../router";
   import { location } from "svelte-spa-router";
   import AppSidebar from "../components/AppSidebar.svelte";
-  import maplibregl, { Map, NavigationControl } from "maplibre-gl";
+  import type { Map } from "maplibre-gl";
+  import maplibregl from "../maplibre";
   import "maplibre-gl/dist/maplibre-gl.css";
   import style from "../assets/map/style/style.json?url";
   import MapLibreGlDirections, {
@@ -39,7 +40,7 @@
 
       directions.interactive = true;
 
-      map.addControl(new NavigationControl({}));
+      map.addControl(new maplibregl.NavigationControl({}));
     });
   });
 
