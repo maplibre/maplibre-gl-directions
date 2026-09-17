@@ -30,7 +30,7 @@ _All the processes mentioned in this section are described in more detail in the
 
 Changes to the library sources should be introduced while there's a running `dev:lib` process. You may also want to have a running `dev:doc` process to see how correctly your doc-comments are parsed. Notice however that `dev:doc` does not serve the built documentation static-website somewhere, it just continuously rebuilds it.
 
-The Demo project might be used as a test-stand while working on the library sources. The `dev:demo` process serves the demo project at `localhost:3000` (by default). The Demo project uses the built `/dist` folder to refer to the library (instead of using sources from the `/src` directly), so you may also want to have a running `dev:lib` at the same time.
+The Demo project might be used as a test-stand while working on the library sources. The `dev:demo` process serves the demo project at `localhost:5173` (by default). The Demo project uses the built `/dist` folder to refer to the library (instead of using sources from the `/src` directly), so you may also want to have a running `dev:lib` at the same time.
 
 You may keep any examples you add when creating a PR if you think the changes you were working on are worth a separate example. An additional example by itself (without modifying the library sources) is a good PR candidate as well. The only thing you should remember when introducing any changes to the Demo project is that they are about to be seen by any other person, a potential end-user, so don't go too crazy and provide human-readable explanations of what the example is really meant to show.
 
