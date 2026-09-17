@@ -1,7 +1,6 @@
 {
   "entryPoints": ["src/main.ts"],
   "readme": "doc/MAIN.md",
-  "projectDocuments": ["doc/*.md"],
   "out": "docs/api",
   "includeVersion": true,
   "githubPages": true
