@@ -520,8 +520,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         });
 
         this.waypointBeingDraggedInitialCoordinates = this.waypointBeingDragged?.geometry.coordinates as
-          | [number, number]
-          | undefined;
+          [number, number] | undefined;
 
         if (this.waypointBeingDragged && this.waypointBeingDraggedInitialCoordinates) {
           const beforeMoveWaypointEvent = new MapLibreGlDirectionsCancelableEvent("beforemovewaypoint", e, {
