@@ -54,6 +54,18 @@ The plugin is written 100% in TypeScript and therefore ships with built-in types
 npm i @maplibre/maplibre-gl-directions
 ```
 
+### Compatibility with MapLibre GL JS
+
+Each plugin release supports exactly one MapLibre GL JS major version; support for the previous major is dropped when a new one is added.
+
+| Plugin version | MapLibre GL JS version |
+| -------------- | ---------------------- |
+| 0.10.x+        | 6.x                    |
+| 0.8.x – 0.9.x  | 5.x                    |
+| 0.7.x          | 4.x                    |
+| 0.4.x – 0.6.x  | 3.x                    |
+| 0.1.x – 0.3.x  | 2.x                    |
+
 ## Usage
 
 ```typescript
