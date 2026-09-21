@@ -1,4 +1,4 @@
-import type maplibregl from "maplibre-gl";
+import type * as maplibregl from "maplibre-gl";
 import type { MapLibreGlDirectionsConfiguration, Feature, LineString, Point } from "@maplibre/maplibre-gl-directions";
 import MapLibreGlDirections from "@maplibre/maplibre-gl-directions";
 import { MapLibreGlDirectionsNonCancelableEvent } from "@maplibre/maplibre-gl-directions";

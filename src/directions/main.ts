@@ -1,4 +1,4 @@
-import type { Map, MapGeoJSONFeature, MapMouseEvent, MapTouchEvent } from "maplibre-gl";
+import type { GeoJSONSource, Map, MapGeoJSONFeature, MapMouseEvent, MapTouchEvent } from "maplibre-gl";
 import type { Directions, MapLibreGlDirectionsConfiguration } from "./types";
 import type { Feature, FeatureCollection, LineString, Point } from "geojson";
 import {
@@ -289,7 +289,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
     };
 
     if (this.map.getSource(this.configuration.sourceName)) {
-      (this.map.getSource(this.configuration.sourceName) as maplibregl.GeoJSONSource).setData(geoJson);
+      (this.map.getSource(this.configuration.sourceName) as GeoJSONSource).setData(geoJson);
     }
   }
 
@@ -427,10 +427,10 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
           this.hoverpoint = this.buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT", {
             departSnappointProperties: {
-              ...JSON.parse(feature?.properties?.departSnappointProperties ?? "{}"),
+              ...(feature?.properties?.departSnappointProperties ?? {}),
             },
             arriveSnappointProperties: {
-              ...JSON.parse(feature?.properties?.arriveSnappointProperties ?? "{}"),
+              ...(feature?.properties?.arriveSnappointProperties ?? {}),
             },
           });
         }
@@ -520,8 +520,7 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
         });
 
         this.waypointBeingDraggedInitialCoordinates = this.waypointBeingDragged?.geometry.coordinates as
-          | [number, number]
-          | undefined;
+          [number, number] | undefined;
 
         if (this.waypointBeingDragged && this.waypointBeingDraggedInitialCoordinates) {
           const beforeMoveWaypointEvent = new MapLibreGlDirectionsCancelableEvent("beforemovewaypoint", e, {
@@ -568,10 +567,10 @@ export default class MapLibreGlDirections extends MapLibreGlDirectionsEvented {
 
           this.hoverpoint = this.buildPoint([e.lngLat.lng, e.lngLat.lat], "HOVERPOINT", {
             departSnappointProperties: {
-              ...JSON.parse(feature?.properties?.departSnappointProperties ?? "{}"),
+              ...(feature?.properties?.departSnappointProperties ?? {}),
             },
             arriveSnappointProperties: {
-              ...JSON.parse(feature?.properties?.arriveSnappointProperties ?? "{}"),
+              ...(feature?.properties?.arriveSnappointProperties ?? {}),
             },
           });
         }

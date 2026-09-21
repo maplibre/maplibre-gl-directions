@@ -164,10 +164,11 @@ Behavioral customization in its main comes down to 2 different strategies. In or
 If the answer is "yes", then in most cases all you'd need is to listen to events and react to them appropriately. But if you need some additional data that comes from the server, or some intrinsic plugin's properties, you'd need to extend the {@link default|`MapLibreGlDirections`} superclass with a subclass:
 
 ```typescript
+import type { Map } from "maplibre-gl";
 import MapLibreGlDirections from "@maplibre/maplibre-gl-directions";
 
 class MyCustomDirections extends MapLibreGlDirections {
-  constructor(map: maplibregl.Map, configuration?: Partial<MapLibreGlDirectionsConfiguration>) {
+  constructor(map: Map, configuration?: Partial<MapLibreGlDirectionsConfiguration>) {
     super(map, configuration);
   }
 }

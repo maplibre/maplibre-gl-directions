@@ -8,16 +8,16 @@ For the sakes of your convenience, make sure you've enabled the "Inherited" filt
 
 ## Basic Usage
 
-[[include:BASIC_USAGE.md]]
+{@include ./BASIC_USAGE.md}
 
 ---
 
 ## Controls
 
-[[include:CONTROLS.md]]
+{@include ./CONTROLS.md}
 
 ---
 
 ## Customization
 
-[[include:CUSTOMIZATION.md]]
+{@include ./CUSTOMIZATION.md}
