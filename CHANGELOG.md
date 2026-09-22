@@ -5,6 +5,12 @@
 ### 🐞 Bug fixes
 - _...Add new stuff here..._
 
+## 0.10.1
+### ✨ Features and improvements
+- Add support for MapLibre GL JS 6 and drop support for MapLibre GL JS 5, in line with this project's policy of supporting a single MapLibre GL JS major version per release. Builds on the migration groundwork from [#300](https://github.com/maplibre/maplibre-gl-directions/pull/300) (by [@clementmas](https://github.com/clementmas)).
+
+### 🐞 Bug fixes
+
 ## 0.10.0
 ### ✨ Features and improvements
 - Add support for MapLibre GL JS 6 and drop support for MapLibre GL JS 5, in line with this project's policy of supporting a single MapLibre GL JS major version per release. Builds on the migration groundwork from [#300](https://github.com/maplibre/maplibre-gl-directions/pull/300) (by [@clementmas](https://github.com/clementmas)).
